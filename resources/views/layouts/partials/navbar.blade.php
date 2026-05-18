@@ -2,9 +2,11 @@
 <nav class="navbar">
     <div class="nav-container">
         <div class="nav-left">
+            @if(!(Auth::check() && in_array(Auth::user()->role, ['kakonsli','wali_kelas'])))
             <button id="hamburger" class="hamburger-btn" aria-label="Toggle sidebar">
                 <i class="fas fa-bars"></i>
             </button>
+            @endif
 
             <a href="{{ Auth::check() && Auth::user()->role === 'admin' ? route('admin.dashboard') : (Auth::check() && Auth::user()->role === 'siswa' ? route('siswa.dashboard') : url('/')) }}" class="nav-logo-container">
                 <img src="{{ asset('images/logo-vohisix.png') }}" alt="VOHISIX Logo" class="nav-logo-img">

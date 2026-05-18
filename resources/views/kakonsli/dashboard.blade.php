@@ -593,6 +593,33 @@
         render();
     }
 
+    function showImagePreview(url, studentName) {
+        filePreviewData = {
+            title: `Foto - ${studentName}`,
+            content: `<div style="display:flex; justify-content:center; align-items:center; padding:16px;"><img src="${url}" alt="${studentName}" style="max-width:90vw; max-height:80vh; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2);" onerror="this.src='https://placehold.co/600x600/003056/white?text=User'"></div>`
+        };
+        render();
+    }
+
+    function exportCSV(data) {
+        if (!data || !data.length) {
+            alert('Tidak ada data untuk diekspor');
+            return;
+        }
+        const headers = ['NIS','Nama','Kelas','Perusahaan','Status Lamaran','Berkas'];
+        const rows = data.map(s => [s.nis, s.nama, s.kelas, s.perusahaan || '-', s.status_lamaran, s.berkas]);
+        const csvContent = [headers.join(','), ...rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(','))].join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `kakonsli_export_${new Date().toISOString().slice(0,10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
     function closeFilePreview() {
         filePreviewData = null;
         render();
@@ -634,15 +661,15 @@
                     <div class="dashboard-toolbar-left">
                         <input id="searchInput" class="toolbar-input" type="text" placeholder="Cari Siswa atau NIS..." value="${searchQuery}">
                         <select id="statusSelect" class="toolbar-select custom-select">
-                            ${statusOptions.map(s => `<option value="${s}" ${statusFilter === s ? 'selected' : ''}>${s}</option>`).join('')}
+                            ${statusOptions.map(s => `<option value="${s}" ${statusFilter === s ? 'selected' : ''}>${s}${s === 'Semua Status' ? ' ▾' : ''}</option>`).join('')}
                         </select>
                         <select id="classSelect" class="toolbar-select custom-select">
-                            <option value="" ${selectedClass === '' ? 'selected' : ''}>Semua Kelas</option>
+                            <option value="" ${selectedClass === '' ? 'selected' : ''}>Semua Kelas ▾</option>
                             ${classOptions.map(k => `<option value="${k}" ${selectedClass === k ? 'selected' : ''}>${k}</option>`).join('')}
                         </select>
                     </div>
                     <div class="dashboard-toolbar-right">
-                        <button id="printBtn" class="toolbar-button">Cetak Laporan</button>
+                        <button id="printBtn" class="toolbar-button">Expor</button>
                     </div>
                 </div>
 
@@ -678,7 +705,7 @@
                 html += `
                     <tr>
                         <td style="text-align:center; color:#94a3b8; font-size:0.75rem; font-weight:700;">${index + 1}</td>
-                        <td class="avatar-cell"><img src="${photo}" alt="${student.nama}"></td>
+                        <td class="avatar-cell"><img src="${photo}" alt="${student.nama}" style="cursor:pointer" onclick="showImagePreview('${photo}','${student.nama}')" onerror="this.src='https://placehold.co/100x100/003056/white?text=User'"></td>
                         <td style="font-weight:700; color:#003056;">${student.nama}</td>
                         <td style="color:#64748b; font-size:0.75rem; font-weight:700;">${student.nis}</td>
                         <td><span class="badge ${berkasClass}">${student.berkas}</span></td>
@@ -703,9 +730,6 @@
                 </div>
             </main>
 
-            <footer class="footer-section">
-                © {{ date('Y') }} VOHISIX. Semua hak dilindungi.
-            </footer>
         `;
 
         if (selectedStudent) {
@@ -722,7 +746,7 @@
                                     <div class="modal-field"><span>Status Lamaran</span><strong>${selectedStudent.status_lamaran}</strong></div>
                                     <div class="modal-field"><span>Kelengkapan Berkas</span><strong style="color:${selectedStudent.berkas==='Lengkap' ? '#86efac' : '#fca5a5'}">${selectedStudent.berkas}</strong></div>
                                 </div>
-                                <button class="detail-button" style="width:100%; margin-top:32px;" onclick="closeModal()">Tutup Detail</button>
+                                <button class="detail-button" style="width:100%; margin-top:32px; background-color: rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.18); color:white;" onclick="closeModal()">Tutup Detail</button>
                             </div>
                             <div class="modal-right">
                                 <div class="modal-tabs">
@@ -813,7 +837,7 @@
             selectedStudent = null;
             render();
         });
-        document.getElementById('printBtn')?.addEventListener('click', () => window.print());
+        document.getElementById('printBtn')?.addEventListener('click', () => exportCSV(filteredData));
 
         document.querySelectorAll('.detail-btn').forEach(btn => {
             btn.addEventListener('click', () => {
