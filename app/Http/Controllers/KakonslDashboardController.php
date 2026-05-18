@@ -17,33 +17,44 @@ class KakonslDashboardController extends Controller
         $kelas2 = $user->kelas_second;
         $kelasIds = array_values(array_filter([$kelas1, $kelas2], fn($value) => !is_null($value) && $value !== ''));
 
-        $totalSiswa = Siswa::whereIn('kelas', $kelasIds)->count();
-        $totalBooking = Booking::whereHas('siswa', function($query) use ($kelasIds) {
-            $query->whereIn('kelas', $kelasIds);
+        if ($user->role === 'kakonsli') {
+            $kelasOptions = Siswa::select('kelas')
+                ->distinct()
+                ->orderBy('kelas')
+                ->pluck('kelas')
+                ->values()
+                ->all();
+            $allowedKelas = $kelasOptions;
+        } else {
+            $kelasOptions = Siswa::whereIn('kelas', $kelasIds)
+                ->select('kelas')
+                ->distinct()
+                ->orderBy('kelas')
+                ->pluck('kelas')
+                ->values()
+                ->all();
+            $allowedKelas = $kelasIds;
+        }
+
+        $totalSiswa = Siswa::whereIn('kelas', $allowedKelas)->count();
+        $totalBooking = Booking::whereHas('siswa', function($query) use ($allowedKelas) {
+            $query->whereIn('kelas', $allowedKelas);
         })->count();
         
-        $bookingDireview = Booking::whereHas('siswa', function($query) use ($kelasIds) {
-            $query->whereIn('kelas', $kelasIds);
+        $bookingDireview = Booking::whereHas('siswa', function($query) use ($allowedKelas) {
+            $query->whereIn('kelas', $allowedKelas);
         })->where('status', 'Direview')->count();
         
-        $bookingDiterima = Booking::whereHas('siswa', function($query) use ($kelasIds) {
-            $query->whereIn('kelas', $kelasIds);
+        $bookingDiterima = Booking::whereHas('siswa', function($query) use ($allowedKelas) {
+            $query->whereIn('kelas', $allowedKelas);
         })->where('status', 'Diterima')->count();
         
-        $bookingDitolak = Booking::whereHas('siswa', function($query) use ($kelasIds) {
-            $query->whereIn('kelas', $kelasIds);
+        $bookingDitolak = Booking::whereHas('siswa', function($query) use ($allowedKelas) {
+            $query->whereIn('kelas', $allowedKelas);
         })->where('status', 'Ditolak')->count();
 
-        $kelasOptions = Siswa::whereIn('kelas', $kelasIds)
-            ->select('kelas')
-            ->distinct()
-            ->orderBy('kelas')
-            ->pluck('kelas')
-            ->values()
-            ->all();
-
         $siswas = Siswa::with(['berkas', 'bookings.dudi'])
-            ->whereIn('kelas', $kelasIds)
+            ->whereIn('kelas', $allowedKelas)
             ->get()
             ->map(function ($siswa) {
                 $latestBooking = $siswa->bookings->sortByDesc('created_at')->first();

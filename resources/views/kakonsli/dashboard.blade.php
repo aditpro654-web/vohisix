@@ -527,7 +527,7 @@
     const PAGE_TITLE = 'Dashboard Ketua Jurusan';
     const PAGE_SUBTITLE = 'Booking PKL SMKN 6 Malang • Manajemen Semua Kelas';
 
-    let selectedClass = classOptions.length ? classOptions[0] : '';
+    let selectedClass = '';
     let searchQuery = '';
     let statusFilter = 'Semua Status';
     let selectedStudent = null;
@@ -637,6 +637,7 @@
                     </div>
                     <div class="dashboard-toolbar-right">
                         <select id="classSelect" class="custom-select">
+                            <option value="" ${selectedClass === '' ? 'selected' : ''}>Semua Kelas</option>
                             ${classOptions.map(k => `<option value="${k}" ${selectedClass === k ? 'selected' : ''}>${k}</option>`).join('')}
                         </select>
                         <button id="printBtn" class="toolbar-button">Cetak Laporan</button>
