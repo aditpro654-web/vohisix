@@ -300,6 +300,24 @@
         border: 1px solid #fde68a;
     }
 
+    .table-summary-bar {
+        background-color: white;
+        color: #475569;
+        padding: 14px 24px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .table-summary-bar span {
+        color: #475569;
+        font-size: 0.75rem;
+    }
+
     .detail-button {
         background-color: #003056;
         color: white;
@@ -538,8 +556,9 @@
     let filePreviewData = null;
 
     function getStatusClass(status) {
-        if (status === 'Diterima') return 'badge-diterima';
-        if (status === 'Ditolak') return 'badge-ditolak';
+        const normalized = String(status || '').trim().toLowerCase();
+        if (normalized === 'diterima') return 'badge-diterima';
+        if (normalized === 'ditolak') return 'badge-ditolak';
         return 'badge-direview';
     }
 
@@ -666,7 +685,7 @@
                             ${statusOptions.map(s => `<option value="${s}" ${statusFilter === s ? 'selected' : ''}>${s}</option>`).join('')}
                         </select>
                         <select id="classSelect" class="toolbar-select custom-select">
-                            <option value="" ${selectedClass === '' ? 'selected' : ''}>Semua Kelas ▾</option>
+                            <option value="" ${selectedClass === '' ? 'selected' : ''}>Semua Kelas</option>
                             ${classOptions.map(k => `<option value="${k}" ${selectedClass === k ? 'selected' : ''}>${k}</option>`).join('')}
                         </select>
                     </div>
@@ -726,7 +745,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div style="background-color: #003056; color: rgba(255,255,255,0.7); padding: 16px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">
+                <div class="table-summary-bar">
                     <span>Kelas: ${selectedClass || '-'} | Total data: ${filteredData.length} dari ${stats.total} Siswa</span>
                     <span>Update: ${formattedDate}, ${formattedTime}</span>
                 </div>
