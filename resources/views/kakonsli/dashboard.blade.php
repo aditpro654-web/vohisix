@@ -23,6 +23,10 @@
         appearance: none;
         -webkit-appearance: none;
         -moz-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23FFFFFF' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+        background-position: right 12px center;
+        background-repeat: no-repeat;
+        background-size: 16px;
         padding-right: 40px;
     }
 
@@ -96,9 +100,9 @@
     }
 
     .kakonsli-dashboard {
-        max-width: 1440px;
+        max-width: 1500px;
         margin: 0 auto;
-        padding: 28px 32px 40px;
+        padding: 24px 24px 40px;
     }
 
     header.kakonsli-header {
@@ -162,7 +166,6 @@
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         overflow: hidden;
         margin-top: 32px;
-        padding-bottom: 24px;
     }
 
     .dashboard-toolbar {
@@ -218,20 +221,17 @@
     .dashboard-table-wrapper {
         overflow-x: auto;
         background-color: white;
-        padding: 0 24px 18px;
-        margin-top: 0;
     }
 
     table.dashboard-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 860px;
-        max-width: none;
+        min-width: 640px;
     }
 
     table.dashboard-table th,
     table.dashboard-table td {
-        padding: 18px 24px;
+        padding: 16px 24px;
         text-align: left;
         vertical-align: middle;
         font-size: 0.875rem;
@@ -282,39 +282,21 @@
     }
 
     .badge-diterima {
-        background-color: #d1fae5;
-        color: #166534;
-        border: 1px solid #86efac;
+        background-color: #dcfce7;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
     }
 
     .badge-ditolak {
         background-color: #fee2e2;
-        color: #991b1b;
-        border: 1px solid #fca5a5;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
     }
 
     .badge-direview {
-        background-color: #ffedd5;
-        color: #9a3412;
-        border: 1px solid #fdba74;
-    }
-
-    .table-summary-bar {
-        background-color: white;
-        color: #475569;
-        padding: 12px 24px;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        gap: 10px;
-        font-size: 0.72rem;
-        font-weight: 600;
-        border-top: 1px solid #e2e8f0;
-    }
-
-    .table-summary-bar span {
-        color: #475569;
-        font-size: 0.72rem;
+        background-color: #fef3c7;
+        color: #b45309;
+        border: 1px solid #fde68a;
     }
 
     .detail-button {
@@ -555,9 +537,9 @@
     let filePreviewData = null;
 
     function getStatusClass(status) {
-        const normalized = String(status || '').trim().toLowerCase();
-        if (normalized === 'diterima') return 'badge-diterima';
-        if (normalized === 'ditolak') return 'badge-ditolak';
+        const normalized = (status || '').toString().trim().toLowerCase();
+        if (normalized === 'diterima' || normalized === 'diterima') return 'badge-diterima';
+        if (normalized === 'ditolak' || normalized === 'ditolak') return 'badge-ditolak';
         return 'badge-direview';
     }
 
@@ -571,26 +553,17 @@
             const matchesSearch = student.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 student.nis.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 (student.perusahaan || '').toLowerCase().includes(searchQuery.toLowerCase());
-            const studentStatus = String(student.status_lamaran || '').trim().toLowerCase();
-            const expectedStatus = String(statusFilter || '').trim().toLowerCase();
-            const matchesStatus = expectedStatus === 'semua status' || studentStatus === expectedStatus;
+            const matchesStatus = statusFilter === 'Semua Status' || student.status_lamaran === statusFilter;
             return matchesClass && matchesSearch && matchesStatus;
         });
-    }
-
-    function getStatusLabel(status) {
-        const normalized = String(status || '').trim().toLowerCase();
-        if (normalized === 'diterima') return 'Diterima';
-        if (normalized === 'ditolak') return 'Ditolak';
-        return 'Direview';
     }
 
     function getStats() {
         const students = SISWAS.filter(student => selectedClass ? student.kelas === selectedClass : true);
         return {
             total: students.length,
-            ditempatkan: students.filter(student => String(student.status_lamaran || '').trim().toLowerCase() === 'diterima').length,
-            berkasKurang: students.filter(student => String(student.berkas || '').trim().toLowerCase() === 'kurang').length,
+            ditempatkan: students.filter(student => student.status_lamaran === 'Diterima').length,
+            berkasKurang: students.filter(student => student.berkas === 'Kurang').length,
         };
     }
 
@@ -742,7 +715,7 @@
                             <div style="font-weight:700; color:#334155; font-size:0.875rem;">${student.perusahaan || '-'}</div>
                             <div style="font-size:10px; color:#94a3b8;">${student.bidang_industri || '-'}</div>
                         </td>
-                        <td style="text-align:center;"><span class="badge ${badgeClass}">${getStatusLabel(student.status_lamaran)}</span></td>
+                        <td style="text-align:center;"><span class="badge ${badgeClass}">${student.status_lamaran}</span></td>
                         <td style="text-align:center;"><button class="detail-btn" data-id="${student.id}" style="background-color: #003056; color: white; padding: 6px 14px; border-radius: 8px; font-size: 10px; font-weight: 700; border: none; cursor: pointer;">Detail</button></td>
                     </tr>
                 `;
@@ -753,7 +726,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="table-summary-bar">
+                <div style="background-color: #003056; color: rgba(255,255,255,0.7); padding: 16px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">
                     <span>Kelas: ${selectedClass || '-'} | Total data: ${filteredData.length} dari ${stats.total} Siswa</span>
                     <span>Update: ${formattedDate}, ${formattedTime}</span>
                 </div>
