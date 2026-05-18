@@ -522,7 +522,7 @@
 
 @push('scripts')
 <script>
-    const SISWAS = @json($siswas);
+    const SISWAS = @json($siswas ?? []);
     const classOptions = @json($kelasOptions ?? []);
     const PAGE_TITLE = 'Dashboard Ketua Jurusan';
     const PAGE_SUBTITLE = 'Booking PKL SMKN 6 Malang • Manajemen Semua Kelas';
@@ -784,7 +784,13 @@
             `;
         }
 
-        document.getElementById('root').innerHTML = html;
+        const root = document.getElementById('root');
+        if (!root) {
+            console.error('Root element not found');
+            return;
+        }
+
+        root.innerHTML = html;
 
         console.log('HTML set to root element, adding event listeners...');
         const searchInput = document.getElementById('searchInput');
@@ -811,7 +817,7 @@
         document.querySelectorAll('.detail-button').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-id');
-                selectedStudent = SISWAS.find(item => item.id === id);
+                selectedStudent = SISWAS.find(item => String(item.id) === String(id));
                 activeTab = 'berkas';
                 render();
             });

@@ -15,25 +15,26 @@ class KakonslDashboardController extends Controller
         $user = auth()->user();
         $kelas1 = $user->kelas_id;
         $kelas2 = $user->kelas_second;
+        $kelasIds = array_values(array_filter([$kelas1, $kelas2], fn($value) => !is_null($value) && $value !== ''));
 
-        $totalSiswa = Siswa::whereIn('kelas', [$kelas1, $kelas2])->count();
-        $totalBooking = Booking::whereHas('siswa', function($query) use ($kelas1, $kelas2) {
-            $query->whereIn('kelas', [$kelas1, $kelas2]);
+        $totalSiswa = Siswa::whereIn('kelas', $kelasIds)->count();
+        $totalBooking = Booking::whereHas('siswa', function($query) use ($kelasIds) {
+            $query->whereIn('kelas', $kelasIds);
         })->count();
         
-        $bookingDireview = Booking::whereHas('siswa', function($query) use ($kelas1, $kelas2) {
-            $query->whereIn('kelas', [$kelas1, $kelas2]);
+        $bookingDireview = Booking::whereHas('siswa', function($query) use ($kelasIds) {
+            $query->whereIn('kelas', $kelasIds);
         })->where('status', 'Direview')->count();
         
-        $bookingDiterima = Booking::whereHas('siswa', function($query) use ($kelas1, $kelas2) {
-            $query->whereIn('kelas', [$kelas1, $kelas2]);
+        $bookingDiterima = Booking::whereHas('siswa', function($query) use ($kelasIds) {
+            $query->whereIn('kelas', $kelasIds);
         })->where('status', 'Diterima')->count();
         
-        $bookingDitolak = Booking::whereHas('siswa', function($query) use ($kelas1, $kelas2) {
-            $query->whereIn('kelas', [$kelas1, $kelas2]);
+        $bookingDitolak = Booking::whereHas('siswa', function($query) use ($kelasIds) {
+            $query->whereIn('kelas', $kelasIds);
         })->where('status', 'Ditolak')->count();
 
-        $kelasOptions = Siswa::whereIn('kelas', [$kelas1, $kelas2])
+        $kelasOptions = Siswa::whereIn('kelas', $kelasIds)
             ->select('kelas')
             ->distinct()
             ->orderBy('kelas')
@@ -42,7 +43,7 @@ class KakonslDashboardController extends Controller
             ->all();
 
         $siswas = Siswa::with(['berkas', 'bookings.dudi'])
-            ->whereIn('kelas', [$kelas1, $kelas2])
+            ->whereIn('kelas', $kelasIds)
             ->get()
             ->map(function ($siswa) {
                 $latestBooking = $siswa->bookings->sortByDesc('created_at')->first();
