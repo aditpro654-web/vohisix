@@ -221,17 +221,18 @@
     .dashboard-table-wrapper {
         overflow-x: auto;
         background-color: white;
+        padding: 8px 12px;
     }
 
     table.dashboard-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 640px;
+        min-width: 980px;
     }
 
     table.dashboard-table th,
     table.dashboard-table td {
-        padding: 16px 24px;
+        padding: 18px 24px;
         text-align: left;
         vertical-align: middle;
         font-size: 0.875rem;
@@ -608,7 +609,8 @@
         }
         const headers = ['NIS','Nama','Kelas','Perusahaan','Status Lamaran','Berkas'];
         const rows = data.map(s => [s.nis, s.nama, s.kelas, s.perusahaan || '-', s.status_lamaran, s.berkas]);
-        const csvContent = [headers.join(','), ...rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(','))].join('\n');
+        const csvBody = [headers.join(';'), ...rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';'))].join('\r\n');
+        const csvContent = '\uFEFF' + csvBody;
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -661,7 +663,7 @@
                     <div class="dashboard-toolbar-left">
                         <input id="searchInput" class="toolbar-input" type="text" placeholder="Cari Siswa atau NIS..." value="${searchQuery}">
                         <select id="statusSelect" class="toolbar-select custom-select">
-                            ${statusOptions.map(s => `<option value="${s}" ${statusFilter === s ? 'selected' : ''}>${s}${s === 'Semua Status' ? ' ▾' : ''}</option>`).join('')}
+                            ${statusOptions.map(s => `<option value="${s}" ${statusFilter === s ? 'selected' : ''}>${s}</option>`).join('')}
                         </select>
                         <select id="classSelect" class="toolbar-select custom-select">
                             <option value="" ${selectedClass === '' ? 'selected' : ''}>Semua Kelas ▾</option>
