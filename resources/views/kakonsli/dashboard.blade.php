@@ -27,6 +27,7 @@
         background-position: right 12px center;
         background-repeat: no-repeat;
         background-size: 16px;
+        padding-right: 40px;
     }
 
     select {
@@ -34,6 +35,7 @@
         color: white !important;
         border-radius: 16px !important;
         cursor: pointer;
+        padding-right: 40px;
     }
 
     select option {
@@ -444,7 +446,7 @@
         padding: 20px 0 0;
     }
 
-    .document-card {
+    .berkas-item-click {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -454,11 +456,11 @@
         cursor: pointer;
     }
 
-    .document-card:hover {
+    .berkas-item-click:hover {
         background: #eef2ff;
     }
 
-    .document-card span {
+    .berkas-item-click span {
         font-weight: 700;
     }
 
@@ -634,12 +636,12 @@
                         <select id="statusSelect" class="toolbar-select custom-select">
                             ${statusOptions.map(s => `<option value="${s}" ${statusFilter === s ? 'selected' : ''}>${s}</option>`).join('')}
                         </select>
-                    </div>
-                    <div class="dashboard-toolbar-right">
-                        <select id="classSelect" class="custom-select">
+                        <select id="classSelect" class="toolbar-select custom-select">
                             <option value="" ${selectedClass === '' ? 'selected' : ''}>Semua Kelas</option>
                             ${classOptions.map(k => `<option value="${k}" ${selectedClass === k ? 'selected' : ''}>${k}</option>`).join('')}
                         </select>
+                    </div>
+                    <div class="dashboard-toolbar-right">
                         <button id="printBtn" class="toolbar-button">Cetak Laporan</button>
                     </div>
                 </div>
@@ -664,9 +666,7 @@
         if (!filteredData.length) {
             html += `
                 <tr>
-                    <td colspan="8">
-                        <div class="empty-state">Data tidak ditemukan</div>
-                    </td>
+                    <td colspan="8" style="padding: 80px 24px; text-align: center; color: #94a3b8;">Data tidak ditemukan</td>
                 </tr>
             `;
         } else {
@@ -687,7 +687,7 @@
                             <div style="font-size:10px; color:#94a3b8;">${student.bidang_industri || '-'}</div>
                         </td>
                         <td style="text-align:center;"><span class="badge ${badgeClass}">${student.status_lamaran}</span></td>
-                        <td style="text-align:center;"><button class="detail-button" data-id="${student.id}">Detail</button></td>
+                        <td style="text-align:center;"><button class="detail-btn" data-id="${student.id}" style="background-color: #003056; color: white; padding: 6px 14px; border-radius: 8px; font-size: 10px; font-weight: 700; border: none; cursor: pointer;">Detail</button></td>
                     </tr>
                 `;
             });
@@ -698,7 +698,7 @@
                     </table>
                 </div>
                 <div style="background-color: #003056; color: rgba(255,255,255,0.7); padding: 16px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">
-                    <span>Kelas: ${selectedClass || '-'} | Total data: ${filteredData.length} dari ${stats.total} siswa</span>
+                    <span>Kelas: ${selectedClass || '-'} | Total data: ${filteredData.length} dari ${stats.total} Siswa</span>
                     <span>Update: ${formattedDate}, ${formattedTime}</span>
                 </div>
             </main>
@@ -733,15 +733,15 @@
             `;
             if (activeTab === 'berkas') {
                 html += `
-                    <div class="document-card" data-berkas="KTP/KIA" data-status="${selectedStudent.berkas_files.ktp.status}">
+                    <div class="berkas-item-click" data-berkas="KTP/KIA" data-status="${selectedStudent.berkas_files.ktp.status}">
                         <span>📄 KTP / KIA</span>
                         <span class="badge ${selectedStudent.berkas_files.ktp.status === 'Selesai' ? 'badge-diterima' : 'badge-direview'}">${selectedStudent.berkas_files.ktp.status}</span>
                     </div>
-                    <div class="document-card" data-berkas="Surat Sehat" data-status="${selectedStudent.berkas_files.sehat.status}">
+                    <div class="berkas-item-click" data-berkas="Surat Sehat" data-status="${selectedStudent.berkas_files.sehat.status}">
                         <span>🏥 Surat Sehat</span>
                         <span class="badge ${selectedStudent.berkas_files.sehat.status === 'Selesai' ? 'badge-diterima' : 'badge-direview'}">${selectedStudent.berkas_files.sehat.status}</span>
                     </div>
-                    <div class="document-card" data-berkas="BPJS Ketenagakerjaan" data-status="${selectedStudent.berkas_files.bpjs.status}">
+                    <div class="berkas-item-click" data-berkas="BPJS Ketenagakerjaan" data-status="${selectedStudent.berkas_files.bpjs.status}">
                         <span>🛡️ BPJS Ketenagakerjaan</span>
                         <span class="badge ${selectedStudent.berkas_files.bpjs.status === 'Selesai' ? 'badge-diterima' : (selectedStudent.berkas_files.bpjs.status === 'Proses' ? 'badge-diterima' : 'badge-direview')}">${selectedStudent.berkas_files.bpjs.status}</span>
                     </div>
@@ -815,7 +815,7 @@
         });
         document.getElementById('printBtn')?.addEventListener('click', () => window.print());
 
-        document.querySelectorAll('.detail-button').forEach(btn => {
+        document.querySelectorAll('.detail-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-id');
                 selectedStudent = SISWAS.find(item => String(item.id) === String(id));
@@ -834,7 +834,7 @@
             
             tabBerkasBtn?.addEventListener('click', () => { activeTab = 'berkas'; render(); });
             tabPerusahaanBtn?.addEventListener('click', () => { activeTab = 'perusahaan'; render(); });
-            document.querySelectorAll('.document-card').forEach(el => {
+            document.querySelectorAll('.berkas-item-click').forEach(el => {
                 el.addEventListener('click', () => {
                     const berkasName = el.getAttribute('data-berkas');
                     const statusVal = el.getAttribute('data-status');
