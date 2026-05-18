@@ -1,23 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Dashboard Ketua Jurusan - Booking PKL</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif; background-color: #f8fafc; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+            background-color: #f8fafc;
+        }
+
         input:focus { outline: none; }
         input::placeholder { color: #cbd5e1; }
-        
-        /* Custom select styling */
+
         .custom-select {
             appearance: none;
             -webkit-appearance: none;
@@ -27,16 +29,14 @@
             background-repeat: no-repeat;
             background-size: 16px;
         }
-        
-        /* Style untuk select container */
+
         select {
             background-color: #003056 !important;
             color: white !important;
             border-radius: 16px !important;
             cursor: pointer;
         }
-        
-        /* Style untuk select option - melengkung, border putih, teks kecil */
+
         select option {
             background-color: #003056 !important;
             color: white !important;
@@ -49,27 +49,24 @@
             margin: 4px 8px !important;
             width: calc(100% - 16px) !important;
         }
-        
-        /* Hover effect untuk option */
+
         select option:hover {
             background-color: #00457d !important;
             color: white !important;
             border-color: rgba(255, 255, 255, 0.6) !important;
         }
-        
-        /* Style untuk select dropdown list */
+
         select:focus {
             outline: none;
             ring: 2px solid white;
         }
-        
-        /* Untuk select di dalam toolbar yang background transparan */
+
         .toolbar-select {
             background-color: rgba(255, 255, 255, 0.1) !important;
             color: white !important;
             border-radius: 16px !important;
         }
-        
+
         .toolbar-select option {
             background-color: #003056 !important;
             color: white !important;
@@ -77,26 +74,122 @@
             border-radius: 12px !important;
             margin: 4px 8px !important;
         }
-        
+
         .toolbar-select option:hover {
             background-color: #00457d !important;
             border-color: rgba(255, 255, 255, 0.6) !important;
         }
-        
-        /* Styling untuk dropdown container */
-        select optgroup {
-            background-color: #003056 !important;
-            color: white !important;
-            border-radius: 16px !important;
+
+        .badge-diterima {
+            background-color: #dcfce7;
+            color: #15803d;
+            border-color: #bbf7d0;
         }
+        .badge-ditolak {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border-color: #fecaca;
+        }
+        .badge-direview {
+            background-color: #fef3c7;
+            color: #b45309;
+            border-color: #fde68a;
+        }
+        .badge-lengkap {
+            background-color: #dcfce7;
+            color: #15803d;
+            border-color: #bbf7d0;
+        }
+        .badge-kurang {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border-color: #fecaca;
+        }
+
+        .modal-detail-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-height: 90vh;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+            .modal-detail-container {
+                flex-direction: row;
+                max-width: 1100px;
+                width: 100%;
+            }
+            .modal-left-profile {
+                width: 320px;
+                flex-shrink: 0;
+            }
+            .modal-right-content {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+        }
+
+        .modal-right-scroll {
+            flex: 1;
+            padding: 20px;
+            overflow-y: visible;
+        }
+
+        .berkas-item-click {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .berkas-item-click:hover {
+            background-color: #eef2ff !important;
+        }
+
+        .file-preview-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(4px);
+        }
+        .file-preview-card {
+            background: white;
+            border-radius: 28px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 40px -12px black;
+            animation: scaleIn 0.2s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        table {
+            min-width: 640px;
+        }
+        th, td {
+            white-space: nowrap;
+        }
+        td:first-child, th:first-child { white-space: normal; }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useMemo } = React;
-
+    <script>
         const MOCK_DUDI = [
             { id: 1, nama_dudi: "PT. Teknologi Bangsa Software", alamat: "Jl. Merdeka No. 45, Jakarta Pusat", jam_berangkat: "08:00", jam_pulang: "17:00", bidang_industri: "Software Development", jumlah_pegawai: "150+", website: "www.tekbangsa.com", telepon: "021-5556677", email: "hrd@tekbangsa.com", kuota: 5, penanggung_jawab: "Siska Amelia", terdaftar: 2 },
             { id: 2, nama_dudi: "Digital Creative Hub", alamat: "Gedung Cyber 2, Lt. 10, Jakarta Selatan", jam_berangkat: "09:00", jam_pulang: "18:00", bidang_industri: "Digital Marketing", jumlah_pegawai: "45", website: "www.creativehub.id", telepon: "021-8889900", email: "contact@creativehub.id", kuota: 3, penanggung_jawab: "Budi Santoso", terdaftar: 3 },
@@ -105,270 +198,310 @@
 
         const MOCK_STUDENTS_BY_CLASS = {
             "XIII SIJA 1": [
-                { id: 1, nama: "Aril Pratama", nis: "210231", foto: "https://randomuser.me/api/portraits/men/1.jpg", status_lamaran: "Direview", berkas: "Lengkap", perusahaan_id: 1, berkas_files: { ktp: { status: "Selesai", date: "03 Nov 2025" }, sehat: { status: "Selesai", date: "04 Nov 2025" }, bpjs: { status: "Proses", date: "-" } } },
-                { id: 2, nama: "Melvin", nis: "210232", foto: "https://randomuser.me/api/portraits/men/2.jpg", status_lamaran: "Diterima", berkas: "Lengkap", perusahaan_id: 2, berkas_files: { ktp: { status: "Selesai", date: "01 Nov 2025" }, sehat: { status: "Selesai", date: "02 Nov 2025" }, bpjs: { status: "Selesai", date: "05 Nov 2025" } } },
-                { id: 3, nama: "Lintang", nis: "210233", foto: "https://randomuser.me/api/portraits/women/1.jpg", status_lamaran: "Ditolak", berkas: "Kurang", perusahaan_id: 3, berkas_files: { ktp: { status: "Selesai", date: "30 Oct 2025" }, sehat: { status: "Belum", date: "-" }, bpjs: { status: "Belum", date: "-" } } },
-                { id: 4, nama: "Dewi Sartika", nis: "210234", foto: "https://randomuser.me/api/portraits/women/2.jpg", status_lamaran: "Diterima", berkas: "Lengkap", perusahaan_id: 1, berkas_files: { ktp: { status: "Selesai", date: "02 Nov 2025" }, sehat: { status: "Selesai", date: "03 Nov 2025" }, bpjs: { status: "Selesai", date: "04 Nov 2025" } } },
-                { id: 5, nama: "Bima Sakti", nis: "210235", foto: "https://randomuser.me/api/portraits/men/3.jpg", status_lamaran: "Direview", berkas: "Kurang", perusahaan_id: 2, berkas_files: { ktp: { status: "Selesai", date: "01 Nov 2025" }, sehat: { status: "Belum", date: "-" }, bpjs: { status: "Belum", date: "-" } } }
+                { id: 1, nama: "Aril Pratama", nis: "210231", foto: "https://randomuser.me/api/portraits/men/1.jpg", status_lamaran: "Direview", berkas: "Lengkap", perusahaan_id: 1, berkas_files: { ktp: { status: "Selesai", date: "03 Nov 2025", file_url: null }, sehat: { status: "Selesai", date: "04 Nov 2025", file_url: null }, bpjs: { status: "Proses", date: "-", file_url: null } } },
+                { id: 2, nama: "Melvin", nis: "210232", foto: "https://randomuser.me/api/portraits/men/2.jpg", status_lamaran: "Diterima", berkas: "Lengkap", perusahaan_id: 2, berkas_files: { ktp: { status: "Selesai", date: "01 Nov 2025", file_url: null }, sehat: { status: "Selesai", date: "02 Nov 2025", file_url: null }, bpjs: { status: "Selesai", date: "05 Nov 2025", file_url: null } } },
+                { id: 3, nama: "Lintang", nis: "210233", foto: "https://randomuser.me/api/portraits/women/1.jpg", status_lamaran: "Ditolak", berkas: "Kurang", perusahaan_id: 3, berkas_files: { ktp: { status: "Selesai", date: "30 Oct 2025", file_url: null }, sehat: { status: "Belum", date: "-", file_url: null }, bpjs: { status: "Belum", date: "-", file_url: null } } },
+                { id: 4, nama: "Dewi Sartika", nis: "210234", foto: "https://randomuser.me/api/portraits/women/2.jpg", status_lamaran: "Diterima", berkas: "Lengkap", perusahaan_id: 1, berkas_files: { ktp: { status: "Selesai", date: "02 Nov 2025", file_url: null }, sehat: { status: "Selesai", date: "03 Nov 2025", file_url: null }, bpjs: { status: "Selesai", date: "04 Nov 2025", file_url: null } } },
+                { id: 5, nama: "Bima Sakti", nis: "210235", foto: "https://randomuser.me/api/portraits/men/3.jpg", status_lamaran: "Direview", berkas: "Kurang", perusahaan_id: 2, berkas_files: { ktp: { status: "Selesai", date: "01 Nov 2025", file_url: null }, sehat: { status: "Belum", date: "-", file_url: null }, bpjs: { status: "Belum", date: "-", file_url: null } } }
             ],
             "XIII SIJA 2": [
-                { id: 6, nama: "Siti Aminah", nis: "210236", foto: "https://randomuser.me/api/portraits/women/3.jpg", status_lamaran: "Diterima", berkas: "Lengkap", perusahaan_id: 2, berkas_files: { ktp: { status: "Selesai", date: "05 Nov 2025" }, sehat: { status: "Selesai", date: "06 Nov 2025" }, bpjs: { status: "Selesai", date: "07 Nov 2025" } } },
-                { id: 7, nama: "Rizki Fadillah", nis: "210237", foto: "https://randomuser.me/api/portraits/men/4.jpg", status_lamaran: "Direview", berkas: "Lengkap", perusahaan_id: 3, berkas_files: { ktp: { status: "Selesai", date: "04 Nov 2025" }, sehat: { status: "Selesai", date: "05 Nov 2025" }, bpjs: { status: "Proses", date: "-" } } },
-                { id: 8, nama: "Nadia Putri", nis: "210238", foto: "https://randomuser.me/api/portraits/women/4.jpg", status_lamaran: "Ditolak", berkas: "Kurang", perusahaan_id: 1, berkas_files: { ktp: { status: "Selesai", date: "03 Nov 2025" }, sehat: { status: "Belum", date: "-" }, bpjs: { status: "Belum", date: "-" } } },
-                { id: 9, nama: "Andi Wijaya", nis: "210239", foto: "https://randomuser.me/api/portraits/men/5.jpg", status_lamaran: "Diterima", berkas: "Lengkap", perusahaan_id: 2, berkas_files: { ktp: { status: "Selesai", date: "06 Nov 2025" }, sehat: { status: "Selesai", date: "07 Nov 2025" }, bpjs: { status: "Selesai", date: "08 Nov 2025" } } },
-                { id: 10, nama: "Maya Sari", nis: "210240", foto: "https://randomuser.me/api/portraits/women/5.jpg", status_lamaran: "Direview", berkas: "Lengkap", perusahaan_id: 3, berkas_files: { ktp: { status: "Selesai", date: "05 Nov 2025" }, sehat: { status: "Selesai", date: "06 Nov 2025" }, bpjs: { status: "Proses", date: "-" } } }
+                { id: 6, nama: "Siti Aminah", nis: "210236", foto: "https://randomuser.me/api/portraits/women/3.jpg", status_lamaran: "Diterima", berkas: "Lengkap", perusahaan_id: 2, berkas_files: { ktp: { status: "Selesai", date: "05 Nov 2025", file_url: null }, sehat: { status: "Selesai", date: "06 Nov 2025", file_url: null }, bpjs: { status: "Selesai", date: "07 Nov 2025", file_url: null } } },
+                { id: 7, nama: "Rizki Fadillah", nis: "210237", foto: "https://randomuser.me/api/portraits/men/4.jpg", status_lamaran: "Direview", berkas: "Lengkap", perusahaan_id: 3, berkas_files: { ktp: { status: "Selesai", date: "04 Nov 2025", file_url: null }, sehat: { status: "Selesai", date: "05 Nov 2025", file_url: null }, bpjs: { status: "Proses", date: "-", file_url: null } } },
+                { id: 8, nama: "Nadia Putri", nis: "210238", foto: "https://randomuser.me/api/portraits/women/4.jpg", status_lamaran: "Ditolak", berkas: "Kurang", perusahaan_id: 1, berkas_files: { ktp: { status: "Selesai", date: "03 Nov 2025", file_url: null }, sehat: { status: "Belum", date: "-", file_url: null }, bpjs: { status: "Belum", date: "-", file_url: null } } },
+                { id: 9, nama: "Andi Wijaya", nis: "210239", foto: "https://randomuser.me/api/portraits/men/5.jpg", status_lamaran: "Diterima", berkas: "Lengkap", perusahaan_id: 2, berkas_files: { ktp: { status: "Selesai", date: "06 Nov 2025", file_url: null }, sehat: { status: "Selesai", date: "07 Nov 2025", file_url: null }, bpjs: { status: "Selesai", date: "08 Nov 2025", file_url: null } } },
+                { id: 10, nama: "Maya Sari", nis: "210240", foto: "https://randomuser.me/api/portraits/women/5.jpg", status_lamaran: "Direview", berkas: "Lengkap", perusahaan_id: 3, berkas_files: { ktp: { status: "Selesai", date: "05 Nov 2025", file_url: null }, sehat: { status: "Selesai", date: "06 Nov 2025", file_url: null }, bpjs: { status: "Proses", date: "-", file_url: null } } }
             ]
         };
 
-        function App() {
-            const [search, setSearch] = useState("");
-            const [statusFilter, setStatusFilter] = useState("Semua Status");
-            const [selectedClass, setSelectedClass] = useState("XIII SIJA 1");
-            const [selectedStudent, setSelectedStudent] = useState(null);
-            const [activeTab, setActiveTab] = useState('berkas');
+        let selectedClass = "XIII SIJA 1";
+        let searchQuery = "";
+        let statusFilter = "Semua Status";
+        let selectedStudent = null;
+        let activeTab = "berkas";
+        let filePreviewData = null;
 
-            const currentStudents = MOCK_STUDENTS_BY_CLASS[selectedClass] || [];
+        function getStatusClass(status) {
+            if (status === "Diterima") return "badge-diterima";
+            if (status === "Ditolak") return "badge-ditolak";
+            return "badge-direview";
+        }
 
-            const filteredData = useMemo(() => {
-                return currentStudents.filter(student => {
-                    const dudi = MOCK_DUDI.find(d => d.id === student.perusahaan_id);
-                    const matchesSearch = student.nama.toLowerCase().includes(search.toLowerCase()) || 
-                                        student.nis.includes(search) ||
-                                        (dudi && dudi.nama_dudi.toLowerCase().includes(search.toLowerCase()));
-                    const matchesStatus = statusFilter === "Semua Status" || student.status_lamaran === statusFilter;
-                    return matchesSearch && matchesStatus;
-                });
-            }, [search, statusFilter, currentStudents]);
+        function getBerkasClass(berkas) {
+            return berkas === "Lengkap" ? "badge-lengkap" : "badge-kurang";
+        }
 
-            const totalSiswa = currentStudents.length;
-            const sudahDitempatkan = currentStudents.filter(s => s.status_lamaran === "Diterima").length;
-            const berkasKurang = currentStudents.filter(s => s.berkas === "Kurang").length;
+        function getFilteredData() {
+            const students = MOCK_STUDENTS_BY_CLASS[selectedClass] || [];
+            return students.filter(student => {
+                const dudi = MOCK_DUDI.find(d => d.id === student.perusahaan_id);
+                const matchesSearch = student.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                    student.nis.includes(searchQuery) ||
+                                    (dudi && dudi.nama_dudi.toLowerCase().includes(searchQuery.toLowerCase()));
+                const matchesStatus = statusFilter === "Semua Status" || student.status_lamaran === statusFilter;
+                return matchesSearch && matchesStatus;
+            });
+        }
 
-            function getStatusColor(status) {
-                if (status === "Diterima") return "bg-green-100 text-green-700 border-green-200";
-                if (status === "Ditolak") return "bg-red-100 text-red-700 border-red-200";
-                return "bg-amber-100 text-amber-700 border-amber-200";
-            }
+        function getStats() {
+            const students = MOCK_STUDENTS_BY_CLASS[selectedClass] || [];
+            const total = students.length;
+            const ditempatkan = students.filter(s => s.status_lamaran === "Diterima").length;
+            const berkasKurang = students.filter(s => s.berkas === "Kurang").length;
+            return { total, ditempatkan, berkasKurang };
+        }
 
-            function getBerkasColor(status) {
-                return status === "Lengkap" ? "text-green-600 bg-green-50 border-green-100" : "text-red-500 bg-red-50 border-red-100";
-            }
-
+        function formatDate() {
             const today = new Date();
             const formattedDate = today.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
             const formattedTime = today.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            return { formattedDate, formattedTime };
+        }
 
+        function showFilePreview(berkasType, studentName, statusFile) {
+            let fileName = `${berkasType}_${studentName.replace(/\s/g, '')}.pdf`;
+            let previewContent = `
+                <div style="background: #f1f5f9; border-radius: 20px; padding: 30px; margin: 16px 0;">
+                    <div style="font-size: 64px; margin-bottom: 16px;">📄</div>
+                    <p style="font-weight: 700; color: #003056; margin-bottom: 8px;">${berkasType}</p>
+                    <p style="font-size: 13px; color: #334155;">Nama file: ${fileName}</p>
+                    <p style="font-size: 12px; color: #64748b; margin-top: 12px;">Status: ${statusFile}</p>
+                    <div style="margin-top: 24px; padding: 16px; background: white; border-radius: 16px; border: 1px dashed #003056;">
+                        ⚡ Preview dokumen (simulasi):<br>
+                        <span style="font-size: 12px;">Berkas ${berkasType} milik ${studentName} akan ditampilkan di sini.</span>
+                    </div>
+                </div>
+            `;
+            filePreviewData = { title: `Preview - ${berkasType}`, content: previewContent };
+            render();
+        }
+
+        function closeFilePreview() {
+            filePreviewData = null;
+            render();
+        }
+
+        function render() {
+            const filteredData = getFilteredData();
+            const stats = getStats();
+            const { formattedDate, formattedTime } = formatDate();
             const classOptions = ["XIII SIJA 1", "XIII SIJA 2"];
             const statusOptions = ["Semua Status", "Diterima", "Ditolak", "Direview"];
 
-            return React.createElement('div', { className: "min-h-screen bg-[#f8fafc]" },
-                React.createElement('header', { className: "bg-[#003056] text-white px-8 py-10 shadow-lg" },
-                    React.createElement('div', { className: "container mx-auto flex flex-col md:flex-row justify-between items-center gap-6" },
-                        React.createElement('div', null,
-                            React.createElement('h1', { className: "text-3xl font-bold tracking-tight mb-2" }, "Dashboard Ketua Jurusan"),
-                            React.createElement('p', { className: "text-slate-300 text-sm font-medium" }, "Booking PKL SMKN 6 Malang • Manajemen Semua Kelas")
-                        ),
-                        React.createElement('div', { className: "flex gap-4 flex-wrap justify-center" },
-                            React.createElement('div', { className: "text-center bg-white/10 px-5 py-3 rounded-2xl min-w-[100px]" },
-                                React.createElement('span', { className: "block text-2xl font-bold" }, totalSiswa),
-                                React.createElement('span', { className: "text-[9px] uppercase tracking-wider text-slate-300" }, "Total Siswa")
-                            ),
-                            React.createElement('div', { className: "text-center bg-white/10 px-5 py-3 rounded-2xl min-w-[100px]" },
-                                React.createElement('span', { className: "block text-2xl font-bold text-green-300" }, sudahDitempatkan),
-                                React.createElement('span', { className: "text-[9px] uppercase tracking-wider text-slate-300" }, "Ditempatkan")
-                            ),
-                            React.createElement('div', { className: "text-center bg-white/10 px-5 py-3 rounded-2xl min-w-[100px]" },
-                                React.createElement('span', { className: "block text-2xl font-bold text-red-300" }, berkasKurang),
-                                React.createElement('span', { className: "text-[9px] uppercase tracking-wider text-slate-300" }, "Berkas Kurang")
-                            ),
-                            React.createElement('div', { className: "relative" },
-                                React.createElement('select', {
-                                    className: "custom-select bg-white/10 border border-white/30 rounded-xl text-sm px-4 py-3 pr-8 focus:outline-none focus:ring-2 focus:ring-white focus:border-white cursor-pointer min-w-[140px] text-white font-semibold",
-                                    value: selectedClass,
-                                    onChange: (e) => {
-                                        setSelectedClass(e.target.value);
-                                        setSearch("");
-                                        setStatusFilter("Semua Status");
-                                    }
-                                },
-                                    classOptions.map(function(className) {
-                                        return React.createElement('option', { key: className, value: className }, className);
-                                    })
-                                )
-                            )
-                        )
-                    )
-                ),
+            let html = `
+                <div class="min-h-screen bg-[#f8fafc]" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+                    <header style="background-color: #003056; color: white; padding: 40px 32px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
+                        <div style="max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap: 24px;">
+                            <div>
+                                <h1 style="font-size: 1.875rem; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 8px;">Dashboard Ketua Jurusan</h1>
+                                <p style="color: #cbd5e1; font-size: 0.875rem; font-weight: 500;">Booking PKL SMKN 6 Malang • Manajemen Semua Kelas</p>
+                            </div>
+                            <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;">
+                                <div style="text-align: center; background-color: rgba(255,255,255,0.1); padding: 12px 20px; border-radius: 16px; min-width: 100px;">
+                                    <span style="display: block; font-size: 1.5rem; font-weight: 700;">${stats.total}</span>
+                                    <span style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; color: #cbd5e1;">Total Siswa</span>
+                                </div>
+                                <div style="text-align: center; background-color: rgba(255,255,255,0.1); padding: 12px 20px; border-radius: 16px; min-width: 100px;">
+                                    <span style="display: block; font-size: 1.5rem; font-weight: 700; color: #86efac;">${stats.ditempatkan}</span>
+                                    <span style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; color: #cbd5e1;">Ditempatkan</span>
+                                </div>
+                                <div style="text-align: center; background-color: rgba(255,255,255,0.1); padding: 12px 20px; border-radius: 16px; min-width: 100px;">
+                                    <span style="display: block; font-size: 1.5rem; font-weight: 700; color: #fca5a5;">${stats.berkasKurang}</span>
+                                    <span style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; color: #cbd5e1;">Berkas Kurang</span>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
 
-                React.createElement('main', { className: "container mx-auto px-4 py-10" },
-                    React.createElement('div', { className: "bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200" },
-                        React.createElement('div', { className: "bg-[#003056] p-6 border-b border-white/10 flex flex-col md:flex-row justify-between items-center gap-4" },
-                            React.createElement('div', { className: "flex flex-col md:flex-row gap-4 w-full md:w-auto" },
-                                React.createElement('input', {
-                                    type: "text",
-                                    placeholder: "Cari Siswa atau NIS...",
-                                    className: "px-4 py-3 border border-white/30 rounded-xl text-sm w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-white focus:border-white bg-white/10 text-white placeholder:text-white/50",
-                                    value: search,
-                                    onChange: (e) => setSearch(e.target.value)
-                                }),
-                                React.createElement('div', { className: "relative" },
-                                    React.createElement('select', {
-                                        className: "toolbar-select custom-select bg-white/10 border border-white/30 rounded-xl text-sm px-4 py-3 pr-8 focus:outline-none focus:ring-2 focus:ring-white focus:border-white cursor-pointer min-w-[140px] text-white font-semibold",
-                                        value: statusFilter,
-                                        onChange: (e) => setStatusFilter(e.target.value)
-                                    },
-                                        statusOptions.map(function(status) {
-                                            return React.createElement('option', { key: status, value: status }, status);
-                                        })
-                                    )
-                                )
-                            ),
-                            React.createElement('button', { className: "bg-white hover:bg-slate-100 text-[#003056] border border-white px-6 py-3 rounded-xl text-sm font-bold transition" }, "Cetak Laporan")
-                        ),
+                    <main style="max-width: 1280px; margin: 0 auto; padding: 40px 16px;">
+                        <div style="background-color: white; border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid #e2e8f0;">
+                            <div style="background-color: #003056; padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 16px;">
+                                <div style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: center;">
+                                    <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+                                        <input type="text" id="searchInput" placeholder="Cari Siswa atau NIS..." value="${searchQuery.replace(/"/g, '&quot;')}" style="padding: 10px 16px; border: 1px solid rgba(255,255,255,0.3); border-radius: 12px; font-size: 0.875rem; width: 280px; background-color: rgba(255,255,255,0.1); color: white;">
+                                        <div style="position: relative;">
+                                            <select id="statusSelect" class="toolbar-select custom-select" style="background-color: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); border-radius: 12px; padding: 10px 32px 10px 16px; font-size: 0.875rem; color: white; font-weight: 600; width: 160px;">
+                                                ${statusOptions.map(s => `<option value="${s}" ${statusFilter === s ? 'selected' : ''}>${s}</option>`).join('')}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 12px;">
+                                        <select id="classSelectToolbar" class="custom-select" style="background-color: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); border-radius: 12px; padding: 10px 32px 10px 16px; font-size: 0.875rem; color: white; font-weight: 600;">
+                                            ${classOptions.map(c => `<option value="${c}" ${selectedClass === c ? 'selected' : ''}>${c}</option>`).join('')}
+                                        </select>
+                                        <button id="printBtn" style="background-color: white; color: #003056; border: none; padding: 10px 24px; border-radius: 12px; font-size: 0.875rem; font-weight: 700; cursor: pointer;">Cetak Laporan</button>
+                                    </div>
+                                </div>
+                            </div>
 
-                        React.createElement('div', { className: "overflow-x-auto" },
-                            React.createElement('table', { className: "w-full text-left" },
-                                React.createElement('thead', null,
-                                    React.createElement('tr', { className: "bg-[#003056] text-white text-[11px] uppercase font-bold tracking-wider" },
-                                        React.createElement('th', { className: "px-6 py-4 text-center w-16" }, "No"),
-                                        React.createElement('th', { className: "px-6 py-4" }, "Foto"),
-                                        React.createElement('th', { className: "px-6 py-4" }, "Nama Siswa"),
-                                        React.createElement('th', { className: "px-6 py-4" }, "NIS"),
-                                        React.createElement('th', { className: "px-6 py-4" }, "Berkas"),
-                                        React.createElement('th', { className: "px-6 py-4" }, "Perusahaan Mitra"),
-                                        React.createElement('th', { className: "px-6 py-4 text-center" }, "Status"),
-                                        React.createElement('th', { className: "px-6 py-4 text-center" }, "Aksi")
-                                    )
-                                ),
-                                React.createElement('tbody', { className: "divide-y divide-slate-100" },
-                                    filteredData.map(function(student, idx) {
-                                        const dudi = MOCK_DUDI.find(function(d) { return d.id === student.perusahaan_id; });
-                                        return React.createElement('tr', { key: student.id, className: "hover:bg-slate-50 transition-colors" },
-                                            React.createElement('td', { className: "px-6 py-4 text-center text-slate-400 text-xs font-bold" }, idx + 1),
-                                            React.createElement('td', { className: "px-6 py-4" },
-                                                React.createElement('img', { src: student.foto, alt: student.nama, className: "w-10 h-10 rounded-full object-cover" })
-                                            ),
-                                            React.createElement('td', { className: "px-6 py-4 font-bold text-[#003056] text-sm" }, student.nama),
-                                            React.createElement('td', { className: "px-6 py-4 text-slate-500 text-xs font-bold" }, student.nis),
-                                            React.createElement('td', { className: "px-6 py-4" },
-                                                React.createElement('span', { className: "px-3 py-1 text-[10px] font-bold rounded-full border " + getBerkasColor(student.berkas) }, student.berkas)
-                                            ),
-                                            React.createElement('td', { className: "px-6 py-4" },
-                                                React.createElement('div', { className: "font-bold text-slate-700 text-sm" }, dudi ? dudi.nama_dudi : "-"),
-                                                dudi && React.createElement('div', { className: "text-[10px] text-slate-400" }, dudi.bidang_industri)
-                                            ),
-                                            React.createElement('td', { className: "px-6 py-4 text-center" },
-                                                React.createElement('span', { className: "px-3 py-1 rounded-full text-[10px] font-bold border " + getStatusColor(student.status_lamaran) }, student.status_lamaran)
-                                            ),
-                                            React.createElement('td', { className: "px-6 py-4 text-center" },
-                                                React.createElement('button', {
-                                                    onClick: function() { setSelectedStudent(student); },
-                                                    className: "bg-[#003056] hover:bg-[#001f38] text-white px-4 py-2 rounded-lg text-[10px] font-bold transition"
-                                                }, "Detail")
-                                            )
-                                        );
-                                    }),
-                                    filteredData.length === 0 && React.createElement('tr', null,
-                                        React.createElement('td', { colSpan: 8, className: "px-6 py-20 text-center text-slate-400" }, "Data tidak ditemukan")
-                                    )
-                                )
-                            )
-                        ),
+                            <div class="table-wrapper">
+                                <table style="width: 100%; text-align: left; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="background-color: #003056; color: white; font-size: 11px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.05em;">
+                                            <th style="padding: 16px 24px; text-align: center; width: 70px;">No</th>
+                                            <th style="padding: 16px 24px;">Foto</th>
+                                            <th style="padding: 16px 24px;">Nama Siswa</th>
+                                            <th style="padding: 16px 24px;">NIS</th>
+                                            <th style="padding: 16px 24px;">Berkas</th>
+                                            <th style="padding: 16px 24px;">Perusahaan Mitra</th>
+                                            <th style="padding: 16px 24px; text-align: center;">Status</th>
+                                            <th style="padding: 16px 24px; text-align: center;">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody style="border-top: 1px solid #f1f5f9;">
+            `;
 
-                        React.createElement('div', { className: "bg-[#003056] text-white/70 px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-3 text-[10px] font-bold uppercase tracking-wider" },
-                            React.createElement('span', null, "Kelas: ", selectedClass, " | Total data: ", filteredData.length, " dari ", totalSiswa, " Siswa"),
-                            React.createElement('span', null, "Update: ", formattedDate, ", ", formattedTime)
-                        )
-                    )
-                ),
+            if (filteredData.length === 0) {
+                html += `<tr><td colspan="8" style="padding: 80px 24px; text-align: center; color: #94a3b8;">Data tidak ditemukan</td></tr>`;
+            } else {
+                filteredData.forEach((student, idx) => {
+                    const dudi = MOCK_DUDI.find(d => d.id === student.perusahaan_id);
+                    html += `
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <td style="padding: 16px 24px; text-align: center; color: #94a3b8; font-size: 0.75rem; font-weight: 700;">${idx+1}</td>
+                            <td style="padding: 16px 24px;"><img src="${student.foto}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" onerror="this.src='https://placehold.co/100x100/003056/white?text=User'"></td>
+                            <td style="padding: 16px 24px; font-weight: 700; color: #003056; font-size: 0.875rem;">${student.nama}</td>
+                            <td style="padding: 16px 24px; color: #64748b; font-size: 0.75rem; font-weight: 700;">${student.nis}</td>
+                            <td style="padding: 16px 24px;"><span style="padding: 4px 12px; font-size: 10px; font-weight: 700; border-radius: 9999px; border: 1px solid; display: inline-block; background-color: ${student.berkas === 'Lengkap' ? '#dcfce7' : '#fee2e2'}; color: ${student.berkas === 'Lengkap' ? '#15803d' : '#b91c1c'}; border-color: ${student.berkas === 'Lengkap' ? '#bbf7d0' : '#fecaca'};">${student.berkas}</span></td>
+                            <td style="padding: 16px 24px;">
+                                <div style="font-weight: 700; color: #334155; font-size: 0.875rem;">${dudi ? dudi.nama_dudi : "-"}</div>
+                                ${dudi ? `<div style="font-size: 10px; color: #94a3b8;">${dudi.bidang_industri}</div>` : ""}
+                            </td>
+                            <td style="padding: 16px 24px; text-align: center;"><span style="padding: 4px 12px; border-radius: 9999px; font-size: 10px; font-weight: 700; border: 1px solid; background-color: ${student.status_lamaran === 'Diterima' ? '#dcfce7' : (student.status_lamaran === 'Ditolak' ? '#fee2e2' : '#fef3c7')}; color: ${student.status_lamaran === 'Diterima' ? '#15803d' : (student.status_lamaran === 'Ditolak' ? '#b91c1c' : '#b45309')};">${student.status_lamaran}</span></td>
+                            <td style="padding: 16px 24px; text-align: center;"><button class="detail-btn" data-id="${student.id}" style="background-color: #003056; color: white; padding: 6px 14px; border-radius: 8px; font-size: 10px; font-weight: 700; border: none; cursor: pointer;">Detail</button></td>
+                        </tr>
+                    `;
+                });
+            }
 
-                selectedStudent && React.createElement('div', { className: "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50", onClick: function() { setSelectedStudent(null); } },
-                    React.createElement('div', { className: "relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]", onClick: function(e) { e.stopPropagation(); } },
-                        React.createElement('div', { className: "w-full md:w-80 bg-[#003056] text-white p-8 flex flex-col items-center text-center" },
-                            React.createElement('img', { src: selectedStudent.foto, alt: selectedStudent.nama, className: "w-32 h-32 rounded-full object-cover border-4 border-white shadow-xl mb-6" }),
-                            React.createElement('h2', { className: "text-2xl font-bold mb-1" }, selectedStudent.nama),
-                            React.createElement('p', { className: "text-blue-200 text-sm mb-6" }, selectedStudent.nis),
-                            React.createElement('div', { className: "w-full space-y-3 text-left" },
-                                React.createElement('div', { className: "flex justify-between py-2 border-b border-white/20" },
-                                    React.createElement('span', { className: "text-xs opacity-70" }, "Status Lamaran"),
-                                    React.createElement('span', { className: "text-xs font-bold" }, selectedStudent.status_lamaran)
-                                ),
-                                React.createElement('div', { className: "flex justify-between py-2 border-b border-white/20" },
-                                    React.createElement('span', { className: "text-xs opacity-70" }, "Kelengkapan Berkas"),
-                                    React.createElement('span', { className: "text-xs font-bold " + (selectedStudent.berkas === 'Lengkap' ? 'text-green-300' : 'text-red-300') }, selectedStudent.berkas)
-                                )
-                            ),
-                            React.createElement('button', { onClick: function() { setSelectedStudent(null); }, className: "mt-8 w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold transition" }, "Tutup Detail")
-                        ),
-                        React.createElement('div', { className: "flex-1 flex flex-col overflow-hidden" },
-                            React.createElement('div', { className: "flex border-b border-slate-200 px-6 pt-6 gap-8" },
-                                React.createElement('button', { onClick: function() { setActiveTab('berkas'); }, className: "pb-3 text-sm font-bold transition " + (activeTab === 'berkas' ? 'text-[#003056] border-b-2 border-[#003056]' : 'text-slate-400') }, "Berkas Administrasi"),
-                                React.createElement('button', { onClick: function() { setActiveTab('perusahaan'); }, className: "pb-3 text-sm font-bold transition " + (activeTab === 'perusahaan' ? 'text-[#003056] border-b-2 border-[#003056]' : 'text-slate-400') }, "Data Perusahaan PKL")
-                            ),
-                            React.createElement('div', { className: "flex-1 overflow-y-auto p-6" },
-                                activeTab === 'berkas' ? 
-                                    React.createElement('div', { className: "space-y-4" },
-                                        React.createElement('div', { className: "flex justify-between items-center p-4 bg-slate-50 rounded-xl" },
-                                            React.createElement('span', { className: "font-bold" }, "KTP / KIA"),
-                                            React.createElement('span', { className: "px-3 py-1 rounded-full text-[10px] font-bold " + (selectedStudent.berkas_files.ktp.status === 'Selesai' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700') }, selectedStudent.berkas_files.ktp.status)
-                                        ),
-                                        React.createElement('div', { className: "flex justify-between items-center p-4 bg-slate-50 rounded-xl" },
-                                            React.createElement('span', { className: "font-bold" }, "Surat Sehat"),
-                                            React.createElement('span', { className: "px-3 py-1 rounded-full text-[10px] font-bold " + (selectedStudent.berkas_files.sehat.status === 'Selesai' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700') }, selectedStudent.berkas_files.sehat.status)
-                                        ),
-                                        React.createElement('div', { className: "flex justify-between items-center p-4 bg-slate-50 rounded-xl" },
-                                            React.createElement('span', { className: "font-bold" }, "BPJS Ketenagakerjaan"),
-                                            React.createElement('span', { className: "px-3 py-1 rounded-full text-[10px] font-bold " + (selectedStudent.berkas_files.bpjs.status === 'Selesai' ? 'bg-green-100 text-green-700' : (selectedStudent.berkas_files.bpjs.status === 'Proses' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700')) }, selectedStudent.berkas_files.bpjs.status)
-                                        )
-                                    ) :
-                                    (function() {
-                                        const dudi = MOCK_DUDI.find(function(d) { return d.id === selectedStudent.perusahaan_id; });
-                                        if (!dudi) return React.createElement('div', { className: "text-slate-400 text-center p-8" }, "Data perusahaan tidak tersedia");
-                                        return React.createElement('div', { className: "space-y-4" },
-                                            React.createElement('div', { className: "p-4 bg-slate-50 rounded-xl" },
-                                                React.createElement('p', { className: "text-xs text-slate-400 mb-1" }, "Nama Perusahaan"),
-                                                React.createElement('p', { className: "font-bold" }, dudi.nama_dudi)
-                                            ),
-                                            React.createElement('div', { className: "p-4 bg-slate-50 rounded-xl" },
-                                                React.createElement('p', { className: "text-xs text-slate-400 mb-1" }, "Bidang Industri"),
-                                                React.createElement('p', { className: "font-bold" }, dudi.bidang_industri)
-                                            ),
-                                            React.createElement('div', { className: "p-4 bg-slate-50 rounded-xl" },
-                                                React.createElement('p', { className: "text-xs text-slate-400 mb-1" }, "Penanggung Jawab"),
-                                                React.createElement('p', { className: "font-bold" }, dudi.penanggung_jawab)
-                                            ),
-                                            React.createElement('div', { className: "p-4 bg-slate-50 rounded-xl" },
-                                                React.createElement('p', { className: "text-xs text-slate-400 mb-1" }, "Kontak"),
-                                                React.createElement('p', { className: "font-bold" }, dudi.telepon, " | ", dudi.email)
-                                            ),
-                                            React.createElement('div', { className: "p-4 bg-slate-50 rounded-xl" },
-                                                React.createElement('p', { className: "text-xs text-slate-400 mb-1" }, "Alamat"),
-                                                React.createElement('p', { className: "font-bold" }, dudi.alamat)
-                                            ),
-                                            React.createElement('div', { className: "grid grid-cols-3 gap-3" },
-                                                React.createElement('div', { className: "p-3 bg-slate-50 rounded-xl text-center" },
-                                                    React.createElement('p', { className: "text-[10px] text-slate-400" }, "Jam Masuk"),
-                                                    React.createElement('p', { className: "font-bold" }, dudi.jam_berangkat)
-                                                ),
-                                                React.createElement('div', { className: "p-3 bg-slate-50 rounded-xl text-center" },
-                                                    React.createElement('p', { className: "text-[10px] text-slate-400" }, "Jam Pulang"),
-                                                    React.createElement('p', { className: "font-bold" }, dudi.jam_pulang)
-                                                ),
-                                                React.createElement('div', { className: "p-3 bg-slate-50 rounded-xl text-center" },
-                                                    React.createElement('p', { className: "text-[10px] text-slate-400" }, "Sisa Kuota"),
-                                                    React.createElement('p', { className: "font-bold" }, dudi.kuota - dudi.terdaftar)
-                                                )
-                                            )
-                                        );
-                                    })()
-                            )
-                        )
-                    )
-                )
-            );
+            html += `
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div style="background-color: #003056; color: rgba(255,255,255,0.7); padding: 16px 24px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">
+                                <span>Kelas: ${selectedClass} | Total data: ${filteredData.length} dari ${stats.total} Siswa</span>
+                                <span>Update: ${formattedDate}, ${formattedTime}</span>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            `;
+
+            // MODAL DETAIL SISWA
+            if (selectedStudent) {
+                const dudi = MOCK_DUDI.find(d => d.id === selectedStudent.perusahaan_id);
+                html += `
+                    <div id="modalOverlay" style="position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 16px; background-color: rgba(0,0,0,0.5);" onclick="closeModal(event)">
+                        <div class="modal-detail-container" onclick="event.stopPropagation()">
+                            <div class="modal-left-profile" style="background-color: #003056; color: white; padding: 32px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                                <img src="${selectedStudent.foto}" style="width: 128px; height: 128px; border-radius: 50%; object-fit: cover; border: 4px solid white; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); margin-bottom: 24px;">
+                                <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 4px;">${selectedStudent.nama}</h2>
+                                <p style="color: #bfdbfe; font-size: 0.875rem; margin-bottom: 24px;">${selectedStudent.nis}</p>
+                                <div style="width: 100%; display: flex; flex-direction: column; gap: 12px; text-align: left;">
+                                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                                        <span style="font-size: 0.75rem; opacity: 0.7;">Status Lamaran</span>
+                                        <span style="font-size: 0.75rem; font-weight: 700;">${selectedStudent.status_lamaran}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.2);">
+                                        <span style="font-size: 0.75rem; opacity: 0.7;">Kelengkapan Berkas</span>
+                                        <span style="font-size: 0.75rem; font-weight: 700; color: ${selectedStudent.berkas === 'Lengkap' ? '#86efac' : '#fca5a5'}">${selectedStudent.berkas}</span>
+                                    </div>
+                                </div>
+                                <button onclick="closeModal()" style="margin-top: 32px; width: 100%; background-color: rgba(255,255,255,0.1); border: none; padding: 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; color: white; cursor: pointer;">Tutup Detail</button>
+                            </div>
+                            <div class="modal-right-content">
+                                <div style="display: flex; border-bottom: 1px solid #e2e8f0; padding: 24px 24px 0 24px; gap: 32px;">
+                                    <button id="tabBerkasBtn" style="padding-bottom: 12px; font-size: 0.875rem; font-weight: 700; background: none; border: none; cursor: pointer; ${activeTab === 'berkas' ? 'color: #003056; border-bottom: 2px solid #003056;' : 'color: #94a3b8;'}">Berkas Administrasi</button>
+                                    <button id="tabPerusahaanBtn" style="padding-bottom: 12px; font-size: 0.875rem; font-weight: 700; background: none; border: none; cursor: pointer; ${activeTab === 'perusahaan' ? 'color: #003056; border-bottom: 2px solid #003056;' : 'color: #94a3b8;'}">Data Perusahaan PKL</button>
+                                </div>
+                                <div class="modal-right-scroll" style="flex:1; padding: 20px;">
+                `;
+                if (activeTab === 'berkas') {
+                    html += `<div style="display: flex; flex-direction: column; gap: 14px;">
+                                <div class="berkas-item-click" data-berkas="KTP/KIA" data-status="${selectedStudent.berkas_files.ktp.status}" style="display: flex; justify-content: space-between; align-items: center; padding: 14px; background-color: #f8fafc; border-radius: 14px;">
+                                    <span style="font-weight: 700;">📄 KTP / KIA</span>
+                                    <span style="padding: 4px 12px; border-radius: 9999px; font-size: 10px; font-weight: 700; background-color: ${selectedStudent.berkas_files.ktp.status === 'Selesai' ? '#dcfce7' : '#fef3c7'}; color: ${selectedStudent.berkas_files.ktp.status === 'Selesai' ? '#15803d' : '#b45309'};">${selectedStudent.berkas_files.ktp.status}</span>
+                                </div>
+                                <div class="berkas-item-click" data-berkas="Surat Sehat" data-status="${selectedStudent.berkas_files.sehat.status}" style="display: flex; justify-content: space-between; align-items: center; padding: 14px; background-color: #f8fafc; border-radius: 14px;">
+                                    <span style="font-weight: 700;">🏥 Surat Sehat</span>
+                                    <span style="padding: 4px 12px; border-radius: 9999px; font-size: 10px; font-weight: 700; background-color: ${selectedStudent.berkas_files.sehat.status === 'Selesai' ? '#dcfce7' : '#fef3c7'}; color: ${selectedStudent.berkas_files.sehat.status === 'Selesai' ? '#15803d' : '#b45309'};">${selectedStudent.berkas_files.sehat.status}</span>
+                                </div>
+                                <div class="berkas-item-click" data-berkas="BPJS Ketenagakerjaan" data-status="${selectedStudent.berkas_files.bpjs.status}" style="display: flex; justify-content: space-between; align-items: center; padding: 14px; background-color: #f8fafc; border-radius: 14px;">
+                                    <span style="font-weight: 700;">🛡️ BPJS Ketenagakerjaan</span>
+                                    <span style="padding: 4px 12px; border-radius: 9999px; font-size: 10px; font-weight: 700; background-color: ${selectedStudent.berkas_files.bpjs.status === 'Selesai' ? '#dcfce7' : (selectedStudent.berkas_files.bpjs.status === 'Proses' ? '#dbeafe' : '#fef3c7')}; color: ${selectedStudent.berkas_files.bpjs.status === 'Selesai' ? '#15803d' : (selectedStudent.berkas_files.bpjs.status === 'Proses' ? '#1d4ed8' : '#b45309')};">${selectedStudent.berkas_files.bpjs.status}</span>
+                                </div>
+                            </div>`;
+                } else {
+                    if (!dudi) html += `<div style="color: #94a3b8; text-align: center;">Data perusahaan tidak tersedia</div>`;
+                    else {
+                        // PERBAIKAN: perkecil padding, gap, font agar tidak kepotong
+                        html += `<div style="display: flex; flex-direction: column; gap: 12px;">
+                                    <div style="padding: 12px; background-color: #f8fafc; border-radius: 12px;"><p style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 2px;">Nama Perusahaan</p><p style="font-weight: 700; font-size: 0.8rem;">${dudi.nama_dudi}</p></div>
+                                    <div style="padding: 12px; background-color: #f8fafc; border-radius: 12px;"><p style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 2px;">Bidang Industri</p><p style="font-weight: 700; font-size: 0.8rem;">${dudi.bidang_industri}</p></div>
+                                    <div style="padding: 12px; background-color: #f8fafc; border-radius: 12px;"><p style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 2px;">Jumlah Pegawai</p><p style="font-weight: 700; font-size: 0.8rem;">${dudi.jumlah_pegawai}</p></div>
+                                    <div style="padding: 12px; background-color: #f8fafc; border-radius: 12px;"><p style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 2px;">Website</p><p style="font-weight: 700; font-size: 0.8rem;">${dudi.website}</p></div>
+                                    <div style="padding: 12px; background-color: #f8fafc; border-radius: 12px;"><p style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 2px;">Penanggung Jawab</p><p style="font-weight: 700; font-size: 0.8rem;">${dudi.penanggung_jawab}</p></div>
+                                    <div style="padding: 12px; background-color: #f8fafc; border-radius: 12px;"><p style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 2px;">Kontak</p><p style="font-weight: 700; font-size: 0.8rem;">${dudi.telepon} | ${dudi.email}</p></div>
+                                    <div style="padding: 12px; background-color: #f8fafc; border-radius: 12px;"><p style="font-size: 0.7rem; color: #94a3b8; margin-bottom: 2px;">Alamat</p><p style="font-weight: 700; font-size: 0.8rem;">${dudi.alamat}</p></div>
+                                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                                        <div style="padding: 8px; background-color: #f8fafc; border-radius: 12px; text-align:center;"><p style="font-size: 9px; color:#94a3b8;">Jam Masuk</p><p style="font-weight: 700; font-size: 0.75rem;">${dudi.jam_berangkat}</p></div>
+                                        <div style="padding: 8px; background-color: #f8fafc; border-radius: 12px; text-align:center;"><p style="font-size: 9px; color:#94a3b8;">Jam Pulang</p><p style="font-weight: 700; font-size: 0.75rem;">${dudi.jam_pulang}</p></div>
+                                        <div style="padding: 8px; background-color: #f8fafc; border-radius: 12px; text-align:center;"><p style="font-size: 9px; color:#94a3b8;">Sisa Kuota</p><p style="font-weight: 700; font-size: 0.75rem;">${dudi.kuota - dudi.terdaftar}</p></div>
+                                    </div>
+                                </div>`;
+                    }
+                }
+                html += `</div></div></div></div>`;
+            }
+
+            if (filePreviewData) {
+                html += `
+                    <div class="file-preview-overlay" onclick="closeFilePreview()">
+                        <div class="file-preview-card" onclick="event.stopPropagation()">
+                            <h3 style="font-size: 1.25rem; font-weight: 800; color: #003056; margin-bottom: 12px;">${filePreviewData.title}</h3>
+                            ${filePreviewData.content}
+                            <button onclick="closeFilePreview()" style="margin-top: 24px; background: #003056; color: white; border: none; padding: 10px 24px; border-radius: 40px; font-weight: 700; cursor: pointer;">Tutup</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('root').innerHTML = html;
+
+            document.getElementById('searchInput')?.addEventListener('input', (e) => { searchQuery = e.target.value; render(); });
+            document.getElementById('statusSelect')?.addEventListener('change', (e) => { statusFilter = e.target.value; render(); });
+            document.getElementById('classSelectToolbar')?.addEventListener('change', (e) => { selectedClass = e.target.value; searchQuery = ""; statusFilter = "Semua Status"; selectedStudent = null; render(); });
+            document.getElementById('printBtn')?.addEventListener('click', () => alert('Fitur cetak laporan akan segera hadir'));
+
+            document.querySelectorAll('.detail-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(btn.getAttribute('data-id'));
+                    const students = MOCK_STUDENTS_BY_CLASS[selectedClass] || [];
+                    const student = students.find(s => s.id === id);
+                    if (student) { selectedStudent = student; activeTab = "berkas"; render(); }
+                });
+            });
+
+            if (selectedStudent) {
+                document.getElementById('tabBerkasBtn')?.addEventListener('click', () => { activeTab = 'berkas'; render(); });
+                document.getElementById('tabPerusahaanBtn')?.addEventListener('click', () => { activeTab = 'perusahaan'; render(); });
+                document.querySelectorAll('.berkas-item-click').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        const berkasName = el.getAttribute('data-berkas');
+                        const statusVal = el.getAttribute('data-status');
+                        showFilePreview(berkasName, selectedStudent.nama, statusVal);
+                    });
+                });
+            }
         }
 
-        ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App, null));
+        window.closeModal = function(event) {
+            if (event && event.target !== event.currentTarget) return;
+            selectedStudent = null;
+            render();
+        };
+        window.closeFilePreview = closeFilePreview;
+
+        render();
     </script>
 </body>
 </html>

@@ -8,7 +8,7 @@
     <p class="form-helper">Perbarui nama atau hak akses pengguna di sistem.</p>
 </div>
 
-<div class="form-card" style="max-width: 700px; margin: 0 auto;">
+<div class="form-card max-w-700 mx-auto">
     <div class="card-header">
         <h2>{{ $user->name }}</h2>
         <p class="form-helper">Username tidak dapat diubah, tetapi role dan nama pengguna bisa disesuaikan.</p>

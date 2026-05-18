@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="{{ asset('css/header.css') }}">
     <link rel="stylesheet" href="{{ asset('css/nav.css') }}">
     <link rel="stylesheet" href="{{ asset('css/footer.css') }}">
+    @if(request()->is('admin/*'))
+        <link rel="stylesheet" href="{{ asset('css/admin-style.css') }}">
+    @endif
     @yield('head')
 </head>
 <body>

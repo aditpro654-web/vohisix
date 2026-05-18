@@ -8,7 +8,7 @@
     <p class="form-helper">Daftarkan perusahaan mitra PKL dengan informasi lengkap dan kontak yang jelas.</p>
 </div>
 
-<div class="form-card" style="max-width: 860px; margin: 0 auto;">
+<div class="form-card max-w-860 mx-auto">
     <div class="card-header">
         <h2>Form Pendaftaran DUDI</h2>
         <p class="form-helper">Lengkapi detail DUDI untuk proses booking siswa.</p>

@@ -1,205 +1,603 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal PKL - Status Center</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; background-color: #F8FAFC; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+            background-color: #F8FAFC;
+        }
+
+        /* Warna Utama */
         .bg-primary { background-color: #003056; }
         .text-primary { color: #003056; }
         .border-primary { border-color: #003056; }
-        .shadow-primary\/20 { box-shadow: 0 10px 25px -5px rgba(0, 48, 86, 0.2); }
+
+        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #F1F5F9; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Animasi */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeInUp {
+            animation: fadeInUp 0.3s ease-out forwards;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1024px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* ========== COMPONENT STYLES ========== */
+
+        /* Navbar */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .navbar-inner {
+            max-width: 1024px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background-color: #003056;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .logo-text {
+            font-size: 1.125rem;
+            font-weight: 900;
+            letter-spacing: -0.025em;
+            color: #003056;
+        }
+        .logo-sub {
+            font-size: 8px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: block;
+            line-height: 1.2;
+        }
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, #003056, #3b82f6);
+            padding: 2px;
+        }
+        .avatar-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 9999px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .avatar-text {
+            font-size: 10px;
+            font-weight: 900;
+            color: #003056;
+        }
+
+        /* Header Section */
+        .page-header {
+            margin-bottom: 48px;
+            text-align: center;
+        }
+        @media (min-width: 768px) {
+            .page-header {
+                text-align: left;
+            }
+        }
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: -0.025em;
+            color: #003056;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+        @media (min-width: 768px) {
+            .page-title {
+                font-size: 3.75rem;
+            }
+        }
+        .page-title-gradient {
+            background: linear-gradient(135deg, #003056, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .page-subtitle {
+            color: #64748b;
+            max-width: 640px;
+            margin: 0 auto;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        @media (min-width: 768px) {
+            .page-subtitle {
+                margin: 0;
+            }
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+        .stat-card {
+            padding: 20px;
+            border-radius: 16px;
+        }
+        .stat-card-primary {
+            background-color: #003056;
+            color: white;
+        }
+        .stat-card-emerald {
+            background-color: #10b981;
+            color: white;
+        }
+        .stat-card-white {
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            color: #003056;
+        }
+        .stat-icon {
+            width: 20px;
+            height: 20px;
+        }
+        .stat-label {
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 12px;
+            opacity: 0.8;
+        }
+        .stat-number {
+            font-size: 2.25rem;
+            font-weight: 900;
+            margin-top: 4px;
+        }
+        .stat-card-white .stat-label {
+            color: #94a3b8;
+        }
+
+        /* Tabs */
+        .tabs-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: #003056;
+        }
+        .tab-group {
+            display: flex;
+            gap: 4px;
+            background-color: #f1f5f9;
+            padding: 4px;
+            border-radius: 12px;
+        }
+        .tab-btn {
+            padding: 6px 16px;
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            color: #64748b;
+        }
+        .tab-btn.active {
+            background-color: #003056;
+            color: white;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        /* Card List */
+        .card-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .booking-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            transition: box-shadow 0.2s;
+            animation: fadeInUp 0.3s ease-out forwards;
+            opacity: 0;
+        }
+        .booking-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .card-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .card-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .company-icon {
+            width: 48px;
+            height: 48px;
+            background-color: #f8fafc;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #003056;
+        }
+        .company-name {
+            font-weight: 700;
+            color: #003056;
+            font-size: 0.875rem;
+        }
+        .company-bidang {
+            font-size: 10px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+        .card-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .status-accepted {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+        .status-rejected {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+        .status-review {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+        .date-badge {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: #94a3b8;
+        }
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background-color: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #003056;
+        }
+        .action-btn:hover {
+            background-color: #003056;
+            color: white;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 64px;
+            background: white;
+            border: 2px dashed #e2e8f0;
+            border-radius: 24px;
+        }
+        .empty-state p {
+            color: #94a3b8;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 32px 0;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+            margin-top: 32px;
+        }
+        .footer p {
+            font-size: 9px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .stats-grid {
+                gap: 12px;
+            }
+            .stat-card {
+                padding: 12px;
+            }
+            .stat-number {
+                font-size: 1.5rem;
+            }
+            .card-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .card-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .tabs-wrapper {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
     </style>
 </head>
 <body>
-    <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <div class="logo-wrapper">
+                <div class="logo-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/>
+                        <path d="M9 22v-4h6v4"/>
+                    </svg>
+                </div>
+                <div>
+                    <span class="logo-text">PortalPKL</span>
+                    <span class="logo-sub">Status Center</span>
+                </div>
+            </div>
+            <div class="avatar">
+                <div class="avatar-inner">
+                    <span class="avatar-text">AW</span>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-        // Icons
-        const Building2 = ({ size = 20 }) => React.createElement('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
-            React.createElement('rect', { x: 4, y: 2, width: 16, height: 20, rx: 2, ry: 2 }),
-            React.createElement('path', { d: 'M9 22v-4h6v4' })
-        );
-        const CheckCircle2 = ({ size = 20 }) => React.createElement('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
-            React.createElement('circle', { cx: 12, cy: 12, r: 10 }),
-            React.createElement('polyline', { points: '9 12 11 14 15 10' })
-        );
-        const Clock = ({ size = 12 }) => React.createElement('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
-            React.createElement('circle', { cx: 12, cy: 12, r: 10 }),
-            React.createElement('polyline', { points: '12 6 12 12 16 14' })
-        );
-        const Search = ({ size = 16 }) => React.createElement('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
-            React.createElement('circle', { cx: 11, cy: 11, r: 8 }),
-            React.createElement('line', { x1: 21, y1: 21, x2: 16.65, y2: 16.65 })
-        );
-        const XCircle = ({ size = 20 }) => React.createElement('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
-            React.createElement('circle', { cx: 12, cy: 12, r: 10 }),
-            React.createElement('line', { x1: 15, y1: 9, x2: 9, y2: 15 }),
-            React.createElement('line', { x1: 9, y1: 9, x2: 15, y2: 15 })
-        );
-        const ArrowRight = ({ size = 20 }) => React.createElement('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
-            React.createElement('line', { x1: 5, y1: 12, x2: 19, y2: 12 }),
-            React.createElement('polyline', { points: '12 5 19 12 12 19' })
-        );
-        const FileText = ({ size = 20 }) => React.createElement('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
-            React.createElement('path', { d: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z' }),
-            React.createElement('polyline', { points: '14 2 14 8 20 8' })
-        );
+    <!-- Main Content -->
+    <main class="container" style="padding-top: 48px; padding-bottom: 48px;">
+        <!-- Header Section -->
+        <div class="page-header">
+            <h1 class="page-title">
+                Your PKL <span class="page-title-gradient">Journey</span>
+            </h1>
+            <p class="page-subtitle">
+                Monitor your internship applications with ease.
+            </p>
+        </div>
 
-        const MOCK_BOOKINGS = [
+        <!-- Stats Cards -->
+        <div class="stats-grid" id="statsContainer">
+            <!-- Akan diisi JavaScript -->
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-wrapper">
+            <h2 class="section-title">History</h2>
+            <div class="tab-group" id="tabGroup">
+                <button class="tab-btn active" data-tab="All">All</button>
+                <button class="tab-btn" data-tab="Diterima">Diterima</button>
+                <button class="tab-btn" data-tab="Ditolak">Ditolak</button>
+                <button class="tab-btn" data-tab="Direview">Direview</button>
+            </div>
+        </div>
+
+        <!-- Card List -->
+        <div class="card-list" id="cardList">
+            <!-- Akan diisi JavaScript -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>PortalPKL • 2026</p>
+    </footer>
+
+    <script>
+        // Data Mock
+        const bookings = [
             { id: '1', dudi: { nama_dudi: 'PT Teknologi Digital Indonesia', bidang_usaha: 'Software Engineering' }, status: 'Diterima', created_at: '15 Apr 2026' },
             { id: '2', dudi: { nama_dudi: 'Bank Central Nasional', bidang_usaha: 'Financial Services' }, status: 'Ditolak', created_at: '18 Apr 2026' },
             { id: '3', dudi: { nama_dudi: 'Startup Kreatif Nusantara', bidang_usaha: 'Creative Agency' }, status: 'Direview', created_at: '20 Apr 2026' },
-            { id: '4', dudi: { nama_dudi: 'Global Logistik Perkasa', bidang_usaha: 'Supply Chain' }, status: 'Direview', created_at: '21 Apr 2026' }
+            { id: '4', dudi: { nama_dudi: 'Global Logistik Perkasa', bidang_usaha: 'Supply Chain' }, status: 'Direview', created_at: '21 Apr 2026' },
+            { id: '5', dudi: { nama_dudi: 'PT Inovasi Teknologi', bidang_usaha: 'Artificial Intelligence' }, status: 'Diterima', created_at: '22 Apr 2026' }
         ];
 
-        const App = () => {
-            const [bookings] = useState(MOCK_BOOKINGS);
-            const [activeTab, setActiveTab] = useState('All');
+        // Hitung statistik
+        const total = bookings.length;
+        const accepted = bookings.filter(b => b.status === 'Diterima').length;
+        const rejected = bookings.filter(b => b.status === 'Ditolak').length;
 
-            const stats = {
-                total: bookings.length,
-                accepted: bookings.filter(b => b.status === 'Diterima').length,
-                rejected: bookings.filter(b => b.status === 'Ditolak').length
-            };
+        // Render Stats
+        function renderStats() {
+            const statsContainer = document.getElementById('statsContainer');
+            statsContainer.innerHTML = `
+                <div class="stat-card stat-card-primary">
+                    <svg class="stat-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    <p class="stat-label">Applications</p>
+                    <p class="stat-number">${total}</p>
+                </div>
+                <div class="stat-card stat-card-emerald">
+                    <svg class="stat-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="9 12 11 14 15 10"/>
+                    </svg>
+                    <p class="stat-label">Accepted</p>
+                    <p class="stat-number">${accepted}</p>
+                </div>
+                <div class="stat-card stat-card-white">
+                    <svg class="stat-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
+                    <p class="stat-label">Declined</p>
+                    <p class="stat-number">${rejected}</p>
+                </div>
+            `;
+        }
 
-            const filteredBookings = activeTab === 'All' ? bookings : bookings.filter(b => b.status === activeTab);
+        // Dapatkan kelas status
+        function getStatusClass(status) {
+            if (status === 'Diterima') return 'status-accepted';
+            if (status === 'Ditolak') return 'status-rejected';
+            return 'status-review';
+        }
 
-            const getStatusMeta = (status) => {
-                if (status === 'Diterima') return { color: 'text-emerald-500', bg: 'bg-emerald-500/10', label: 'Accepted' };
-                if (status === 'Ditolak') return { color: 'text-rose-500', bg: 'bg-rose-500/10', label: 'Declined' };
-                return { color: 'text-amber-500', bg: 'bg-amber-500/10', label: 'Reviewing' };
-            };
+        // Dapatkan label status
+        function getStatusLabel(status) {
+            if (status === 'Diterima') return 'Accepted';
+            if (status === 'Ditolak') return 'Declined';
+            return 'Reviewing';
+        }
 
-            return React.createElement('div', { className: "min-h-screen bg-[#F8FAFC]" },
-                // Header
-                React.createElement('nav', { className: "sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200" },
-                    React.createElement('div', { className: "max-w-5xl mx-auto px-6 h-16 flex items-center justify-between" },
-                        React.createElement('div', { className: "flex items-center gap-2.5" },
-                            React.createElement('div', { className: "w-9 h-9 bg-primary rounded-xl flex items-center justify-center text-white shadow-md" },
-                                React.createElement(Building2, { size: 18 })
-                            ),
-                            React.createElement('div', null,
-                                React.createElement('span', { className: "text-lg font-black tracking-tight text-primary" }, "PortalPKL"),
-                                React.createElement('span', { className: "text-[8px] font-bold text-slate-400 uppercase tracking-wider block leading-3" }, "Status Center")
-                            )
-                        ),
-                        React.createElement('div', { className: "flex items-center gap-3" },
-                            React.createElement('div', { className: "w-8 h-8 rounded-full bg-gradient-to-br from-primary to-blue-400 p-0.5" },
-                                React.createElement('div', { className: "w-full h-full rounded-full bg-white flex items-center justify-center" },
-                                    React.createElement('span', { className: "text-[10px] font-black text-primary" }, "AW")
-                                )
-                            )
-                        )
-                    )
-                ),
+        // Render card list
+        function renderCards(filter = 'All') {
+            const cardList = document.getElementById('cardList');
+            let filteredBookings = bookings;
+            
+            if (filter !== 'All') {
+                filteredBookings = bookings.filter(b => b.status === filter);
+            }
 
-                // Main Content
-                React.createElement('main', { className: "max-w-5xl mx-auto px-6 py-12" },
-                    // Header Section
-                    React.createElement('div', { className: "mb-12 text-center md:text-left" },
-                        React.createElement('h1', { className: "text-4xl md:text-6xl font-black tracking-tight text-primary leading-[1.1] mb-4" },
-                            "Your PKL ", React.createElement('span', { className: "text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500" }, "Journey")
-                        ),
-                        React.createElement('p', { className: "text-slate-500 max-w-lg text-base font-medium" },
-                            "Monitor your internship applications with ease."
-                        )
-                    ),
+            if (filteredBookings.length === 0) {
+                cardList.innerHTML = `
+                    <div class="empty-state">
+                        <p>No applications found</p>
+                    </div>
+                `;
+                return;
+            }
 
-                    // Stats Cards
-                    React.createElement('div', { className: "grid grid-cols-3 gap-4 mb-12" },
-                        // Total Card
-                        React.createElement('div', { className: "bg-primary p-5 rounded-2xl text-white" },
-                            React.createElement(FileText, { size: 20 }),
-                            React.createElement('p', { className: "text-[10px] font-black uppercase tracking-wider mt-3 opacity-80" }, "Applications"),
-                            React.createElement('p', { className: "text-3xl font-black mt-1" }, stats.total)
-                        ),
-                        // Accepted Card
-                        React.createElement('div', { className: "bg-emerald-500 p-5 rounded-2xl text-white" },
-                            React.createElement(CheckCircle2, { size: 20 }),
-                            React.createElement('p', { className: "text-[10px] font-black uppercase tracking-wider mt-3 opacity-80" }, "Accepted"),
-                            React.createElement('p', { className: "text-3xl font-black mt-1" }, stats.accepted)
-                        ),
-                        // Declined Card
-                        React.createElement('div', { className: "bg-white border border-slate-200 p-5 rounded-2xl text-primary" },
-                            React.createElement(XCircle, { size: 20 }),
-                            React.createElement('p', { className: "text-[10px] font-black uppercase tracking-wider mt-3 text-slate-400" }, "Declined"),
-                            React.createElement('p', { className: "text-3xl font-black mt-1" }, stats.rejected)
-                        )
-                    ),
+            cardList.innerHTML = filteredBookings.map((booking, idx) => `
+                <div class="booking-card" style="animation-delay: ${idx * 0.05}s">
+                    <div class="card-content">
+                        <div class="card-left">
+                            <div class="company-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="4" y="2" width="16" height="20" rx="2" ry="2"/>
+                                    <path d="M9 22v-4h6v4"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="company-name">${booking.dudi.nama_dudi}</h3>
+                                <p class="company-bidang">${booking.dudi.bidang_usaha}</p>
+                            </div>
+                        </div>
+                        <div class="card-right">
+                            <span class="status-badge ${getStatusClass(booking.status)}">${getStatusLabel(booking.status)}</span>
+                            <span class="date-badge">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                                ${booking.created_at}
+                            </span>
+                            <button class="action-btn" onclick="alert('Detail booking: ${booking.dudi.nama_dudi}')">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="5" y1="12" x2="19" y2="12"/>
+                                    <polyline points="12 5 19 12 12 19"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-                    // Tabs
-                    React.createElement('div', { className: "flex items-center justify-between mb-6" },
-                        React.createElement('h2', { className: "text-xl font-black text-primary" }, "History"),
-                        React.createElement('div', { className: "flex gap-1 bg-slate-100 p-1 rounded-xl" },
-                            ['All', 'Diterima', 'Ditolak', 'Direview'].map(tab => 
-                                React.createElement('button', {
-                                    key: tab,
-                                    onClick: () => setActiveTab(tab),
-                                    className: `px-4 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${activeTab === tab ? 'bg-primary text-white shadow-sm' : 'text-slate-500'}`
-                                }, tab)
-                            )
-                        )
-                    ),
+        // Setup tabs
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Update active class
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Render cards with filter
+                    const filter = tab.getAttribute('data-tab');
+                    renderCards(filter);
+                });
+            });
+        }
 
-                    // List
-                    React.createElement('div', { className: "space-y-3" },
-                        filteredBookings.length > 0 ? filteredBookings.map((booking, idx) => {
-                            const meta = getStatusMeta(booking.status);
-                            return React.createElement('div', { 
-                                key: booking.id,
-                                className: "bg-white border border-slate-200 rounded-2xl p-5 hover:shadow-md transition-all",
-                                style: { animation: `fadeInUp 0.3s ease-out ${idx * 0.05}s both` }
-                            },
-                                React.createElement('div', { className: "flex items-center justify-between flex-wrap gap-4" },
-                                    React.createElement('div', { className: "flex items-center gap-4" },
-                                        React.createElement('div', { className: "w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-primary" },
-                                            React.createElement(Building2, { size: 24 })
-                                        ),
-                                        React.createElement('div', null,
-                                            React.createElement('h3', { className: "font-bold text-primary text-sm" }, booking.dudi.nama_dudi),
-                                            React.createElement('p', { className: "text-[10px] text-slate-400 mt-0.5" }, booking.dudi.bidang_usaha)
-                                        )
-                                    ),
-                                    React.createElement('div', { className: "flex items-center gap-4" },
-                                        React.createElement('div', { className: `px-3 py-1 rounded-full ${meta.bg} ${meta.color} text-[9px] font-black uppercase tracking-wider` }, meta.label),
-                                        React.createElement('span', { className: "flex items-center gap-1 text-[10px] text-slate-400" },
-                                            React.createElement(Clock, { size: 10 }), " ", booking.created_at
-                                        ),
-                                        React.createElement('button', { className: "w-10 h-10 rounded-xl bg-slate-50 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all" },
-                                            React.createElement(ArrowRight, { size: 16 })
-                                        )
-                                    )
-                                )
-                            );
-                        }) : React.createElement('div', { className: "text-center py-16 bg-white border-2 border-dashed border-slate-200 rounded-3xl" },
-                            React.createElement('p', { className: "text-slate-400 font-medium text-sm" }, "No applications found")
-                        )
-                    )
-                ),
-
-                // Footer
-                React.createElement('footer', { className: "py-8 border-t border-slate-200 text-center mt-8" },
-                    React.createElement('p', { className: "text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]" }, "PortalPKL • 2026")
-                )
-            );
-        };
-
-        ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App, null));
+        // Inisialisasi
+        renderStats();
+        renderCards('All');
+        setupTabs();
     </script>
 </body>
 </html>

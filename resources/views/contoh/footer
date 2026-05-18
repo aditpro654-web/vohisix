@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Footer VOHISIX - SMKN 6 Malang</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Warna utama */
+        :root {
+            --primary: #003056;
+            --primary-light: #1a4a7a;
+            --primary-soft: #e6f0fa;
+            --white: #ffffff;
+            --gray-light: #f8fafc;
+            --gray: #64748b;
+            --border: #e2e8f0;
+        }
+        
+        /* Footer Styles */
+        footer {
+            background-color: var(--primary);
+            color: #fff;
+            padding: 25px 60px 15px 60px;
+            width: 100%;
+            margin-top: 15px;
+        }
+        
+        .footer-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0;
+        }
+        
+        .footer-top {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .footer-logo-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+            margin-top: -5px;
+        }
+        
+        .footer-logo-img {
+            width: 240px;
+            height: 70px;
+            object-fit: contain;
+            border-radius: 0;
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .footer-logo-img:hover {
+            transform: scale(1.02);
+            opacity: 0.9;
+        }
+        
+        .footer-subtitle {
+            font-size: 0.85rem;
+            color: #cbd5e0;
+            line-height: 1.5;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Footer Middle - Dengan grid 4 kolom */
+        .footer-middle {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 0;
+            margin-bottom: 20px;
+            padding: 0;
+            position: relative;
+        }
+        
+        .footer-section {
+            text-align: left;
+            padding: 0;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        
+        /* Inner container untuk konten */
+        .section-content {
+            width: 100%;
+            text-align: left;
+            margin: 0 auto;
+        }
+        
+        /* Lebar spesifik untuk setiap section */
+        .info-section .section-content {
+            max-width: 200px;
+        }
+        
+        .bantuan-section .section-content {
+            max-width: 140px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 10px;
+        }
+        
+        .pembuat-section .section-content {
+            max-width: 150px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 15px;
+        }
+        
+        .medsos-vertical-section .section-content {
+            max-width: 140px;
+        }
+        
+        /* Garis pemisah vertikal */
+        .footer-section {
+            position: relative;
+        }
+        
+        .footer-section:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: -5px;
+            top: 10%;
+            height: 80%;
+            width: 1px;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .footer-title {
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            color: #fff;
+            font-weight: 600;
+            padding-bottom: 4px;
+            border-bottom: 2px solid #ffffff;
+            display: inline-block;
+        }
+        
+        .contact-info p {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #cbd5e0;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+        
+        .contact-info i {
+            color: #ffffff;
+            width: 14px;
+            font-size: 0.8rem;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0px;
+            text-align: left;
+            line-height: 1.2;
+        }
+        
+        .footer-links a {
+            color: #cbd5e0;
+            text-decoration: none;
+            transition: color 0.3s;
+            display: inline-block;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+        
+        .footer-links a:hover {
+            color: #ffffff;
+            transform: translateX(5px);
+        }
+        
+        .pembuat-list {
+            list-style: none;
+        }
+        
+        .pembuat-list li {
+            color: #cbd5e0;
+            font-size: 0.75rem;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            text-align: left;
+            line-height: 1.2;
+        }
+        
+        /* Media Sosial Vertikal */
+        .social-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 0;
+        }
+        
+        .social-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #cbd5e0;
+            text-decoration: none;
+            transition: all 0.2s;
+            position: relative;
+            padding: 0;
+            justify-content: flex-start;
+            line-height: 1.2;
+        }
+        
+        .social-item:not(:last-child) {
+            margin-bottom: 0;
+        }
+        
+        .social-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            max-width: 120px;
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .social-item:hover {
+            color: white;
+            transform: translateX(3px);
+        }
+        
+        .social-icon-small {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        
+        .social-item:hover .social-icon-small {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .social-item span {
+            font-size: 0.75rem;
+            line-height: 1.2;
+        }
+        
+        .social-item.instagram:hover .social-icon-small { background-color: #E1306C; }
+        .social-item.tiktok:hover .social-icon-small { background-color: #000000; }
+        .social-item.facebook:hover .social-icon-small { background-color: #1877F2; }
+        .social-item.youtube:hover .social-icon-small { background-color: #FF0000; }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #a0aec0;
+            font-size: 0.75rem;
+            margin-top: 10px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .footer-section:not(:last-child)::after {
+                right: -10px;
+            }
+        }
+        
+        @media (max-width: 1100px) {
+            .info-section .section-content { max-width: 180px; }
+            .bantuan-section .section-content { max-width: 130px; padding-left: 5px; }
+            .pembuat-section .section-content { max-width: 140px; padding-left: 10px; }
+            .medsos-vertical-section .section-content { max-width: 130px; }
+        }
+        
+        @media (max-width: 992px) {
+            .footer-middle {
+                grid-template-columns: 1fr 1fr;
+                gap: 30px 40px;
+            }
+            
+            .footer-section:not(:last-child)::after {
+                display: none;
+            }
+            
+            .info-section .section-content,
+            .bantuan-section .section-content,
+            .pembuat-section .section-content,
+            .medsos-vertical-section .section-content {
+                max-width: 220px;
+                margin: 0 auto;
+                padding-left: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            footer {
+                padding: 20px 20px 10px 20px;
+            }
+            
+            .footer-middle {
+                grid-template-columns: 1fr;
+                gap: 25px;
+            }
+            
+            .footer-section {
+                width: 100%;
+            }
+            
+            .info-section .section-content,
+            .bantuan-section .section-content,
+            .pembuat-section .section-content,
+            .medsos-vertical-section .section-content {
+                max-width: 280px;
+                margin: 0 auto;
+                padding-left: 0;
+            }
+            
+            .footer-logo-img {
+                width: 200px;
+                height: 60px;
+            }
+            
+            .contact-info p, .footer-links a, .pembuat-list li {
+                white-space: normal;
+            }
+            
+            .footer-subtitle {
+                padding: 0 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .footer-logo-img {
+                width: 180px;
+                height: 55px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hanya Footer, tanpa konten lain -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-top">
+                <div class="footer-logo-container">
+                    <img src="logo-vohisix.png" alt="VOHISIX Logo" class="footer-logo-img" id="footerLogo" onclick="window.location.href='#'">
+                </div>
+                <p class="footer-subtitle">
+                    Booking PKL adalah platform resmi SMK Negeri 6 Malang untuk memudahkan siswa dalam mencari, melamar, dan memantau proses PKL secara digital.
+                </p>
+            </div>
+            
+            <div class="footer-middle">
+                <!-- Informasi Sekolah -->
+                <div class="footer-section info-section">
+                    <div class="section-content">
+                        <h3 class="footer-title">Informasi Sekolah</h3>
+                        <div class="contact-info">
+                            <p><i class="fas fa-school"></i> SMK Negeri 6 Malang</p>
+                            <p><i class="fas fa-map-marker-alt"></i> JL. Ki Ageng Gribig no.28</p>
+                            <p><i class="fas fa-phone"></i> Telp: (0341) 720138</p>
+                            <p><i class="fas fa-envelope"></i> smkn6malang@sch.id</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bantuan - Kembali ke posisi tengah -->
+                <div class="footer-section bantuan-section">
+                    <div class="section-content">
+                        <h3 class="footer-title">Bantuan</h3>
+                        <ul class="footer-links">
+                            <li><a href="#">FAQ</a></li>
+                            <li><a href="#">Panduan Penggunaan</a></li>
+                            <li><a href="#">Cara Upload</a></li>
+                            <li><a href="#">Cara Melamar</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Pembuat - Kembali ke posisi tengah -->
+                <div class="footer-section pembuat-section">
+                    <div class="section-content">
+                        <h3 class="footer-title">Pembuat</h3>
+                        <ul class="pembuat-list">
+                            <li>Cantika Egaraisya R</li>
+                            <li>Mega Yuliani</li>
+                            <li>Aditya Fabian</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Media Sosial -->
+                <div class="footer-section medsos-vertical-section">
+                    <div class="section-content">
+                        <div class="social-vertical">
+                            <a href="#" class="social-item instagram">
+                                <span class="social-icon-small"><i class="fab fa-instagram"></i></span>
+                                <span>Instagram</span>
+                            </a>
+                            <a href="#" class="social-item tiktok">
+                                <span class="social-icon-small"><i class="fab fa-tiktok"></i></span>
+                                <span>TikTok</span>
+                            </a>
+                            <a href="#" class="social-item facebook">
+                                <span class="social-icon-small"><i class="fab fa-facebook-f"></i></span>
+                                <span>Facebook</span>
+                            </a>
+                            <a href="#" class="social-item youtube">
+                                <span class="social-icon-small"><i class="fab fa-youtube"></i></span>
+                                <span>YouTube</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 All Rights Reserved. Booking PKL.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const copyrightText = document.querySelector('.copyright p');
+            const currentYear = new Date().getFullYear();
+            copyrightText.innerHTML = `&copy; ${currentYear} All Rights Reserved. Booking PKL.`;
+        });
+    </script>
+</body>
+</html>

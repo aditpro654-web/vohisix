@@ -377,7 +377,15 @@
 
 @section('content')
 <div class="container" style="max-width: 1024px; margin: 0 auto; padding: 48px 20px;">
-
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">
+            Status Booking <span class="page-title-gradient">PKL</span>
+        </h1>
+        <p class="page-subtitle">
+            Pantau status pengajuan PKL Anda dengan kartu informasi yang mudah dibaca.
+        </p>
+    </div>
 
     @if($bookings->count() > 0)
         <!-- Stats Grid -->
@@ -426,7 +434,6 @@
 
         <!-- Card List -->
         <div class="card-list" id="cardList">
-
             @forelse($bookings as $booking)
                 <div class="booking-card animate-fadeInUp" data-status="{{ $booking->status }}" style="animation-delay: {{ $loop->index * 0.05 }}s;">
                     <div class="card-content">

@@ -8,7 +8,7 @@
     <p class="form-helper">Tambahkan siswa baru dengan data lengkap untuk login dan booking PKL.</p>
 </div>
 
-<div class="form-card" style="max-width: 700px; margin: 0 auto;">
+<div class="form-card">
     <div class="card-header">
         <h2>Form Pendaftaran Siswa</h2>
         <p class="form-helper">Masukkan NIS, nama, kelas, dan unggah foto jika tersedia.</p>
@@ -35,7 +35,7 @@
 
         <div class="form-group">
             <label>Kelas *</label>
-            <div class="form-row" style="gap: 16px;">
+            <div class="form-row">
                 <label class="radio-option"><input type="radio" name="kelas" value="XIII SIJA 1" {{ old('kelas') == 'XIII SIJA 1' ? 'checked' : '' }}> XIII SIJA 1</label>
                 <label class="radio-option"><input type="radio" name="kelas" value="XIII SIJA 2" {{ old('kelas') == 'XIII SIJA 2' ? 'checked' : '' }}> XIII SIJA 2</label>
             </div>
@@ -46,7 +46,15 @@
 
         <div class="form-group">
             <label for="foto">Foto Siswa (opsional)</label>
-            <input type="file" id="foto" name="foto" accept="image/*">
+            <div class="input-icon-group">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 5 17 10"></polyline>
+                    <path d="M12 5v12"></path>
+                </svg>
+                <label for="foto" class="upload-file-label">Pilih Foto</label>
+            </div>
+            <input id="foto" type="file" name="foto" accept="image/*" class="sr-only">
             @error('foto')
                 <div class="form-error">{{ $message }}</div>
             @enderror

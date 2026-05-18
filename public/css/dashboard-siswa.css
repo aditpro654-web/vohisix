@@ -171,7 +171,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.35);
     z-index: 1001;
     visibility: hidden;
     opacity: 0;
@@ -186,11 +186,11 @@ body {
 .sidebar {
     position: fixed;
     top: 0;
-    left: -300px;
-    width: 280px;
+    left: -320px;
+    width: 320px;
     height: 100%;
-    background-color: var(--white);
-    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(180deg, #0f2b3d 0%, #0a1a28 100%);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     z-index: 1002;
     transition: left 0.3s ease;
     display: flex;
@@ -203,15 +203,15 @@ body {
 }
 
 .sidebar-header {
-    padding: 25px 20px;
-    border-bottom: 1px solid var(--border);
+    padding: 32px 24px;
     text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .sidebar-user-avatar {
-    width: 70px;
-    height: 70px;
-    background-color: var(--primary);
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, #0f2b3d 0%, #1a3a5c 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -219,68 +219,78 @@ body {
     color: white;
     font-size: 2rem;
     font-weight: bold;
-    margin: 0 auto 15px;
-    border: 3px solid var(--primary-soft);
+    margin: 0 auto 16px;
+    border: 3px solid rgba(255, 255, 255, 0.24);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 .sidebar-user-name {
     font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--primary);
+    font-weight: 700;
+    color: white;
 }
 
 .sidebar-user-role {
-    font-size: 0.8rem;
-    color: var(--gray);
-    margin-top: 5px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.78);
+    margin-top: 6px;
 }
 
 .sidebar-nav {
     flex: 1;
-    padding: 20px 0;
+    padding: 24px;
 }
 
-.sidebar-nav-item {
+.sidebar-nav-item,
+.sidebar-nav-link {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 20px;
-    color: #334155;
+    gap: 14px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    border-radius: 14px;
     text-decoration: none;
-    transition: all 0.2s;
-    border-left: 3px solid transparent;
-}
-
-.sidebar-nav-item i {
-    width: 20px;
-    color: var(--gray);
-    font-size: 1rem;
-}
-
-.sidebar-nav-item:hover {
-    background-color: var(--primary-soft);
-    border-left-color: var(--primary);
-    color: var(--primary);
-}
-
-.sidebar-nav-item:hover i {
-    color: var(--primary);
-}
-
-.sidebar-nav-item.active {
-    background-color: var(--primary-soft);
-    border-left-color: var(--primary);
-    color: var(--primary);
+    color: #cbd5e1;
+    transition: all 0.22s ease;
+    border: 1px solid transparent;
     font-weight: 500;
 }
 
-.sidebar-nav-item.active i {
-    color: var(--primary);
+.sidebar-nav-item i,
+.sidebar-nav-link i {
+    width: 22px;
+    text-align: center;
+    font-size: 1rem;
+    color: #cbd5e1;
+}
+
+.sidebar-nav-item:hover,
+.sidebar-nav-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+}
+
+.sidebar-nav-item:hover i,
+.sidebar-nav-link:hover i {
+    color: white;
+}
+
+.sidebar-nav-item.active,
+.sidebar-nav-link.active {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.14);
+    font-weight: 600;
+}
+
+.sidebar-nav-item.active i,
+.sidebar-nav-link.active i {
+    color: white;
 }
 
 .sidebar-footer {
-    padding: 20px;
-    border-top: 1px solid var(--border);
+    padding: 22px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .logout-btn {
@@ -289,20 +299,21 @@ body {
     align-items: center;
     justify-content: center;
     gap: 12px;
-    padding: 12px 20px;
-    background-color: var(--primary-soft);
-    color: var(--primary);
-    border: none;
-    border-radius: 8px;
+    padding: 12px 16px;
+    background: transparent;
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.24);
+    border-radius: 14px;
     cursor: pointer;
-    transition: all 0.2s;
-    font-weight: 500;
-    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    font-weight: 600;
+    font-size: 0.95rem;
 }
 
 .logout-btn:hover {
-    background-color: var(--primary);
-    color: white;
+    background: rgba(248, 113, 113, 0.12);
+    color: #ef4444;
+    border-color: rgba(248, 113, 113, 0.36);
 }
 
 /* Main Content */
@@ -310,7 +321,7 @@ body {
     flex: 1;
     padding: 0;
     width: 100%;
-    margin: 0;
+    margin: 32px 0 60px 0;
 }
 
 .dashboard-card {

@@ -1,156 +1,540 @@
+Baik, saya akan buatkan menjadi format Laravel dengan file CSS eksternal di `public/css/` dan file Blade untuk sidebar.
+
+## 📁 Struktur File yang akan dibuat:
+
+```
+public/css/
+├── sidebar.css          (CSS sidebar navy elegant)
+
+resources/views/layouts/
+├── app.blade.php        (Update dengan sidebar baru)
+```
+
+---
+
+## 📄 File 1: `public/css/sidebar.css`
+
+```css
+/* ========================================
+   SIDEBAR NAVIGATION - NAVY ELEGANT
+   Untuk PKL Management System
+   ======================================== */
+
+/* Tombol Menu - Hamburger */
+.sidebar-menu-toggle {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    background: #0f2b3d;
+    color: white;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+}
+
+.sidebar-menu-toggle:hover {
+    background: #0a1a28;
+    transform: scale(1.02);
+}
+
+.sidebar-menu-toggle.hidden {
+    display: none;
+}
+
+/* Sidebar - Navy Elegant */
+.admin-sidebar {
+    width: 320px;
+    position: fixed;
+    top: 0;
+    left: -340px;
+    height: 100vh;
+    background: linear-gradient(180deg, #0f2b3d 0%, #0a1a28 100%);
+    display: flex;
+    flex-direction: column;
+    transition: left 0.25s ease;
+    z-index: 1000;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.admin-sidebar.active {
+    left: 0;
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.25s ease;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Sidebar Inner Container */
+.sidebar-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+/* Scrollbar Custom */
+.sidebar-inner::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-inner::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.sidebar-inner::-webkit-scrollbar-thumb {
+    background: #2c5a7a;
+    border-radius: 10px;
+}
+
+.sidebar-inner::-webkit-scrollbar-thumb:hover {
+    background: #3b6e94;
+}
+
+/* ========== PROFILE CARD ========== */
+.sidebar-profile-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
+    padding: 24px;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    margin: 24px 24px 0 24px;
+}
+
+/* Avatar */
+.sidebar-avatar {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #0f2b3d 0%, #1a3a5c 100%);
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    border: 3px solid white;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 48, 86, 0.2);
+}
+
+.sidebar-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sidebar-avatar-placeholder {
+    font-size: 28px;
+    font-weight: 600;
+    color: white;
+}
+
+/* Profile Info */
+.sidebar-user-name {
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #0f2b3d;
+    margin-bottom: 4px;
+}
+
+.sidebar-user-role {
+    text-align: center;
+    font-size: 11px;
+    color: #2c5a7a;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+}
+
+.sidebar-user-badge {
+    display: inline-block;
+    padding: 5px 14px;
+    background: #0f2b3d;
+    color: white;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sidebar-badge-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+/* ========== NAVIGATION MENU ========== */
+.sidebar-nav {
+    flex: 1;
+    padding: 24px;
+}
+
+.sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    color: #a0c4e0;
+    cursor: pointer;
+}
+
+.sidebar-nav-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+}
+
+.sidebar-nav-item.active {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+    font-weight: 600;
+    border-left: 3px solid #3b82f6;
+}
+
+.sidebar-nav-item svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+}
+
+/* ========== LOGOUT BUTTON ========== */
+.sidebar-footer {
+    padding: 20px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    width: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #f87171;
+}
+
+.sidebar-logout-btn:hover {
+    background: rgba(248, 113, 113, 0.1);
+    color: #ef4444;
+}
+
+.sidebar-logout-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .admin-sidebar {
+        width: 280px;
+    }
+    
+    .sidebar-profile-card {
+        padding: 20px;
+        margin: 20px 20px 0 20px;
+    }
+    
+    .sidebar-avatar {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .sidebar-avatar-placeholder {
+        font-size: 24px;
+    }
+    
+    .sidebar-nav {
+        padding: 16px;
+    }
+    
+    .sidebar-nav-item {
+        padding: 10px 14px;
+    }
+    
+    .sidebar-logout-btn {
+        padding: 10px 14px;
+    }
+}
+```
+
+---
+
+## 📄 File 2: `resources/views/layouts/app.blade.php` (Update)
+
+```blade
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal PKL - Sidebar Navigation</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>@yield('title', 'PKL Management System')</title>
     
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
-            background: linear-gradient(135deg, #e8f0fe 0%, #f0f4fa 100%);
-        }
-        
-        .font-display {
-            font-family: 'Quicksand', sans-serif;
-        }
-        
-        .sidebar {
-            width: 320px;
-        }
-        
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #E2E8F0;
-            border-radius: 10px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #003056;
-            border-radius: 10px;
-        }
-        
-        .clickable-avatar {
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .clickable-avatar:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 20px rgba(0, 48, 86, 0.15);
-        }
-        
-        .profile-card {
-            background: linear-gradient(135deg, #003056 0%, #00457d 100%);
-        }
-    </style>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Admin Global Style -->
+    <link rel="stylesheet" href="{{ asset('css/admin-style.css') }}">
+    
+    <!-- Sidebar Navy Elegant CSS -->
+    <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
+    
+    @stack('styles')
 </head>
 <body>
-    <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState } = React;
+    <!-- Tombol Menu Hamburger -->
+    <button class="sidebar-menu-toggle" id="menuToggle">
+        ☰ Menu
+    </button>
 
-        // Mock Data
-        const STUDENT_DATA = {
-            nama: "Ahmad Fauzi",
-            nis: "212210123",
-            kelas: "XII RPL 2",
-            program: "Rekayasa Perangkat Lunak",
-        };
+    <!-- Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        // Icon components
-        const LayoutDashboard = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>;
-        const FileText = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>;
-        const User = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
-        const Settings = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
-        const LogOut = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>;
-
-        function NavItem({ icon, label, active = false }) {
-            return (
-                <a href="#" className={`flex items-center gap-3 px-6 py-4 rounded-2xl text-sm transition-all shadow-sm border ${
-                    active 
-                        ? 'bg-white text-[#003056] font-bold border-white/60 shadow-md' 
-                        : 'text-slate-500 hover:bg-white/30 hover:text-[#003056] font-semibold border-transparent'
-                }`}>
-                    <span className={`${active ? 'text-[#003056]' : 'text-slate-400 group-hover:text-[#003056]'}`}>{icon}</span>
-                    <span>{label}</span>
-                </a>
-            );
-        }
-
-        function App() {
-            const handleAvatarClick = () => {
-                alert("Profil siswa: " + STUDENT_DATA.nama + "\nNIS: " + STUDENT_DATA.nis + "\nKelas: " + STUDENT_DATA.kelas);
-            };
-
-            const handleLogout = () => {
-                alert("Anda telah keluar dari sistem");
-            };
-
-            return (
-                <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #e8f0fe 0%, #f0f4fa 100%)' }}>
-                    {/* Sidebar Only */}
-                    <aside className="sidebar fixed h-full bg-white flex flex-col border-r border-slate-200 shadow-xl z-10">
-                        <div className="p-8">
-                            {/* Profile Card - Langsung di atas, tanpa logo */}
-                            <div className="mb-8">
-                                <div className="profile-card p-6 rounded-2xl shadow-lg">
-                                    {/* Avatar Clickable */}
-                                    <div className="w-16 h-16 bg-white rounded-full mx-auto mb-3 border-4 border-white/30 shadow-inner overflow-hidden clickable-avatar" onClick={handleAvatarClick}>
-                                        <img 
-                                            src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${STUDENT_DATA.nama}`} 
-                                            alt="Avatar"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                    <h2 className="text-center font-bold text-white text-lg font-display">{STUDENT_DATA.nama}</h2>
-                                    <p className="text-center text-xs text-blue-200 tracking-wider font-semibold">NIS: {STUDENT_DATA.nis}</p>
-                                    <div className="mt-4 flex justify-center">
-                                        <span className="px-3 py-1 bg-white/20 text-white rounded-full text-[10px] font-bold uppercase tracking-tighter shadow-sm border border-white/30">{STUDENT_DATA.kelas}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Navigation Menu */}
-                            <nav className="space-y-2">
-                                <NavItem icon={<LayoutDashboard />} label="Dashboard" active />
-                                <NavItem icon={<FileText />} label="Berkas Saya" />
-                                <NavItem icon={<User />} label="Profil" />
-                                <NavItem icon={<Settings />} label="Pengaturan" />
-                            </nav>
-                        </div>
-                        
-                        {/* Logout Button - Rata Kiri, sejajar dengan menu */}
-                        <div className="mt-auto p-8 border-t border-slate-200/50">
-                            <button 
-                                onClick={handleLogout}
-                                className="flex items-center gap-3 text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors font-semibold text-sm py-3 px-6 rounded-xl w-full"
-                            >
-                                <LogOut />
-                                <span>Keluar Akun</span>
-                            </button>
-                        </div>
-                    </aside>
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-inner">
+            <!-- Profile Card -->
+            <div class="sidebar-profile-card">
+                <div class="sidebar-avatar" id="avatarBtn">
+                    @php
+                        $user = Auth::user();
+                        $avatarInitial = $user ? strtoupper(substr($user->name, 0, 2)) : 'AD';
+                    @endphp
+                    @if(isset($user) && $user->foto)
+                        <img src="{{ asset('storage/'.$user->foto) }}" alt="Avatar">
+                    @else
+                        <div class="sidebar-avatar-placeholder">{{ $avatarInitial }}</div>
+                    @endif
                 </div>
-            );
+                <h2 class="sidebar-user-name">{{ $user->name ?? 'Administrator' }}</h2>
+                <p class="sidebar-user-role">{{ $user->role ?? 'Admin' }}</p>
+                <div class="sidebar-badge-wrapper">
+                    <span class="sidebar-user-badge">{{ $user->kelas ?? 'Administrator' }}</span>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="sidebar-nav">
+                <a href="{{ route('dashboard') }}" class="sidebar-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+                
+                <a href="{{ route('admin.siswa.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.siswa.*') ? 'active' : '' }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    <span>Data Siswa</span>
+                </a>
+                
+                <a href="{{ route('admin.dudi.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.dudi.*') ? 'active' : '' }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                    </svg>
+                    <span>Data DUDI</span>
+                </a>
+                
+                <a href="{{ route('admin.booking.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.booking.*') ? 'active' : '' }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <span>Booking PKL</span>
+                </a>
+                
+                <a href="{{ route('admin.login.index') }}" class="sidebar-nav-item {{ request()->routeIs('admin.login.*') ? 'active' : '' }}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="2.5"/>
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    <span>Manajemen Login</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Logout Button -->
+        <div class="sidebar-footer">
+            <form action="{{ route('logout') }}" method="POST" style="width: 100%;">
+                @csrf
+                <button type="submit" class="sidebar-logout-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    <span>Keluar Akun</span>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        @yield('content')
+    </main>
+
+    <!-- Scripts -->
+    <script>
+        // DOM Elements
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('adminSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        // Fungsi buka sidebar
+        function openSidebar() {
+            sidebar.classList.add('active');
+            overlay.classList.add('active');
+            menuToggle.classList.add('hidden');
         }
 
-        ReactDOM.createRoot(document.getElementById('root')).render(<React.StrictMode><App /></React.StrictMode>);
+        // Fungsi tutup sidebar
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            menuToggle.classList.remove('hidden');
+        }
+
+        // Event listener
+        if (menuToggle) {
+            menuToggle.addEventListener('click', openSidebar);
+        }
+        if (overlay) {
+            overlay.addEventListener('click', closeSidebar);
+        }
+
+        // Avatar Click
+        const avatarBtn = document.getElementById('avatarBtn');
+        if (avatarBtn) {
+            avatarBtn.addEventListener('click', () => {
+                alert("Profil Pengguna\n\nNama: {{ $user->name ?? 'Administrator' }}\nRole: {{ $user->role ?? 'Admin' }}");
+            });
+        }
+
+        // Tutup sidebar saat resize ke desktop (opsional)
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768 && sidebar.classList.contains('active')) {
+                // Biarkan sidebar tetap terbuka jika di desktop
+            }
+        });
     </script>
+    
+    @stack('scripts')
 </body>
 </html>
+```
+
+---
+
+## 📄 File 3: Tambahkan CSS untuk main content di `public/css/admin-style.css`
+
+```css
+/* Main Content Style */
+.main-content {
+    margin-left: 0;
+    padding: 80px 40px 40px 40px;
+    transition: margin-left 0.25s ease;
+}
+
+/* Untuk desktop, sidebar bisa tetap terbuka */
+@media (min-width: 769px) {
+    .admin-sidebar {
+        left: 0;
+    }
+    .sidebar-menu-toggle {
+        display: none;
+    }
+    .main-content {
+        margin-left: 320px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 80px 20px 40px 20px;
+    }
+    .admin-sidebar {
+        left: -340px;
+    }
+    .admin-sidebar.active {
+        left: 0;
+    }
+    .sidebar-menu-toggle {
+        display: block;
+    }
+}
+```
+
+---
+
+## 📋 Cara Install:
+
+1. **Buat folder** `public/css/` jika belum ada
+2. **Copy** file `sidebar.css` ke `public/css/sidebar.css`
+3. **Update** file `resources/views/layouts/app.blade.php` dengan kode di atas
+4. **Tambahkan** CSS main content ke `public/css/admin-style.css`
+5. **Pastikan** route `dashboard`, `admin.siswa.index`, `admin.dudi.index`, `admin.booking.index`, `admin.login.index`, dan `logout` sudah terdefinisi di `routes/web.php`
+(jika sudah ada folder yang sama/serupa tidak perlu dibuat ulang, cukup update file yang sudah ada)
+
+## ✅ Hasil:
+
+- **Desktop (≥769px)** : Sidebar selalu terbuka di kiri, hamburger hilang
+- **Mobile (≤768px)** : Sidebar tersembunyi, muncul saat hamburger diklik
+- **Warna** : Navy elegant seperti yang diminta
+- **Tanpa link eksternal** : Semua CSS sudah di file sendiri, tidak ada CDN kecuali Google Fonts (opsional)

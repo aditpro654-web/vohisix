@@ -23,30 +23,30 @@
     </div>
 </div>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
-    <div class="card" style="border-left: 4px solid #ffc107;">
+<div class="stats-grid">
+    <div class="status-card review">
         <div class="stat-label">Booking Direview</div>
-        <div class="stat-number" style="color: #ffc107;">{{ $bookingDireview }}</div>
+        <div class="stat-number status-number review">{{ $bookingDireview }}</div>
     </div>
-    <div class="card" style="border-left: 4px solid #28a745;">
+    <div class="status-card accept">
         <div class="stat-label">Booking Diterima</div>
-        <div class="stat-number" style="color: #28a745;">{{ $bookingDiterima }}</div>
+        <div class="stat-number status-number accept">{{ $bookingDiterima }}</div>
     </div>
-    <div class="card" style="border-left: 4px solid #dc3545;">
+    <div class="status-card reject">
         <div class="stat-label">Booking Ditolak</div>
-        <div class="stat-number" style="color: #dc3545;">{{ $bookingDitolak }}</div>
+        <div class="stat-number status-number reject">{{ $bookingDitolak }}</div>
     </div>
 </div>
 
-<div class="card" style="margin-top: 30px;">
+<div class="card">
     <div class="card-header">
         <h2>Menu Utama</h2>
     </div>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
-        <a href="{{ route('admin.siswa.index') }}" class="btn btn-primary" style="text-align: center;">👥 Kelola Siswa</a>
-        <a href="{{ route('admin.dudi.index') }}" class="btn btn-primary" style="text-align: center;">🏢 Kelola DUDI</a>
-        <a href="{{ route('admin.booking.index') }}" class="btn btn-primary" style="text-align: center;">📋 Kelola Booking</a>
-        <a href="{{ route('admin.login.index') }}" class="btn btn-primary" style="text-align: center;">🔐 Manajemen Login</a>
+    <div class="dashboard-grid">
+        <a href="{{ route('admin.siswa.index') }}" class="btn btn-primary">👥 Kelola Siswa</a>
+        <a href="{{ route('admin.dudi.index') }}" class="btn btn-primary">🏢 Kelola DUDI</a>
+        <a href="{{ route('admin.booking.index') }}" class="btn btn-primary">📋 Kelola Booking</a>
+        <a href="{{ route('admin.login.index') }}" class="btn btn-primary">🔐 Manajemen Login</a>
     </div>
 </div>
 @endsection

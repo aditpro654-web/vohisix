@@ -710,10 +710,10 @@
         if (sudahAjukan) {
             warningMessage.style.display = 'flex';
             warningText.textContent = '✓ Anda sudah mengajukan PKL ke perusahaan ini. Silakan cek status di halaman Booking PKL.';
-            warningMessage.style.backgroundColor = '#d1fae5';
-            warningMessage.style.borderColor = '#6ee7b7';
-            warningMessage.style.color = '#047857';
-            warningMessage.querySelector('i').style.color = '#047857';
+            warningMessage.style.backgroundColor = '#d0e8f7';
+            warningMessage.style.borderColor = '#88c9f0';
+            warningMessage.style.color = '#003d5c';
+            warningMessage.querySelector('i').style.color = '#003d5c';
             dudiDetailApply.disabled = true;
             dudiDetailApply.textContent = 'Sudah Diajukan';
         } else if (kuotaPenuh) {

@@ -1,151 +1,201 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login PKL SIJA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Login PKL SIJA | Sistem Informasi PKL</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        * { box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            margin: 0;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             min-height: 100vh;
-            font-family: 'Inter', sans-serif;
-            background: radial-gradient(circle at top left, rgba(0, 80, 150, 0.18), transparent 25%),
-                        linear-gradient(180deg, #f7fbff 0%, #ebf2f8 100%);
-            color: #102a43;
-            display: grid;
-            place-items: center;
-            padding: 24px;
+            background: url('https://placehold.co/1920x1080/2c3e50/ffffff?text=Ganti+Dengan+Foto+Sekolah+Anda') center/cover no-repeat fixed;
+            /* Ganti URL di atas dengan foto sekolah Anda, misal: {{ asset('images/school-bg.jpg') }} */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
         }
-        .form-card {
+
+        /* Overlay gelap agar teks kontras */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 420px;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 48, 86, 0.85) 0%, rgba(0, 48, 86, 0.75) 100%);
+            z-index: 0;
+        }
+
+        /* Card Login */
+        .login-card {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 460px;
             background: #ffffff;
-            border-radius: 28px;
-            box-shadow: 0 40px 120px rgba(16, 42, 67, 0.14);
-            border: 1px solid rgba(16, 42, 67, 0.08);
+            border-radius: 32px;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1);
             overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .form-card header {
-            padding: 32px 28px 22px;
-            background: linear-gradient(135deg, #003056 0%, #005a8c 100%);
-            color: #ffffff;
+
+        .login-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 40px 60px rgba(0, 0, 0, 0.25);
         }
-        .form-card header h1 {
-            margin: 0 0 8px;
+
+        /* Header card */
+        .card-header {
+            background: linear-gradient(135deg, #003056 0%, #00457d 100%);
+            padding: 34px 32px 28px;
+            text-align: center;
+            color: white;
+        }
+
+        .card-header h1 {
             font-size: 28px;
-            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-bottom: 10px;
         }
-        .form-card header p {
-            margin: 0;
-            opacity: 0.88;
+
+        .card-header p {
             font-size: 14px;
+            opacity: 0.85;
+            font-weight: 500;
+            line-height: 1.4;
         }
-        .form-body {
-            padding: 30px 28px 28px;
+
+        /* Body form */
+        .card-body {
+            padding: 36px 32px 40px;
+            background: white;
         }
+
+        /* Form group */
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 24px;
         }
+
         .form-group label {
             display: block;
             margin-bottom: 8px;
             font-size: 14px;
-            color: #102a43;
             font-weight: 600;
+            color: #1e293b;
+            letter-spacing: -0.2px;
         }
+
         .form-group input {
             width: 100%;
-            padding: 14px 16px;
-            border: 1px solid #d5e1ef;
-            border-radius: 16px;
-            font-size: 14px;
-            background: #f9fbff;
-            color: #102a43;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            padding: 14px 18px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: 500;
+            background: #fefefe;
+            transition: all 0.2s ease;
+            color: #0f172a;
+            font-family: inherit;
         }
+
         .form-group input:focus {
             outline: none;
             border-color: #003056;
-            box-shadow: 0 0 0 4px rgba(0, 80, 150, 0.12);
+            box-shadow: 0 0 0 4px rgba(0, 48, 86, 0.12);
+            background: #ffffff;
         }
+
+        /* Error styling */
         .form-error {
             margin-top: 8px;
-            color: #dc3545;
+            color: #dc2626;
             font-size: 13px;
-        }
-        .error-banner {
-            padding: 16px 18px;
-            border-radius: 18px;
-            background: #fff5f5;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-            margin-bottom: 20px;
-        }
-        .button-group {
+            font-weight: 500;
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            align-items: center;
+            gap: 6px;
         }
-        .login-btn {
-            width: 100%;
+
+        .error-banner {
+            background: #fee2e2;
+            border-left: 4px solid #dc2626;
             padding: 14px 18px;
-            border-radius: 16px;
-            border: none;
-            background: #003056;
-            color: #ffffff;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.2s ease, background 0.2s ease;
-        }
-        .login-btn:hover {
-            background: #002845;
-            transform: translateY(-1px);
-        }
-        .credentials {
-            margin-top: 24px;
-            padding: 18px 20px;
             border-radius: 20px;
-            background: #f1f6ff;
-            border: 1px solid #dbe9ff;
+            margin-bottom: 28px;
+            color: #991b1b;
+            font-size: 14px;
+            font-weight: 500;
         }
-        .credentials h4 {
-            margin: 0 0 10px;
-            font-size: 15px;
-            color: #003056;
-        }
-        .credentials p {
-            margin: 0 0 10px;
-            line-height: 1.6;
-            color: #102a43;
+
+        .error-banner strong {
+            display: block;
+            margin-bottom: 6px;
             font-size: 14px;
         }
-        code {
-            background: #e8f1ff;
-            color: #0f4a8a;
-            padding: 2px 6px;
-            border-radius: 6px;
-            font-size: 13px;
+
+        /* Button */
+        .login-btn {
+            width: 100%;
+            padding: 15px 18px;
+            background: #003056;
+            border: none;
+            border-radius: 28px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 12px rgba(0, 48, 86, 0.25);
+            letter-spacing: -0.2px;
+        }
+
+        .login-btn:hover {
+            background: #002542;
+            transform: scale(0.98);
+            box-shadow: 0 6px 14px rgba(0, 48, 86, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 500px) {
+            .card-header {
+                padding: 28px 24px;
+            }
+            .card-body {
+                padding: 28px 24px;
+            }
+            .card-header h1 {
+                font-size: 24px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="form-card">
-        <header>
-            <h1>Masuk ke Sistem PKL SIJA</h1>
-            <p>Login dengan akun Admin atau Siswa untuk mengelola booking dan profil.</p>
-        </header>
-        <div class="form-body">
+    <div class="login-card">
+        <div class="card-header">
+            <h1>Selamat Datang</h1>
+            <p>Masuk ke Sistem Informasi PKL<br>SMK Negeri 6 Malang</p>
+        </div>
+
+        <div class="card-body">
             @if ($errors->any())
                 <div class="error-banner">
-                    <strong>Login Gagal!</strong>
-                    <div style="margin-top: 10px;">
+                    <strong>⚠️ Login gagal</strong>
+                    <ul style="margin-top: 8px; margin-left: 20px;">
                         @foreach ($errors->all() as $error)
-                            <div>{{ $error }}</div>
+                            <li>{{ $error }}</li>
                         @endforeach
-                    </div>
+                    </ul>
                 </div>
             @endif
 
@@ -154,7 +204,7 @@
 
                 <div class="form-group @error('username') error @enderror">
                     <label for="username">Username</label>
-                    <input type="text" id="username" name="username" value="{{ old('username') }}" required autofocus>
+                    <input type="text" id="username" name="username" value="{{ old('username') }}" required autofocus placeholder="Masukkan username Anda">
                     @error('username')
                         <div class="form-error">{{ $message }}</div>
                     @enderror
@@ -162,26 +212,14 @@
 
                 <div class="form-group @error('password') error @enderror">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
+                    <input type="password" id="password" name="password" required placeholder="••••••••">
                     @error('password')
                         <div class="form-error">{{ $message }}</div>
                     @enderror
                 </div>
 
-                <div class="button-group">
-                    <button type="submit" class="login-btn">Masuk</button>
-                </div>
+                <button type="submit" class="login-btn">Masuk ke Dashboard</button>
             </form>
-
-            <div class="credentials">
-                <h4>📌 Kredensial Akun</h4>
-                <p><strong>Admin:</strong><br>
-                Username: <code>gwadmin</code><br>
-                Password: <code>acm</code></p>
-                <p><strong>Siswa (Contoh):</strong><br>
-                Username: <code>001</code><br>
-                Password: <code>001</code></p>
-            </div>
         </div>
     </div>
 </body>

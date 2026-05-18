@@ -25,14 +25,6 @@
                     <div class="user-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
                     <span>Halo, {{ Auth::user()->name }}</span>
                 </div>
-
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                    @csrf
-                </form>
-
-                <button type="button" class="logout-btn" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    Logout
-                </button>
             @endif
         </div>
     </div>

@@ -17,39 +17,31 @@
             <i class="fas fa-times"></i>
         </button>
     </div>
-    <ul class="sidebar-nav-items">
-        <li class="sidebar-nav-item">
-            <a href="{{ route('siswa.dashboard') }}" class="sidebar-nav-link">
-                <i class="fas fa-home"></i>
-                <span>Dashboard</span>
-            </a>
-        </li>
-        <li class="sidebar-nav-item">
-            <a href="{{ route('siswa.dudi.index') }}" class="sidebar-nav-link active">
-                <i class="fas fa-briefcase"></i>
-                <span>Cari DUDI</span>
-            </a>
-        </li>
-        <li class="sidebar-nav-item">
-            <a href="{{ route('siswa.booking.index') }}" class="sidebar-nav-link">
-                <i class="fas fa-calendar-check"></i>
-                <span>Status Pengajuan</span>
-            </a>
-        </li>
-        <li class="sidebar-nav-item">
-            <a href="{{ route('siswa.profile.index') }}" class="sidebar-nav-link">
-                <i class="fas fa-file-upload"></i>
-                <span>Profil</span>
-            </a>
-        </li>
-        <li class="sidebar-nav-item" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-            <form method="POST" action="{{ route('logout') }}" style="display: inline-width: 100%;">
+    <div class="sidebar-nav-items">
+        <a href="{{ route('siswa.dashboard') }}" class="sidebar-nav-link sidebar-nav-item {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
+            <i class="fas fa-home"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="{{ route('siswa.dudi.index') }}" class="sidebar-nav-link sidebar-nav-item {{ request()->routeIs('siswa.dudi.*') ? 'active' : '' }}">
+            <i class="fas fa-briefcase"></i>
+            <span>Cari DUDI</span>
+        </a>
+        <a href="{{ route('siswa.booking.index') }}" class="sidebar-nav-link sidebar-nav-item {{ request()->routeIs('siswa.booking.*') ? 'active' : '' }}">
+            <i class="fas fa-calendar-check"></i>
+            <span>Status Pengajuan</span>
+        </a>
+        <a href="{{ route('siswa.profile.index') }}" class="sidebar-nav-link sidebar-nav-item {{ request()->routeIs('siswa.profile.*') ? 'active' : '' }}">
+            <i class="fas fa-file-upload"></i>
+            <span>Profil</span>
+        </a>
+        <div class="sidebar-nav-item sidebar-footer">
+            <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
                 @csrf
-                <button type="submit" class="sidebar-nav-link" style="width: 100%; text-align: left; cursor: pointer;">
+                <button type="submit" class="sidebar-logout-btn">
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </button>
             </form>
-        </li>
-    </ul>
+        </div>
+    </div>
 </nav>

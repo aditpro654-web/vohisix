@@ -8,7 +8,7 @@
     <p class="form-helper">Perbarui informasi DUDI untuk menjaga data booking tetap akurat.</p>
 </div>
 
-<div class="form-card" style="max-width: 860px; margin: 0 auto;">
+<div class="form-card max-w-860 mx-auto">
     <div class="card-header">
         <h2>{{ $dudi->nama_dudi }}</h2>
         <p class="form-helper">Sesuaikan detail perusahaan dan jam operasional.</p>

@@ -8,7 +8,7 @@
     <p class="form-helper">Perbarui data siswa agar profil dan login tetap sinkron.</p>
 </div>
 
-<div class="form-card" style="max-width: 700px; margin: 0 auto;">
+<div class="form-card max-w-700 mx-auto">
     <div class="card-header">
         <h2>{{ $siswa->nama }}</h2>
         <p class="form-helper">Ubah NIS, nama, kelas, atau foto siswa.</p>
@@ -37,9 +37,7 @@
 
         <div class="form-group">
             <label>Kelas *</label>
-            <div class="form-row" style="gap: 16px;">
-                <label class="radio-option"><input type="radio" name="kelas" value="XIII SIJA 1" {{ old('kelas', $siswa->kelas) == 'XIII SIJA 1' ? 'checked' : '' }}> XIII SIJA 1</label>
-                <label class="radio-option"><input type="radio" name="kelas" value="XIII SIJA 2" {{ old('kelas', $siswa->kelas) == 'XIII SIJA 2' ? 'checked' : '' }}> XIII SIJA 2</label>
+                <div class="form-row">
             </div>
             @error('kelas')
                 <div class="form-error">{{ $message }}</div>
@@ -50,8 +48,8 @@
             <label for="foto">Foto Siswa (opsional)</label>
             <input type="file" id="foto" name="foto" accept="image/*">
             @if($siswa->foto)
-                <div style="margin-top: 10px;">
-                    <img src="{{ asset('storage/'.$siswa->foto) }}" alt="Foto" style="width:100px;height:100px;object-fit:cover;border-radius:14px;border:1px solid rgba(0,0,0,0.08);">
+                <div class="image-preview">
+                    <img src="{{ asset('storage/'.$siswa->foto) }}" alt="Foto" class="preview-image">
                 </div>
             @endif
             @error('foto')
