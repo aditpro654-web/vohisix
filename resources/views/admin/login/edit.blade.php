@@ -37,11 +37,41 @@
                 <select id="role" name="role" required>
                     <option value="">Pilih Role</option>
                     <option value="admin" @if($user->role === 'admin') selected @endif>Admin</option>
+                    <option value="wali_kelas" @if($user->role === 'wali_kelas') selected @endif>Wali Kelas</option>
+                    <option value="kakonsli" @if($user->role === 'kakonsli') selected @endif>Kakonsli</option>
                     <option value="siswa" @if($user->role === 'siswa') selected @endif>Siswa</option>
                 </select>
                 @error('role')
                     <div class="form-error">{{ $message }}</div>
                 @enderror
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="kelas_id">Kelas Utama</label>
+                <select id="kelas_id" name="kelas_id">
+                    <option value="">Tidak Ada</option>
+                    <option value="XII SIJA 1" {{ old('kelas_id', $user->kelas_id) == 'XII SIJA 1' ? 'selected' : '' }}>XII SIJA 1</option>
+                    <option value="XII SIJA 2" {{ old('kelas_id', $user->kelas_id) == 'XII SIJA 2' ? 'selected' : '' }}>XII SIJA 2</option>
+                </select>
+                @error('kelas_id')
+                    <div class="form-error">{{ $message }}</div>
+                @enderror
+                <p class="form-helper">Diperlukan untuk role Wali Kelas dan Kakonsli.</p>
+            </div>
+
+            <div class="form-group">
+                <label for="kelas_second">Kelas Kedua</label>
+                <select id="kelas_second" name="kelas_second">
+                    <option value="">Tidak Ada</option>
+                    <option value="XII SIJA 1" {{ old('kelas_second', $user->kelas_second) == 'XII SIJA 1' ? 'selected' : '' }}>XII SIJA 1</option>
+                    <option value="XII SIJA 2" {{ old('kelas_second', $user->kelas_second) == 'XII SIJA 2' ? 'selected' : '' }}>XII SIJA 2</option>
+                </select>
+                @error('kelas_second')
+                    <div class="form-error">{{ $message }}</div>
+                @enderror
+                <p class="form-helper">Hanya diperlukan untuk role Kakonsli.</p>
             </div>
         </div>
 

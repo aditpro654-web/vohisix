@@ -40,6 +40,7 @@
                 <option value="siswa_desc" {{ $sortBy == 'siswa_desc' ? 'selected' : '' }}>NIS Z-A</option>
             </select>
             <button type="submit">Cari</button>
+            <a href="{{ route('admin.booking.export', request()->query()) }}" class="btn btn-secondary">Export</a>
         </form>
     </div>
 

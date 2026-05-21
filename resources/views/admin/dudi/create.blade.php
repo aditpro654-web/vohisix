@@ -141,4 +141,28 @@
         </div>
     </form>
 </div>
+
+<div class="form-card">
+    <div class="card-header">
+        <h2>Import Data DUDI</h2>
+        <p class="form-helper">Unggah file CSV untuk menambahkan banyak DUDI sekaligus.</p>
+    </div>
+
+    <form action="{{ route('admin.dudi.import') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+
+        <div class="form-group">
+            <label for="csv_file">Pilih File CSV</label>
+            <input type="file" id="csv_file" name="file" accept=".csv,.xlsx" required>
+            @error('file')
+                <div class="form-error">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Import Data</button>
+            <a href="{{ route('admin.dudi.index') }}" class="btn btn-secondary">Kembali</a>
+        </div>
+    </form>
+</div>
 @endsection

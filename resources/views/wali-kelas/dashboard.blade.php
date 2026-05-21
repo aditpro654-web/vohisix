@@ -27,13 +27,13 @@
         margin-left: 0 !important;
     }
 
-    .kakonsli-dashboard {
-        max-width: 1280px;
+    .wali-dashboard {
+        max-width: 1500px;
         margin: 0 auto;
-        padding: 24px 20px 40px;
+        padding: 24px 24px 40px;
     }
 
-    header.kakonsli-header {
+    header.wali-header {
         background-color: #003056;
         color: white;
         border-radius: 24px;
@@ -261,18 +261,6 @@
         color: #94a3b8;
     }
 
-    .empty-state-icon {
-        width: 48px;
-        height: 48px;
-        margin: 0 auto 16px;
-        display: grid;
-        place-items: center;
-        border-radius: 16px;
-        background-color: #e2e8f0;
-        color: #003056;
-        font-size: 1.5rem;
-    }
-
     .modal-overlay {
         position: fixed;
         inset: 0;
@@ -348,7 +336,7 @@
         display: flex;
         justify-content: space-between;
         padding: 12px 0;
-        border-bottom: 1px solid rgba(255,255,255,0.2);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         font-size: 0.8rem;
     }
 
@@ -404,14 +392,6 @@
         font-weight: 700;
     }
 
-    .footer-section {
-        margin-top: 40px;
-        padding: 20px 0;
-        text-align: center;
-        color: #64748b;
-        font-size: 0.875rem;
-    }
-
     @media (max-width: 1024px) {
         .header-title {
             font-size: 1.5rem;
@@ -441,7 +421,7 @@
     }
 
     @media (max-width: 640px) {
-        .kakonsli-dashboard {
+        .wali-dashboard {
             padding: 16px 12px 32px;
         }
 
@@ -459,22 +439,24 @@
 @endsection
 
 @section('content')
-<div class="kakonsli-dashboard" id="root"></div>
+<div class="wali-dashboard" id="root"></div>
 @endsection
 
 @push('scripts')
 <script>
+    // Data dari controller - gunakan variabel yang dikirim
     const SISWAS = @json($siswas);
-    const KELAS_OPTIONS = [@json($kelas)];
-    const PAGE_TITLE = 'Dashboard Wali Kelas';
-    const PAGE_SUBTITLE = 'Booking PKL SMKN 6 Malang • Data Kelas {{ $kelas }}';
-    const STATS = {
-        total: {{ $totalSiswa }},
-        ditempatkan: {{ $bookingDiterima }},
-        berkasKurang: {{ $siswas->where('berkas', 'Kurang')->count() }},
-    };
+    const KELAS_WALI = @json($kelas);
+    const TOTAL_SISWA = @json($totalSiswa);
+    const BOOKING_DITERIMA = @json($bookingDiterima);
+    
+    // Hitung berkas kurang dari data siswa
+    const BERKAS_KURANG = SISWAS.filter(s => s.berkas === 'Kurang').length;
 
-    let selectedClass = KELAS_OPTIONS.length ? KELAS_OPTIONS[0] : '';
+    // Debug
+    console.log('SISWAS:', SISWAS);
+    console.log('Jumlah data:', SISWAS.length);
+
     let searchQuery = '';
     let statusFilter = 'Semua Status';
     let selectedStudent = null;
@@ -492,13 +474,14 @@
     }
 
     function getFilteredData() {
+        if (!SISWAS.length) return [];
         return SISWAS.filter(student => {
-            const matchesClass = selectedClass ? student.kelas === selectedClass : true;
-            const matchesSearch = student.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                student.nis.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                student.perusahaan.toLowerCase().includes(searchQuery.toLowerCase());
-            const matchesStatus = statusFilter === 'Semua Status' || student.status_lamaran === statusFilter;
-            return matchesClass && matchesSearch && matchesStatus;
+            const searchLower = searchQuery.toLowerCase();
+            const matchSearch = student.nama.toLowerCase().includes(searchLower) ||
+                student.nis.toLowerCase().includes(searchLower) ||
+                (student.perusahaan && student.perusahaan.toLowerCase().includes(searchLower));
+            const matchStatus = statusFilter === 'Semua Status' || student.status_lamaran === statusFilter;
+            return matchSearch && matchStatus;
         });
     }
 
@@ -529,36 +512,62 @@
         render();
     }
 
+    function showImagePreview(url, studentName) {
+        filePreviewData = {
+            title: `Foto - ${studentName}`,
+            content: `<div style="display:flex; justify-content:center; align-items:center; padding:16px;"><img src="${url}" alt="${studentName}" style="max-width:90vw; max-height:80vh; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.2);" onerror="this.src='https://placehold.co/600x600/003056/white?text=User'"></div>`
+        };
+        render();
+    }
+
+    function exportCSV() {
+        const data = getFilteredData();
+        if (!data.length) {
+            alert('Tidak ada data untuk diekspor');
+            return;
+        }
+        const headers = ['NIS', 'Nama', 'Kelas', 'Perusahaan', 'Status Lamaran', 'Berkas'];
+        const rows = data.map(s => [s.nis, s.nama, s.kelas, s.perusahaan || '-', s.status_lamaran, s.berkas]);
+        const csvBody = [headers.join(';'), ...rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(';'))].join('\r\n');
+        const csvContent = '\uFEFF' + csvBody;
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `wali_kelas_export_${new Date().toISOString().slice(0,10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
     function closeFilePreview() {
         filePreviewData = null;
         render();
     }
 
     function render() {
-        document.body.classList.add('hide-sidebar');
-        console.log('Rendering dashboard...', {SISWAS: SISWAS, selectedClass: selectedClass});
         const filteredData = getFilteredData();
-        console.log('Filtered data:', {count: filteredData.length, data: filteredData});
         const { formattedDate, formattedTime } = formatDate();
         const statusOptions = ['Semua Status', 'Diterima', 'Ditolak', 'Direview'];
 
         let html = `
-            <header class="kakonsli-header">
+            <header class="wali-header">
                 <div>
-                    <h1 class="header-title">${PAGE_TITLE}</h1>
-                    <p class="header-subtitle">${PAGE_SUBTITLE}</p>
+                    <h1 class="header-title">Dashboard Wali Kelas</h1>
+                    <p class="header-subtitle">Booking PKL SMKN 6 Malang • Kelas ${KELAS_WALI}</p>
                 </div>
                 <div class="header-stats">
                     <div class="header-stat">
-                        <strong>${STATS.total}</strong>
+                        <strong>${TOTAL_SISWA}</strong>
                         <span>Total Siswa</span>
                     </div>
                     <div class="header-stat">
-                        <strong style="color: #86efac;">${STATS.ditempatkan}</strong>
+                        <strong style="color: #86efac;">${BOOKING_DITERIMA}</strong>
                         <span>Ditempatkan</span>
                     </div>
                     <div class="header-stat">
-                        <strong style="color: #fca5a5;">${STATS.berkasKurang}</strong>
+                        <strong style="color: #fca5a5;">${BERKAS_KURANG}</strong>
                         <span>Berkas Kurang</span>
                     </div>
                 </div>
@@ -567,16 +576,17 @@
             <main class="dashboard-card">
                 <div class="dashboard-toolbar">
                     <div class="dashboard-toolbar-left">
-                        <input id="searchInput" class="toolbar-input" type="text" placeholder="Cari Siswa atau NIS..." value="${searchQuery}">
+                        <input id="searchInput" class="toolbar-input" type="text" placeholder="Cari Siswa atau NIS..." value="${searchQuery.replace(/"/g, '&quot;')}">
                         <select id="statusSelect" class="toolbar-select custom-select">
                             ${statusOptions.map(s => `<option value="${s}" ${statusFilter === s ? 'selected' : ''}>${s}</option>`).join('')}
                         </select>
                     </div>
                     <div class="dashboard-toolbar-right">
-                        <select id="classSelect" class="custom-select">
-                            ${KELAS_OPTIONS.map(k => `<option value="${k}" ${selectedClass === k ? 'selected' : ''}>${k}</option>`).join('')}
-                        </select>
-                        <button id="printBtn" class="toolbar-button">Cetak Laporan</button>
+                        <div style="background-color: rgba(255,255,255,0.1); border-radius: 16px; padding: 10px 16px; font-weight: 600; color: white; display: inline-flex; align-items: center; gap: 8px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v16M4 12h16"/></svg>
+                            Kelas: ${KELAS_WALI}
+                        </div>
+                        <button id="printBtn" class="toolbar-button">Export</button>
                     </div>
                 </div>
 
@@ -600,8 +610,9 @@
         if (!filteredData.length) {
             html += `
                 <tr>
-                    <td colspan="8">
-                        <div class="empty-state">Data tidak ditemukan</div>
+                    <td colspan="8" style="padding: 80px 24px; text-align: center; color: #94a3b8;">
+                        Data tidak ditemukan<br>
+                        <small>(Total siswa di kelas: ${TOTAL_SISWA})</small>
                     </td>
                 </tr>
             `;
@@ -614,7 +625,7 @@
                 html += `
                     <tr>
                         <td style="text-align:center; color:#94a3b8; font-size:0.75rem; font-weight:700;">${index + 1}</td>
-                        <td class="avatar-cell"><img src="${photo}" alt="${student.nama}"></td>
+                        <td class="avatar-cell"><img src="${photo}" alt="${student.nama}" onclick="showImagePreview('${photo}', '${student.nama}')" onerror="this.src='https://placehold.co/100x100/003056/white?text=User'"></td>
                         <td style="font-weight:700; color:#003056;">${student.nama}</td>
                         <td style="color:#64748b; font-size:0.75rem; font-weight:700;">${student.nis}</td>
                         <td><span class="badge ${berkasClass}">${student.berkas}</span></td>
@@ -634,16 +645,13 @@
                     </table>
                 </div>
                 <div style="background-color: #003056; color: rgba(255,255,255,0.7); padding: 16px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">
-                    <span>Kelas: ${selectedClass || '-'} | Total data: ${filteredData.length} dari ${STATS.total} siswa</span>
+                    <span>Kelas: ${KELAS_WALI} | Total data: ${filteredData.length} dari ${TOTAL_SISWA} siswa</span>
                     <span>Update: ${formattedDate}, ${formattedTime}</span>
                 </div>
             </main>
-
-            <footer class="footer-section">
-                © {{ date('Y') }} VOHISIX. Semua hak dilindungi.
-            </footer>
         `;
 
+        // MODAL DETAIL (sama seperti sebelumnya)
         if (selectedStudent) {
             const dudiName = selectedStudent.perusahaan || '-';
             html += `
@@ -658,7 +666,7 @@
                                     <div class="modal-field"><span>Status Lamaran</span><strong>${selectedStudent.status_lamaran}</strong></div>
                                     <div class="modal-field"><span>Kelengkapan Berkas</span><strong style="color:${selectedStudent.berkas==='Lengkap' ? '#86efac' : '#fca5a5'}">${selectedStudent.berkas}</strong></div>
                                 </div>
-                                <button class="detail-button" style="width:100%; margin-top:32px;" onclick="closeModal()">Tutup Detail</button>
+                                <button class="detail-button" style="width:100%; margin-top:32px; background-color: rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.18);" onclick="closeModal()">Tutup Detail</button>
                             </div>
                             <div class="modal-right">
                                 <div class="modal-tabs">
@@ -689,6 +697,7 @@
                         <div style="padding:12px; background:#f8fafc; border-radius:12px;"><p style="font-size:0.7rem; color:#94a3b8; margin-bottom:2px;">Bidang Industri</p><p style="font-weight:700; font-size:0.8rem;">${selectedStudent.bidang_industri}</p></div>
                         <div style="padding:12px; background:#f8fafc; border-radius:12px;"><p style="font-size:0.7rem; color:#94a3b8; margin-bottom:2px;">Jumlah Pegawai</p><p style="font-weight:700; font-size:0.8rem;">${selectedStudent.jumlah_pegawai}</p></div>
                         <div style="padding:12px; background:#f8fafc; border-radius:12px;"><p style="font-size:0.7rem; color:#94a3b8; margin-bottom:2px;">Website</p><p style="font-weight:700; font-size:0.8rem;">${selectedStudent.website}</p></div>
+                        <div style="padding:12px; background:#f8fafc; border-radius:12px;"><p style="font-size:0.7rem; color:#94a3b8; margin-bottom:2px;">Penanggung Jawab</p><p style="font-weight:700; font-size:0.8rem;">${selectedStudent.penanggung_jawab || '-'}</p></div>
                         <div style="padding:12px; background:#f8fafc; border-radius:12px;"><p style="font-size:0.7rem; color:#94a3b8; margin-bottom:2px;">Kontak</p><p style="font-weight:700; font-size:0.8rem;">${selectedStudent.telepon} | ${selectedStudent.email}</p></div>
                         <div style="padding:12px; background:#f8fafc; border-radius:12px;"><p style="font-size:0.7rem; color:#94a3b8; margin-bottom:2px;">Alamat</p><p style="font-weight:700; font-size:0.8rem;">${selectedStudent.alamat}</p></div>
                         <div style="display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:10px;">
@@ -711,7 +720,7 @@
         if (filePreviewData) {
             html += `
                 <div class="modal-overlay" onclick="closeFilePreview()">
-                    <div class="file-preview-card" onclick="event.stopPropagation()">
+                    <div style="background: white; border-radius: 24px; padding: 24px; max-width: 600px; width: 90%;" onclick="event.stopPropagation()">
                         <h3 style="font-size:1.25rem; font-weight:800; color:#003056; margin-bottom:12px;">${filePreviewData.title}</h3>
                         ${filePreviewData.content}
                         <button onclick="closeFilePreview()" style="margin-top:24px; background:#003056; color:white; border:none; padding:10px 24px; border-radius:40px; font-weight:700; cursor:pointer;">Tutup</button>
@@ -720,41 +729,27 @@
             `;
         }
 
-        document.getElementById('root').innerHTML = html;
+        const root = document.getElementById('root');
+        if (!root) return;
+        root.innerHTML = html;
 
-        console.log('HTML set to root element, adding event listeners...');
-        const searchInput = document.getElementById('searchInput');
-        const statusSelect = document.getElementById('statusSelect');
-        const classSelect = document.getElementById('classSelect');
-        const printBtn = document.getElementById('printBtn');
-        
-        if (!searchInput) console.error('searchInput element not found');
-        if (!statusSelect) console.error('statusSelect element not found');
-        if (!classSelect) console.error('classSelect element not found');
-        if (!printBtn) console.error('printBtn element not found');
-
-        searchInput?.addEventListener('input', (e) => { searchQuery = e.target.value; render(); });
-        statusSelect?.addEventListener('change', (e) => { statusFilter = e.target.value; render(); });
-        classSelect?.addEventListener('change', (e) => { selectedClass = e.target.value; statusFilter = 'Semua Status'; render(); });
-        printBtn?.addEventListener('click', () => window.print());
+        // Event listeners
+        document.getElementById('searchInput')?.addEventListener('input', (e) => { searchQuery = e.target.value; render(); });
+        document.getElementById('statusSelect')?.addEventListener('change', (e) => { statusFilter = e.target.value; render(); });
+        document.getElementById('printBtn')?.addEventListener('click', () => exportCSV());
 
         document.querySelectorAll('.detail-button').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = btn.getAttribute('data-id');
-                selectedStudent = SISWAS.find(item => item.id === id);
+                selectedStudent = SISWAS.find(item => String(item.id) === String(id));
                 activeTab = 'berkas';
                 render();
             });
         });
 
         if (selectedStudent) {
-            console.log('Selected student exists, attaching modal event listeners');
             const tabBerkasBtn = document.getElementById('tabBerkasBtn');
             const tabPerusahaanBtn = document.getElementById('tabPerusahaanBtn');
-            
-            if (!tabBerkasBtn) console.error('tabBerkasBtn not found');
-            if (!tabPerusahaanBtn) console.error('tabPerusahaanBtn not found');
-            
             tabBerkasBtn?.addEventListener('click', () => { activeTab = 'berkas'; render(); });
             tabPerusahaanBtn?.addEventListener('click', () => { activeTab = 'perusahaan'; render(); });
             document.querySelectorAll('.document-card').forEach(el => {
@@ -767,6 +762,7 @@
         }
     }
 
+    window.showImagePreview = showImagePreview;
     window.closeModal = function(event) {
         if (event && event.target !== event.currentTarget) return;
         selectedStudent = null;

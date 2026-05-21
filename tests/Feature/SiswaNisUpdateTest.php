@@ -18,7 +18,7 @@ class SiswaNisUpdateTest extends TestCase
         $siswa = Siswa::create([
             'nis' => '001',
             'nama' => 'Test Student',
-            'kelas' => '12 SIJA 1'
+            'kelas' => 'XII SIJA 1'
         ]);
 
         User::create([
@@ -50,7 +50,7 @@ class SiswaNisUpdateTest extends TestCase
             ->put(route('admin.siswa.update', $siswa->nis), [
                 'nis' => '9999',
                 'nama' => 'Test Student Updated',
-                'kelas' => '12 SIJA 1'
+                'kelas' => 'XII SIJA 1'
             ]);
 
         // Verify User username changed

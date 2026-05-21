@@ -7,11 +7,12 @@ use App\Models\User;
 use App\Models\Berkas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Controllers\Traits\ExcelExportTrait;
 use App\Http\Controllers\Traits\ExcelImportTrait;
 
 class AdminSiswaController extends Controller
 {
-    use ExcelImportTrait;
+    use ExcelImportTrait, ExcelExportTrait;
     /**
      * Display a listing of siswas
      */
@@ -77,12 +78,14 @@ class AdminSiswaController extends Controller
         $validated = $request->validate([
             'nis' => 'required|unique:siswas',
             'nama' => 'required|string|max:255',
-            'kelas' => 'required|in:XIII SIJA 1,XIII SIJA 2',
+            'kelas' => 'required|in:XII SIJA 1,XII SIJA 2,XII SIJA 3',
             // allow a broad set of common image file types; skip the `image` rule so unknown formats
             // (webp/heic/etc.) don't trigger "must be an image" errors
             'foto' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif,bmp,heic,heif|max:2048',
             // password no longer provided here, it's defaulted in create view if needed
         ]);
+
+        $validated['kelas'] = $this->normalizeKelas($validated['kelas']);
 
         // Generate password default to NIS if not specified (handled at view level now)
         $password = $validated['nis'];
@@ -149,10 +152,12 @@ class AdminSiswaController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'kelas' => 'required|in:XIII SIJA 1,XIII SIJA 2',
+            'kelas' => 'required|in:XII SIJA 1,XII SIJA 2,XII SIJA 3',
             'nis' => 'nullable|string|unique:siswas,nis,' . $siswa->nis . ',nis',
             'foto' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif,bmp,heic,heif|max:2048',
         ]);
+
+        $validated['kelas'] = $this->normalizeKelas($validated['kelas']);
 
         // Handle new photo upload if present
         if ($request->hasFile('foto')) {
@@ -227,15 +232,21 @@ class AdminSiswaController extends Controller
         foreach ($rows as $row) {
             $nis = $row['nis'] ?? null;
             $nama = $row['nama'] ?? null;
-            $kelas = $row['kelas'] ?? null;
+            $kelasValue = $row['kelas'] ?? null;
 
-            if (!$nis || !$nama || !$kelas) {
+            if (!$nis || !$nama || !$kelasValue) {
                 $skipped++;
                 continue;
             }
 
             $existing = Siswa::find($nis);
             if ($existing) {
+                $skipped++;
+                continue;
+            }
+
+            $kelas = $this->normalizeKelas($kelasValue);
+            if (!$kelas || !in_array($kelas, ['XII SIJA 1', 'XII SIJA 2', 'XII SIJA 3'], true)) {
                 $skipped++;
                 continue;
             }
@@ -267,5 +278,55 @@ class AdminSiswaController extends Controller
         }
 
         return redirect()->route('admin.siswa.index')->with('success', $message);
+    }
+
+    public function export(Request $request)
+    {
+        $search = $request->input('search');
+        $kelas = $request->input('kelas');
+
+        $siswas = Siswa::with('berkas');
+        if ($search) {
+            $siswas->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%$search%")
+                  ->orWhere('nis', 'like', "%$search%")
+                  ->orWhere('kelas', 'like', "%$search%");
+            });
+        }
+        if ($kelas) {
+            $siswas->where('kelas', $kelas);
+        }
+
+        $siswas = $siswas->orderBy('created_at', 'desc')->get();
+        $rows = $siswas->map(function ($siswa) {
+            $berkas = $siswa->berkas;
+            return [
+                $siswa->nis,
+                $siswa->nama,
+                $siswa->kelas,
+                $berkas?->ktp_kia ? 'Selesai' : 'Belum',
+                $berkas?->surat_sehat ? 'Selesai' : 'Belum',
+                $berkas?->kartu_bpjs ? 'Selesai' : 'Belum',
+            ];
+        })->toArray();
+
+        return $this->streamCsvDownload(
+            'siswa_export_' . now()->format('Y-m-d') . '.csv',
+            ['NIS', 'Nama', 'Kelas', 'KTP/KIA', 'Surat Sehat', 'BPJS'],
+            $rows
+        );
+    }
+
+    private function normalizeKelas(?string $kelas): ?string
+    {
+        if (!$kelas) {
+            return null;
+        }
+
+        $kelas = trim(strtoupper($kelas));
+        $kelas = preg_replace('/^(12|XIII)\s+SIJA/i', 'XII SIJA', $kelas);
+        $kelas = preg_replace('/\s+/', ' ', $kelas);
+
+        return $kelas;
     }
 }

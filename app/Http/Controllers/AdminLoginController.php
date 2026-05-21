@@ -5,11 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Controllers\Traits\ExcelExportTrait;
 use App\Http\Controllers\Traits\ExcelImportTrait;
 
 class AdminLoginController extends Controller
 {
-    use ExcelImportTrait;
+    use ExcelImportTrait, ExcelExportTrait;
     /**
      * Display a listing of users
      */
@@ -73,14 +74,18 @@ class AdminLoginController extends Controller
         $validated = $request->validate([
             'username' => 'required|unique:users',
             'name' => 'required|string|max:255',
-            'role' => 'required|in:admin,siswa',
+            'role' => 'required|in:admin,siswa,wali_kelas,kakonsli',
             'password' => 'required|string|min:6',
+            'kelas_id' => 'nullable|required_if:role,wali_kelas,kakonsli|in:XII SIJA 1,XII SIJA 2',
+            'kelas_second' => 'nullable|required_if:role,kakonsli|in:XII SIJA 1,XII SIJA 2',
         ]);
 
         User::create([
             'username' => $validated['username'],
             'name' => $validated['name'],
             'role' => $validated['role'],
+            'kelas_id' => $validated['kelas_id'] ?? null,
+            'kelas_second' => $validated['kelas_second'] ?? null,
             'password' => Hash::make($validated['password']),
         ]);
 
@@ -110,12 +115,16 @@ class AdminLoginController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'role' => 'required|in:admin,siswa',
+            'role' => 'required|in:admin,siswa,wali_kelas,kakonsli',
             'password' => 'nullable|string|min:6',
+            'kelas_id' => 'nullable|required_if:role,wali_kelas,kakonsli|in:XII SIJA 1,XII SIJA 2',
+            'kelas_second' => 'nullable|required_if:role,kakonsli|in:XII SIJA 1,XII SIJA 2',
         ]);
 
         $user->name = $validated['name'];
         $user->role = $validated['role'];
+        $user->kelas_id = $validated['kelas_id'] ?? null;
+        $user->kelas_second = $validated['kelas_second'] ?? null;
 
         if ($validated['password']) {
             $user->password = Hash::make($validated['password']);
@@ -141,6 +150,40 @@ class AdminLoginController extends Controller
         return redirect()->route('admin.login.index')->with('success', 'User berhasil dihapus');
     }
 
+    public function export(Request $request)
+    {
+        $search = $request->input('search');
+        $role = $request->input('role');
+
+        $users = User::query();
+        if ($search) {
+            $users->where(function ($q) use ($search) {
+                $q->where('username', 'like', "%$search%")
+                  ->orWhere('name', 'like', "%$search%");
+            });
+        }
+        if ($role) {
+            $users->where('role', $role);
+        }
+
+        $users = $users->orderBy('created_at', 'desc')->get();
+        $rows = $users->map(function ($user) {
+            return [
+                $user->username,
+                $user->name,
+                $user->role,
+                $user->kelas_id,
+                $user->kelas_second,
+            ];
+        })->toArray();
+
+        return $this->streamCsvDownload(
+            'users_export_' . now()->format('Y-m-d') . '.csv',
+            ['Username', 'Nama', 'Role', 'Kelas Utama', 'Kelas Kedua'],
+            $rows
+        );
+    }
+
     public function import(Request $request)
     {
         $validated = $request->validate([
@@ -159,8 +202,20 @@ class AdminLoginController extends Controller
             $name = $row['name'] ?? null;
             $role = $row['role'] ?? null;
             $password = $row['password'] ?? null;
+            $kelasId = $row['kelas_id'] ?? null;
+            $kelasSecond = $row['kelas_second'] ?? null;
 
-            if (!$username || !$name || !$role || !$password || !in_array($role, ['admin', 'siswa'])) {
+            if (!$username || !$name || !$role || !$password || !in_array($role, ['admin', 'siswa', 'wali_kelas', 'kakonsli'])) {
+                $skipped++;
+                continue;
+            }
+
+            if (in_array($role, ['wali_kelas', 'kakonsli'], true) && !in_array($kelasId, ['XII SIJA 1', 'XII SIJA 2'], true)) {
+                $skipped++;
+                continue;
+            }
+
+            if ($role === 'kakonsli' && !in_array($kelasSecond, ['XII SIJA 1', 'XII SIJA 2'], true)) {
                 $skipped++;
                 continue;
             }
@@ -170,6 +225,8 @@ class AdminLoginController extends Controller
                 $user->update([
                     'name' => $name,
                     'role' => $role,
+                    'kelas_id' => $kelasId,
+                    'kelas_second' => $kelasSecond,
                     'password' => Hash::make($password),
                 ]);
                 $skipped++;
@@ -180,6 +237,8 @@ class AdminLoginController extends Controller
                 'username' => $username,
                 'name' => $name,
                 'role' => $role,
+                'kelas_id' => $kelasId,
+                'kelas_second' => $kelasSecond,
                 'password' => Hash::make($password),
             ]);
             $imported++;

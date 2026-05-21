@@ -293,13 +293,13 @@ table { width: 100%; border-collapse: collapse; }
     vertical-align: middle;
 }
 .table-card th {
-    background: #eef5fb;
-    color: #003056;
+    background: #003056; /* BIRU TUA */
+    color: white;
     font-size: 12px;
     font-weight: 700;
     letter-spacing: .1em;
     text-transform: uppercase;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
 }
 .table-card td {
     border-bottom: 1px solid #f1f5f9;

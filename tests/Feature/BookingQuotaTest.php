@@ -38,7 +38,7 @@ class BookingQuotaTest extends TestCase
             Siswa::create([
                 'nis' => $sd['nis'],
                 'nama' => $sd['nama'],
-                'kelas' => '12 SIJA'
+                'kelas' => 'XII SIJA 1',
             ]);
 
             User::create([

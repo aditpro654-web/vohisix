@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Dudi;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Traits\ExcelExportTrait;
 use App\Http\Controllers\Traits\ExcelImportTrait;
 
 class AdminDudiController extends Controller
 {
-    use ExcelImportTrait;
+    use ExcelImportTrait, ExcelExportTrait;
     /**
      * Display a listing of dudis
      */
@@ -151,6 +152,48 @@ class AdminDudiController extends Controller
         $dudi->delete();
 
         return redirect()->route('admin.dudi.index')->with('success', 'DUDI berhasil dihapus');
+    }
+
+    public function export(Request $request)
+    {
+        $search = $request->input('search');
+        $bidang = $request->input('bidang_usaha');
+
+        $dudis = Dudi::query();
+        if ($search) {
+            $dudis->where(function ($q) use ($search) {
+                $q->where('nama_dudi', 'like', "%$search%")
+                  ->orWhere('bidang_usaha', 'like', "%$search%")
+                  ->orWhere('alamat', 'like', "%$search%");
+            });
+        }
+        if ($bidang) {
+            $dudis->where('bidang_usaha', $bidang);
+        }
+
+        $dudis = $dudis->orderBy('created_at', 'desc')->get();
+        $rows = $dudis->map(function ($dudi) {
+            return [
+                $dudi->nama_dudi,
+                $dudi->alamat,
+                $dudi->telepon,
+                $dudi->email,
+                $dudi->bidang_usaha,
+                $dudi->website,
+                $dudi->jumlah_pegawai,
+                $dudi->pembimbing_dudi,
+                $dudi->jam_masuk,
+                $dudi->jam_pulang,
+                $dudi->kota,
+                $dudi->kuota,
+            ];
+        })->toArray();
+
+        return $this->streamCsvDownload(
+            'dudi_export_' . now()->format('Y-m-d') . '.csv',
+            ['Nama DUDI', 'Alamat', 'Telepon', 'Email', 'Bidang Industri', 'Website', 'Jumlah Pegawai', 'Pembimbing', 'Jam Masuk', 'Jam Pulang', 'Kota', 'Kuota'],
+            $rows
+        );
     }
 
     public function import(Request $request)

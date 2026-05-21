@@ -28,6 +28,7 @@
                 @endforeach
             </select>
             <button type="submit">Cari</button>
+            <a href="{{ route('admin.siswa.export', request()->query()) }}" class="btn btn-secondary">Export</a>
         </form>
     </div>
 

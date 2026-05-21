@@ -15,8 +15,13 @@
         body {
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             min-height: 100vh;
-            background: url('https://placehold.co/1920x1080/2c3e50/ffffff?text=Ganti+Dengan+Foto+Sekolah+Anda') center/cover no-repeat fixed;
-            /* Ganti URL di atas dengan foto sekolah Anda, misal: {{ asset('images/school-bg.jpg') }} */
+            /* Prefer a fast local gradient background; optionally place a local image at public/images/school-bg.jpg to override */
+            background: linear-gradient(135deg, #0b3b57 0%, #123f5a 100%);
+            background-image: url("{{ asset('images/school-bg.jpg') }}");
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -181,6 +186,10 @@
     </style>
 </head>
 <body>
+    @php
+        $errors = $errors ?? session()->get('errors', new \Illuminate\Support\ViewErrorBag());
+    @endphp
+
     <div class="login-card">
         <div class="card-header">
             <h1>Selamat Datang</h1>

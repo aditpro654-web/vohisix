@@ -20,6 +20,9 @@ class DatabaseSeeder extends Seeder
     {
         // Call DudiSeeder to populate DUDI data
         $this->call(DudiSeeder::class);
+
+        // Create wali kelas and kakonsli accounts if missing
+        $this->call(WaliKelasAndKakonslSeeder::class);
         
         // Buat admin user
         User::updateOrCreate(
@@ -33,11 +36,11 @@ class DatabaseSeeder extends Seeder
 
         // Buat sample siswa
         $siswas = [
-            ['nis' => '001', 'nama' => 'Ari Pratama', 'kelas' => '12 SIJA 1'],
-            ['nis' => '002', 'nama' => 'Budi Santoso', 'kelas' => '12 SIJA 1'],
-            ['nis' => '003', 'nama' => 'Citra Dewi', 'kelas' => '12 SIJA 2'],
-            ['nis' => '004', 'nama' => 'Dina Kusuma', 'kelas' => '12 SIJA 2'],
-            ['nis' => '005', 'nama' => 'Eka Wijaya', 'kelas' => '12 SIJA 3'],
+            ['nis' => '001', 'nama' => 'Ari Pratama', 'kelas' => 'XII SIJA 1'],
+            ['nis' => '002', 'nama' => 'Budi Santoso', 'kelas' => 'XII SIJA 1'],
+            ['nis' => '003', 'nama' => 'Citra Dewi', 'kelas' => 'XII SIJA 2'],
+            ['nis' => '004', 'nama' => 'Dina Kusuma', 'kelas' => 'XII SIJA 2'],
+            ['nis' => '005', 'nama' => 'Eka Wijaya', 'kelas' => 'XII SIJA 3'],
         ];
 
         foreach ($siswas as $siswa) {

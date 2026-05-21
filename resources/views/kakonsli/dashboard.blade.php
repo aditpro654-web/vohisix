@@ -671,7 +671,7 @@
                         </select>
                     </div>
                     <div class="dashboard-toolbar-right">
-                        <button id="printBtn" class="toolbar-button">Expor</button>
+                        <button id="printBtn" class="toolbar-button">Export</button>
                     </div>
                 </div>
 

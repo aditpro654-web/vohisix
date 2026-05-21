@@ -31,6 +31,8 @@
             <select name="role">
                 <option value="">Semua Role</option>
                 <option value="admin" {{ ($role ?? '') == 'admin' ? 'selected' : '' }}>Admin</option>
+                <option value="wali_kelas" {{ ($role ?? '') == 'wali_kelas' ? 'selected' : '' }}>Wali Kelas</option>
+                <option value="kakonsli" {{ ($role ?? '') == 'kakonsli' ? 'selected' : '' }}>Kakonsli</option>
                 <option value="siswa" {{ ($role ?? '') == 'siswa' ? 'selected' : '' }}>Siswa</option>
             </select>
             <select name="sort_by">
@@ -40,6 +42,7 @@
                 <option value="name_desc" {{ ($sortBy ?? '') == 'name_desc' ? 'selected' : '' }}>Nama Z-A</option>
             </select>
             <button type="submit" class="btn btn-primary">Cari</button>
+            <a href="{{ route('admin.login.export', request()->query()) }}" class="btn btn-secondary">Export</a>
         </form>
     </div>
 

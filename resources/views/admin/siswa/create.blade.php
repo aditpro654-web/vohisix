@@ -36,8 +36,9 @@
         <div class="form-group">
             <label>Kelas *</label>
             <div class="form-row">
-                <label class="radio-option"><input type="radio" name="kelas" value="XIII SIJA 1" {{ old('kelas') == 'XIII SIJA 1' ? 'checked' : '' }}> XIII SIJA 1</label>
-                <label class="radio-option"><input type="radio" name="kelas" value="XIII SIJA 2" {{ old('kelas') == 'XIII SIJA 2' ? 'checked' : '' }}> XIII SIJA 2</label>
+                <label class="radio-option"><input type="radio" name="kelas" value="XII SIJA 1" {{ old('kelas') == 'XII SIJA 1' ? 'checked' : '' }}> XII SIJA 1</label>
+                <label class="radio-option"><input type="radio" name="kelas" value="XII SIJA 2" {{ old('kelas') == 'XII SIJA 2' ? 'checked' : '' }}> XII SIJA 2</label>
+                <label class="radio-option"><input type="radio" name="kelas" value="XII SIJA 3" {{ old('kelas') == 'XII SIJA 3' ? 'checked' : '' }}> XII SIJA 3</label>
             </div>
             @error('kelas')
                 <div class="form-error">{{ $message }}</div>
@@ -63,6 +64,30 @@
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Simpan Siswa</button>
             <a href="{{ route('admin.siswa.index') }}" class="btn btn-secondary">Batal</a>
+        </div>
+    </form>
+</div>
+
+<div class="form-card">
+    <div class="card-header">
+        <h2>Import Data Siswa</h2>
+        <p class="form-helper">Unggah file CSV untuk menambahkan banyak siswa sekaligus.</p>
+    </div>
+
+    <form action="{{ route('admin.siswa.import') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+
+        <div class="form-group">
+            <label for="csv_file">Pilih File CSV</label>
+            <input type="file" id="csv_file" name="file" accept=".csv,.xlsx" required>
+            @error('file')
+                <div class="form-error">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Import Data</button>
+            <a href="{{ route('admin.siswa.index') }}" class="btn btn-secondary">Kembali</a>
         </div>
     </form>
 </div>

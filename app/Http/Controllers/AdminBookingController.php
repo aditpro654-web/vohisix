@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Models\Siswa;
 use App\Models\Dudi;
+use App\Http\Controllers\Traits\ExcelExportTrait;
 use Illuminate\Http\Request;
 
 class AdminBookingController extends Controller
 {
+    use ExcelExportTrait;
     /**
      * Display a listing of bookings
      */
@@ -58,6 +60,41 @@ class AdminBookingController extends Controller
     }
 
     /**
+     * Show form for creating a new booking
+     */
+    public function create()
+    {
+        $siswas = Siswa::orderBy('nama')->get();
+        $dudis = Dudi::orderBy('nama_dudi')->get();
+
+        return view('admin.booking.create', compact('siswas', 'dudis'));
+    }
+
+    /**
+     * Store a newly created booking in storage
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'nis' => 'required|exists:siswas,nis',
+            'id_dudi' => 'required|exists:dudis,id_dudi',
+            'status' => 'required|in:Direview,Diterima,Ditolak',
+        ]);
+
+        $exists = Booking::where('nis', $validated['nis'])
+            ->where('id_dudi', $validated['id_dudi'])
+            ->exists();
+
+        if ($exists) {
+            return redirect()->route('admin.booking.index')->with('error', 'Booking untuk siswa dan DUDI yang sama sudah ada.');
+        }
+
+        Booking::create($validated);
+
+        return redirect()->route('admin.booking.index')->with('success', 'Booking berhasil ditambahkan');
+    }
+
+    /**
      * Show booking details
      */
     public function show(Booking $booking)
@@ -95,5 +132,40 @@ class AdminBookingController extends Controller
         $booking->delete();
 
         return redirect()->route('admin.booking.index')->with('success', 'Booking berhasil dihapus');
+    }
+
+    public function export(Request $request)
+    {
+        $search = $request->input('search');
+        $status = $request->input('status');
+
+        $bookings = Booking::with(['siswa', 'dudi']);
+        if ($search) {
+            $bookings->whereHas('siswa', function ($query) use ($search) {
+                $query->where('nama', 'like', "%$search%")
+                      ->orWhere('nis', 'like', "%$search%");
+            });
+        }
+        if ($status && $status !== '') {
+            $bookings->where('status', $status);
+        }
+
+        $bookings = $bookings->orderBy('created_at', 'desc')->get();
+        $rows = $bookings->map(function ($booking) {
+            return [
+                $booking->siswa?->nis,
+                $booking->siswa?->nama,
+                $booking->siswa?->kelas,
+                $booking->dudi?->nama_dudi,
+                $booking->status,
+                $booking->created_at->format('d M Y H:i'),
+            ];
+        })->toArray();
+
+        return $this->streamCsvDownload(
+            'booking_export_' . now()->format('Y-m-d') . '.csv',
+            ['NIS', 'Nama Siswa', 'Kelas', 'DUDI', 'Status', 'Tanggal'],
+            $rows
+        );
     }
 }
