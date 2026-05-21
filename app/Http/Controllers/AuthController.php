@@ -27,8 +27,14 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        // Cari user berdasarkan username
-        $user = User::where('username', $credentials['username'])->first();
+        try {
+            // Cari user berdasarkan username
+            $user = User::where('username', $credentials['username'])->first();
+        } catch (\Exception $exception) {
+            return back()->withErrors([
+                'username' => 'Gagal terhubung ke database. Silakan coba lagi nanti.',
+            ])->onlyInput('username');
+        }
 
         if (! $user) {
             return back()->withErrors([
@@ -39,7 +45,7 @@ class AuthController extends Controller
         // Cek password
         if (! Hash::check($credentials['password'], $user->password)) {
             return back()->withErrors([
-                'username' => 'Password salah',
+                'password' => 'Password salah',
             ])->onlyInput('username');
         }
 
