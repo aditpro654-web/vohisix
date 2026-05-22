@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\Traits\ExcelExportTrait;
-use App\Http\Controllers\Traits\ExcelImportTrait;
+use App\Http\Requests\AdminLoginStoreRequest;
+use App\Http\Requests\AdminLoginImportPreviewRequest;
+use App\Services\Import\UserImportService;
 
 class AdminLoginController extends Controller
 {
-    use ExcelImportTrait, ExcelExportTrait;
+    use ExcelExportTrait;
     /**
      * Display a listing of users
      */
@@ -69,16 +72,10 @@ class AdminLoginController extends Controller
     /**
      * Store user in database
      */
-    public function store(Request $request)
+    public function store(AdminLoginStoreRequest $request)
     {
-        $validated = $request->validate([
-            'username' => 'required|unique:users',
-            'name' => 'required|string|max:255',
-            'role' => 'required|in:admin,siswa,wali_kelas,kakonsli',
-            'password' => 'required|string|min:6',
-            'kelas_id' => 'nullable|required_if:role,wali_kelas,kakonsli|in:XII SIJA 1,XII SIJA 2',
-            'kelas_second' => 'nullable|required_if:role,kakonsli|in:XII SIJA 1,XII SIJA 2',
-        ]);
+        $validated = $request->validated();
+        $password = $validated['password'] ?? $validated['username'];
 
         User::create([
             'username' => $validated['username'],
@@ -86,7 +83,7 @@ class AdminLoginController extends Controller
             'role' => $validated['role'],
             'kelas_id' => $validated['kelas_id'] ?? null,
             'kelas_second' => $validated['kelas_second'] ?? null,
-            'password' => Hash::make($validated['password']),
+            'password' => Hash::make($password),
         ]);
 
         return redirect()->route('admin.login.index')->with('success', 'User berhasil ditambahkan');
@@ -184,71 +181,53 @@ class AdminLoginController extends Controller
         );
     }
 
-    public function import(Request $request)
+    public function previewImport(AdminLoginImportPreviewRequest $request, UserImportService $importService)
     {
-        $validated = $request->validate([
-            'file' => 'required|file|mimes:csv,txt,xlsx|max:5120',
-        ]);
-
-        $rows = $this->parseImportFile($request->file('file'));
+        $rows = $importService->parseFile($request->file('file'));
         if (empty($rows)) {
-            return redirect()->route('admin.login.index')->with('error', 'File tidak dapat dibaca. Gunakan format CSV atau XLSX dengan header username, name, role, password.');
+            return redirect()->route('admin.login.create')->with('error', 'File tidak dapat dibaca. Gunakan format CSV atau XLSX dengan header yang tepat.');
         }
 
-        $imported = 0;
-        $skipped = 0;
-        foreach ($rows as $row) {
-            $username = $row['username'] ?? null;
-            $name = $row['name'] ?? null;
-            $role = $row['role'] ?? null;
-            $password = $row['password'] ?? null;
-            $kelasId = $row['kelas_id'] ?? null;
-            $kelasSecond = $row['kelas_second'] ?? null;
+        $preview = $importService->previewRows($rows);
+        Session::put('admin_login_import_preview', $preview['previewRows']);
 
-            if (!$username || !$name || !$role || !$password || !in_array($role, ['admin', 'siswa', 'wali_kelas', 'kakonsli'])) {
-                $skipped++;
-                continue;
-            }
+        return view('admin.login.create', [
+            'previewRows' => $preview['previewRows'],
+            'previewSummary' => $preview['summary'],
+            'previewHeaders' => $preview['headers'],
+            'previewMode' => true,
+        ]);
+    }
 
-            if (in_array($role, ['wali_kelas', 'kakonsli'], true) && !in_array($kelasId, ['XII SIJA 1', 'XII SIJA 2'], true)) {
-                $skipped++;
-                continue;
-            }
-
-            if ($role === 'kakonsli' && !in_array($kelasSecond, ['XII SIJA 1', 'XII SIJA 2'], true)) {
-                $skipped++;
-                continue;
-            }
-
-            $user = User::where('username', $username)->first();
-            if ($user) {
-                $user->update([
-                    'name' => $name,
-                    'role' => $role,
-                    'kelas_id' => $kelasId,
-                    'kelas_second' => $kelasSecond,
-                    'password' => Hash::make($password),
-                ]);
-                $skipped++;
-                continue;
-            }
-
-            User::create([
-                'username' => $username,
-                'name' => $name,
-                'role' => $role,
-                'kelas_id' => $kelasId,
-                'kelas_second' => $kelasSecond,
-                'password' => Hash::make($password),
-            ]);
-            $imported++;
+    public function import(Request $request, UserImportService $importService)
+    {
+        $previewRows = Session::get('admin_login_import_preview', []);
+        if (empty($previewRows)) {
+            return redirect()->route('admin.login.create')->with('error', 'Unggah file import terlebih dahulu untuk melihat preview dan mengonfirmasi data.');
         }
 
-        $message = "$imported user berhasil diimpor";
-        if ($skipped > 0) {
-            $message .= ", $skipped baris dilewati karena format tidak lengkap atau username sudah ada";
+        $result = $importService->importRows($previewRows);
+        Session::forget('admin_login_import_preview');
+
+        $message = "{$result['imported']} user berhasil diimpor";
+        if ($result['skipped'] > 0) {
+            $message .= ", {$result['skipped']} baris dilewati.";
         }
 
         return redirect()->route('admin.login.index')->with('success', $message);
+    }
+
+    public function downloadImportTemplate()
+    {
+        return $this->streamCsvDownload(
+            'user_import_template.csv',
+            ['Username', 'Nama', 'Role', 'Password', 'Kelas Utama', 'Kelas Kedua'],
+            [
+                ['1210001', 'Budi Santoso', 'siswa', '', 'XII SIJA 1', ''],
+                ['admin01', 'Admin Sekolah', 'admin', 'password123', '', ''],
+                ['wali01', 'Wali Kelas A', 'wali_kelas', 'secret456', 'XII SIJA 1', ''],
+                ['konsli01', 'Konsli B', 'kakonsli', 'secret789', 'XII SIJA 1', 'XII SIJA 2'],
+            ]
+        );
     }
 }

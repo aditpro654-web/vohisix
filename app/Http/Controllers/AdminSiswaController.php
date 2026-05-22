@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AdminSiswaStoreRequest;
+use App\Http\Requests\AdminSiswaImportPreviewRequest;
 use App\Models\Siswa;
 use App\Models\User;
 use App\Models\Berkas;
+use App\Services\Import\SiswaImportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\Traits\ExcelExportTrait;
-use App\Http\Controllers\Traits\ExcelImportTrait;
 
 class AdminSiswaController extends Controller
 {
-    use ExcelImportTrait, ExcelExportTrait;
+    use ExcelExportTrait;
     /**
      * Display a listing of siswas
      */
@@ -73,30 +76,17 @@ class AdminSiswaController extends Controller
     /**
      * Store siswa in database
      */
-    public function store(Request $request)
+    public function store(AdminSiswaStoreRequest $request)
     {
-        $validated = $request->validate([
-            'nis' => 'required|unique:siswas',
-            'nama' => 'required|string|max:255',
-            'kelas' => 'required|in:XII SIJA 1,XII SIJA 2,XII SIJA 3',
-            // allow a broad set of common image file types; skip the `image` rule so unknown formats
-            // (webp/heic/etc.) don't trigger "must be an image" errors
-            'foto' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif,bmp,heic,heif|max:2048',
-            // password no longer provided here, it's defaulted in create view if needed
-        ]);
-
+        $validated = $request->validated();
         $validated['kelas'] = $this->normalizeKelas($validated['kelas']);
-
-        // Generate password default to NIS if not specified (handled at view level now)
         $password = $validated['nis'];
 
-        // Handle photo upload
         $fotoPath = null;
         if ($request->hasFile('foto')) {
             $fotoPath = $request->file('foto')->store('siswas', 'public');
         }
 
-        // Buat siswa
         Siswa::create([
             'nis' => $validated['nis'],
             'nama' => $validated['nama'],
@@ -104,7 +94,6 @@ class AdminSiswaController extends Controller
             'foto' => $fotoPath,
         ]);
 
-        // Buat user untuk login
         User::create([
             'username' => $validated['nis'],
             'name' => $validated['nama'],
@@ -112,20 +101,18 @@ class AdminSiswaController extends Controller
             'password' => Hash::make($password),
         ]);
 
-        // Buat berkas kosong
         Berkas::create([
             'nis' => $validated['nis'],
             'lengkap' => false,
         ]);
 
-        // Return view dengan credentials
         return redirect()
             ->route('admin.siswa.index')
             ->with('success', 'Siswa berhasil ditambahkan')
             ->with('siswa_created', [
                 'username' => $validated['nis'],
                 'password' => $password,
-                'nama' => $validated['nama']
+                'nama' => $validated['nama'],
             ]);
     }
 
@@ -216,68 +203,53 @@ class AdminSiswaController extends Controller
         return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil dihapus');
     }
 
-    public function import(Request $request)
+    public function importPreview(AdminSiswaImportPreviewRequest $request, SiswaImportService $importService)
     {
-        $validated = $request->validate([
-            'file' => 'required|file|mimes:csv,txt,xlsx|max:5120',
-        ]);
-
-        $rows = $this->parseImportFile($request->file('file'));
+        $rows = $importService->parseFile($request->file('file'));
         if (empty($rows)) {
-            return redirect()->route('admin.siswa.index')->with('error', 'File tidak dapat dibaca. Gunakan format CSV atau XLSX dengan header yang tepat.');
+            return redirect()->route('admin.siswa.create')->with('error', 'File tidak dapat dibaca. Gunakan format CSV atau XLSX dengan header yang tepat.');
         }
 
-        $imported = 0;
-        $skipped = 0;
-        foreach ($rows as $row) {
-            $nis = $row['nis'] ?? null;
-            $nama = $row['nama'] ?? null;
-            $kelasValue = $row['kelas'] ?? null;
+        $preview = $importService->previewRows($rows);
+        Session::put('admin_siswa_import_preview', $preview['previewRows']);
 
-            if (!$nis || !$nama || !$kelasValue) {
-                $skipped++;
-                continue;
-            }
+        return view('admin.siswa.create', [
+            'previewRows' => $preview['previewRows'],
+            'previewSummary' => $preview['summary'],
+            'previewHeaders' => $preview['headers'],
+            'previewMode' => true,
+        ]);
+    }
 
-            $existing = Siswa::find($nis);
-            if ($existing) {
-                $skipped++;
-                continue;
-            }
-
-            $kelas = $this->normalizeKelas($kelasValue);
-            if (!$kelas || !in_array($kelas, ['XII SIJA 1', 'XII SIJA 2', 'XII SIJA 3'], true)) {
-                $skipped++;
-                continue;
-            }
-
-            Siswa::create([
-                'nis' => $nis,
-                'nama' => $nama,
-                'kelas' => $kelas,
-            ]);
-
-            User::create([
-                'username' => $nis,
-                'name' => $nama,
-                'role' => 'siswa',
-                'password' => Hash::make($nis),
-            ]);
-
-            Berkas::create([
-                'nis' => $nis,
-                'lengkap' => false,
-            ]);
-
-            $imported++;
+    public function import(Request $request, SiswaImportService $importService)
+    {
+        $previewRows = Session::get('admin_siswa_import_preview', []);
+        if (empty($previewRows)) {
+            return redirect()->route('admin.siswa.create')->with('error', 'Unggah file import terlebih dahulu untuk melihat preview dan mengonfirmasi data.');
         }
 
-        $message = "$imported siswa berhasil diimpor";
-        if ($skipped > 0) {
-            $message .= ", $skipped baris dilewati karena data tidak lengkap atau NIS sudah ada";
+        $result = $importService->importRows($previewRows);
+        Session::forget('admin_siswa_import_preview');
+
+        $message = "{$result['imported']} siswa berhasil diimpor";
+        if ($result['skipped'] > 0) {
+            $message .= ", {$result['skipped']} baris dilewati.";
         }
 
         return redirect()->route('admin.siswa.index')->with('success', $message);
+    }
+
+    public function downloadImportTemplate()
+    {
+        return $this->streamCsvDownload(
+            'siswa_import_template.csv',
+            ['NIS', 'Nama', 'Kelas'],
+            [
+                ['1210001', 'Budi Santoso', 'XII SIJA 1'],
+                ['1210002', 'Ani Putri', 'XII SIJA 2'],
+                ['1210003', 'Candra Wijaya', 'XII SIJA 3'],
+            ]
+        );
     }
 
     public function export(Request $request)

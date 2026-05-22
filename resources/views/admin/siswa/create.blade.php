@@ -74,11 +74,11 @@
         <p class="form-helper">Unggah file CSV untuk menambahkan banyak siswa sekaligus.</p>
     </div>
 
-    <form action="{{ route('admin.siswa.import') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.siswa.import.preview') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="form-group">
-            <label for="csv_file">Pilih File CSV</label>
+            <label for="csv_file">Pilih File CSV/XLSX</label>
             <input type="file" id="csv_file" name="file" accept=".csv,.xlsx" required>
             @error('file')
                 <div class="form-error">{{ $message }}</div>
@@ -86,9 +86,51 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Import Data</button>
+            <button type="submit" class="btn btn-primary">Preview Import</button>
+            <a href="{{ route('admin.siswa.import.template') }}" class="btn btn-secondary">Download Template Import</a>
             <a href="{{ route('admin.siswa.index') }}" class="btn btn-secondary">Kembali</a>
         </div>
     </form>
+
+    @if(!empty($previewMode) && !empty($previewRows))
+        <div class="preview-card" style="margin-top:1.5rem;">
+            <div class="card-header">
+                <h2>Preview Import Siswa</h2>
+                <p class="form-helper">Periksa data valid dan kesalahan sebelum melakukan import.</p>
+            </div>
+            <div class="preview-summary">
+                <p>Total baris: {{ $previewSummary['total'] }}</p>
+                <p>Valid: {{ $previewSummary['valid'] }}</p>
+                <p>Tidak valid: {{ $previewSummary['invalid'] }}</p>
+            </div>
+            <div class="table-card">
+                <table>
+                    <thead>
+                        <tr>
+                            @foreach($previewHeaders as $header)
+                                <th>{{ $header }}</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($previewRows as $row)
+                            <tr class="{{ $row['valid'] ? '' : 'invalid-row' }}">
+                                <td>{{ $row['row_number'] }}</td>
+                                <td>{{ $row['data']['nis'] }}</td>
+                                <td>{{ $row['data']['nama'] }}</td>
+                                <td>{{ $row['data']['kelas'] }}</td>
+                                <td>{{ $row['valid'] ? 'Ya' : 'Tidak' }}</td>
+                                <td>{{ implode(', ', $row['errors']) }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <form action="{{ route('admin.siswa.import') }}" method="POST" style="margin-top: 1rem;">
+                @csrf
+                <button type="submit" class="btn btn-success">Import Semua Baris Valid</button>
+            </form>
+        </div>
+    @endif
 </div>
 @endsection

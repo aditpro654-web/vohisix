@@ -29,6 +29,8 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
     
     Route::resource('/admin/siswa', AdminSiswaController::class, ['names' => 'admin.siswa']);
     Route::get('/admin/siswa/export', [AdminSiswaController::class, 'export'])->name('admin.siswa.export');
+    Route::get('/admin/siswa/import/template', [AdminSiswaController::class, 'downloadImportTemplate'])->name('admin.siswa.import.template');
+    Route::post('/admin/siswa/import/preview', [AdminSiswaController::class, 'importPreview'])->name('admin.siswa.import.preview');
     Route::post('/admin/siswa/import', [AdminSiswaController::class, 'import'])->name('admin.siswa.import');
 
     Route::resource('/admin/dudi', AdminDudiController::class, ['names' => 'admin.dudi']);
@@ -40,6 +42,8 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
 
     Route::resource('/admin/login', AdminLoginController::class, ['names' => 'admin.login']);
     Route::get('/admin/login/export', [AdminLoginController::class, 'export'])->name('admin.login.export');
+    Route::get('/admin/login/import/template', [AdminLoginController::class, 'downloadImportTemplate'])->name('admin.login.import.template');
+    Route::post('/admin/login/import/preview', [AdminLoginController::class, 'previewImport'])->name('admin.login.import.preview');
     Route::post('/admin/login/import', [AdminLoginController::class, 'import'])->name('admin.login.import');
 });
 

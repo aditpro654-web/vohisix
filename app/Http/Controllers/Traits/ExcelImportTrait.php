@@ -32,8 +32,11 @@ trait ExcelImportTrait
             return [];
         }
 
+        $delimiter = $this->detectCsvDelimiter($handle);
+        rewind($handle);
+
         $headers = [];
-        while (($line = fgetcsv($handle, 0, ',')) !== false) {
+        while (($line = fgetcsv($handle, 0, $delimiter)) !== false) {
             if (count(array_filter($line, fn($value) => $value !== null && trim($value) !== '')) === 0) {
                 continue;
             }
@@ -49,6 +52,19 @@ trait ExcelImportTrait
         fclose($handle);
 
         return $rows;
+    }
+
+    protected function detectCsvDelimiter($handle): string
+    {
+        $line = fgets($handle);
+        if ($line === false) {
+            return ',';
+        }
+
+        $semicolonCount = substr_count($line, ';');
+        $commaCount = substr_count($line, ',');
+
+        return $semicolonCount >= $commaCount ? ';' : ',';
     }
 
     protected function parseXlsxFile(string $path): array
