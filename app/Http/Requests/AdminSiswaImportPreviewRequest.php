@@ -15,6 +15,7 @@ class AdminSiswaImportPreviewRequest extends FormRequest
     {
         return [
             'file' => 'required|file|mimes:csv,txt,xlsx|max:5120',
+            'zip' => 'nullable|file|mimes:zip|max:51200',
         ];
     }
 
@@ -25,6 +26,9 @@ class AdminSiswaImportPreviewRequest extends FormRequest
             'file.file' => 'File import tidak valid.',
             'file.mimes' => 'Gunakan file CSV, TXT, atau XLSX.',
             'file.max' => 'Ukuran file maksimal 5MB.',
+            'zip.file' => 'File ZIP tidak valid.',
+            'zip.mimes' => 'Gunakan file ZIP untuk gambar.',
+            'zip.max' => 'Ukuran file ZIP maksimal 50MB.',
         ];
     }
 }

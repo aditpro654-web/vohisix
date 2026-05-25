@@ -11,6 +11,7 @@ use App\Services\Import\SiswaImportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Traits\ExcelExportTrait;
 
 class AdminSiswaController extends Controller
@@ -209,12 +210,24 @@ class AdminSiswaController extends Controller
 
     public function importPreview(AdminSiswaImportPreviewRequest $request, SiswaImportService $importService)
     {
+        $zipPath = null;
+        if ($request->hasFile('zip')) {
+            $zipPath = $request->file('zip')->storeAs('imports/temp', uniqid('siswa_images_') . '.zip');
+            Session::put('admin_siswa_import_zip', $zipPath);
+        } else {
+            Session::forget('admin_siswa_import_zip');
+        }
+
         $rows = $importService->parseFile($request->file('file'));
         if (empty($rows)) {
+            if ($zipPath) {
+                Storage::disk('local')->delete($zipPath);
+                Session::forget('admin_siswa_import_zip');
+            }
             return redirect()->route('admin.siswa.create')->with('error', 'File tidak dapat dibaca. Gunakan format CSV atau XLSX dengan header yang tepat.');
         }
 
-        $preview = $importService->previewRows($rows);
+        $preview = $importService->previewRows($rows, $zipPath);
         Session::put('admin_siswa_import_preview', $preview['previewRows']);
 
         return view('admin.siswa.create', [
@@ -222,22 +235,41 @@ class AdminSiswaController extends Controller
             'previewSummary' => $preview['summary'],
             'previewHeaders' => $preview['headers'],
             'previewMode' => true,
+            'zipUploaded' => $zipPath !== null,
         ]);
     }
 
     public function import(Request $request, SiswaImportService $importService)
     {
         $previewRows = Session::get('admin_siswa_import_preview', []);
+        $zipPath = Session::get('admin_siswa_import_zip');
+
         if (empty($previewRows)) {
+            if ($zipPath) {
+                Storage::disk('local')->delete($zipPath);
+                Session::forget('admin_siswa_import_zip');
+            }
             return redirect()->route('admin.siswa.create')->with('error', 'Unggah file import terlebih dahulu untuk melihat preview dan mengonfirmasi data.');
         }
 
-        $result = $importService->importRows($previewRows);
-        Session::forget('admin_siswa_import_preview');
+        $result = $importService->importRows($previewRows, $zipPath);
+        Session::forget(['admin_siswa_import_preview', 'admin_siswa_import_zip']);
+        if ($zipPath) {
+            Storage::disk('local')->delete($zipPath);
+        }
 
         $message = "{$result['imported']} siswa berhasil diimpor";
         if ($result['skipped'] > 0) {
             $message .= ", {$result['skipped']} baris dilewati.";
+        }
+        if ($zipPath) {
+            $message .= " {$result['images_processed']} gambar berhasil disimpan.";
+            if ($result['images_missing'] > 0) {
+                $message .= " {$result['images_missing']} gambar tidak ditemukan.";
+            }
+            if ($result['images_invalid'] > 0) {
+                $message .= " {$result['images_invalid']} gambar tidak valid dan diganti default.";
+            }
         }
 
         return redirect()->route('admin.siswa.index')->with('success', $message);

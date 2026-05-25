@@ -3,20 +3,6 @@
 @section('title', 'Manajemen Login')
 
 @section('content')
-<div class="page-hero">
-    <div class="section-title">
-        <div>
-            <h1>Manajemen Login</h1>
-            <p>Kelola akun user Admin dan Siswa dengan tampilan yang rapi dan modern.</p>
-        </div>
-    </div>
-    <div class="hero-stats">
-        <div class="hero-stat"><strong>{{ $totalUser }}</strong><span>Total User</span></div>
-        <div class="hero-stat"><strong>{{ $totalAdmin }}</strong><span>Admin</span></div>
-        <div class="hero-stat"><strong>{{ $totalSiswa }}</strong><span>Siswa</span></div>
-    </div>
-</div>
-
 <div class="card">
     <div class="toolbar-panel">
         <div class="toolbar-panel-header">

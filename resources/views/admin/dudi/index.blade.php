@@ -3,26 +3,6 @@
 @section('title', 'Data DUDI')
 
 @section('content')
-<div class="page-hero">
-    <div class="section-title">
-        <div>
-            <h1>Data DUDI</h1>
-            <p>Kelola mitra DUDI, kuota, dan detail perusahaan mitra PKL dalam satu tampilan yang konsisten.</p>
-        </div>
-        <a href="{{ route('admin.dudi.create') }}" class="btn-add">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            Tambah DUDI Baru
-        </a>
-    </div>
-    <div class="hero-stats">
-        <div class="hero-stat"><strong>{{ $totalDudi }}</strong><span>Total DUDI</span></div>
-        <div class="hero-stat"><strong>{{ $totalKuota }}</strong><span>Total Kuota</span></div>
-    </div>
-</div>
-
 <div class="card">
     <div class="toolbar-panel">
         <div>
@@ -39,6 +19,13 @@
             </select>
             <button type="submit">Cari</button>
             <a href="{{ route('admin.dudi.export', request()->query()) }}" class="btn btn-secondary">Export</a>
+            <a href="{{ route('admin.dudi.create') }}" class="btn btn-primary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Tambah DUDI Baru
+            </a>
         </form>
     </div>
 

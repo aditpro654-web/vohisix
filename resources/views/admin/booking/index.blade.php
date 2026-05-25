@@ -3,22 +3,6 @@
 @section('title', 'Booking PKL')
 
 @section('content')
-<div class="booking-hero">
-    <div class="section-title">
-        <div>
-            <h1>Manajemen Booking PKL</h1>
-            <p>Review dan update status pengajuan PKL siswa dengan tampilan yang lebih segar dan konsisten.</p>
-        </div>
-        <a href="{{ route('admin.booking.create') }}" class="btn btn-primary">+ Tambah Booking</a>
-    </div>
-    <div class="hero-stats">
-        <div class="hero-stat"><strong>{{ $totalBooking }}</strong><span>Total Booking</span></div>
-        <div class="hero-stat"><strong>{{ $bookingDireview }}</strong><span>Direview</span></div>
-        <div class="hero-stat"><strong>{{ $bookingDiterima }}</strong><span>Diterima</span></div>
-        <div class="hero-stat"><strong>{{ $bookingDitolak }}</strong><span>Ditolak</span></div>
-    </div>
-</div>
-
 <div class="card">
     <div class="toolbar-panel">
         <div>
@@ -41,6 +25,7 @@
             </select>
             <button type="submit">Cari</button>
             <a href="{{ route('admin.booking.export', request()->query()) }}" class="btn btn-secondary">Export</a>
+            <a href="{{ route('admin.booking.create') }}" class="btn btn-primary">+ Tambah Booking</a>
         </form>
     </div>
 

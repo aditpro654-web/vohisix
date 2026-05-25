@@ -1,18 +1,39 @@
-- saya ada 1 hal kelewatan, saat ini terdapat kolom “No” yang tampil menggunakan nomor default/auto increment database.
-Yang seharusnya ditampilkan adalah nomor absen siswa.
-Masalahnya:
-1. Database/data siswa belum memiliki field nomor_absen
-2. Semua halaman data masih memakai ID/default number
-3. Form tambah/edit siswa juga belum ada input nomor absen
-Tolong bantu perbaiki dengan:
-Menambahkan field nomor_absen pada database
-Menampilkan nomor absen di tabel data siswa dan booking
-Mengubah semua tampilan nomor default menjadi nomor absen siswa
-Menambahkan input nomor absen pada form tambah/edit
-Memastikan sorting dan pencarian bisa berdasarkan nomor absen
-Menyesuaikan relasi/query yang berkaitan
-Jangan merusak fitur lama
-Berikan query SQL migration yang diperlukan
-Rapikan tampilan tabel jika ada perubahan kolom
+Tambahkan fitur import gambar otomatis pada sistem import Excel yang sudah ada.
 
-jadi sehingga nanti data yg tampil sesuai urutan nomor absen (semisal absen 1 diinput terakhir, dia tetep akan tampil pertama bukan terakhir)
+KONDISI SAAT INI:
+- Import data Excel sudah berhasil
+- Data teks sudah masuk database dengan benar
+- Kolom foto pada Excel sudah tersedia
+- Tinggal proses upload dan penyimpanan gambar
+
+YANG DIINGINKAN:
+1. User dapat upload:
+   - file Excel
+   - file ZIP berisi gambar
+
+2. Sistem otomatis:
+   - extract ZIP gambar
+   - membaca nama file gambar dari kolom foto Excel
+   - mencocokkan file gambar dengan data Excel
+   - menyimpan gambar ke folder uploads
+   - menyimpan nama/path gambar ke database
+
+3. Tambahkan validasi:
+   - hanya jpg, jpeg, png (ada beberapa yang berkas itu upoad pdf atau semacamnya yang tidak menimbulkan error boleh)
+   - ukuran maksimal gambar
+   - cek gambar ada atau tidak
+   - jika gambar tidak ditemukan gunakan foto default
+
+4. Tambahkan keamanan:
+   - rename file otomatis agar tidak bentrok
+   - hindari overwrite file lama
+   - sanitasi nama file
+
+5. Tambahkan notifikasi:
+   - jumlah data berhasil import
+   - jumlah gambar berhasil diproses
+   - daftar gambar yang gagal ditemukan
+
+6. Buat kode rapi, minim bug, dan kompatibel dengan PHP laravel + MySQL.
+
+7. Jangan merusak sistem import lama yang sudah berjalan.

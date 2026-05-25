@@ -3,16 +3,6 @@
 @section('title', 'Data Siswa PKL')
 
 @section('content')
-<div class="page-hero">
-    <div class="section-title">
-        <div>
-            <h1>Data Siswa PKL</h1>
-            <p>Kelola semua siswa, lihat verifikasi berkas, dan temukan data penting dengan cepat.</p>
-        </div>
-        <a href="{{ route('admin.siswa.create') }}" class="btn-add">+ Tambah Siswa Baru</a>
-    </div>
-</div>
-
 <div class="card">
     <div class="toolbar-panel">
         <div>
@@ -29,6 +19,7 @@
             </select>
             <button type="submit">Cari</button>
             <a href="{{ route('admin.siswa.export', request()->query()) }}" class="btn btn-secondary">Export</a>
+            <a href="{{ route('admin.siswa.create') }}" class="btn btn-primary">+ Tambah Siswa Baru</a>
         </form>
     </div>
 

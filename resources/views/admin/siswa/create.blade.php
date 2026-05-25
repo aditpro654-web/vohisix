@@ -93,6 +93,14 @@
             @enderror
         </div>
 
+        <div class="form-group">
+            <label for="zip_file">Pilih File ZIP Gambar (opsional)</label>
+            <input type="file" id="zip_file" name="zip" accept=".zip">
+            @error('zip')
+                <div class="form-error">{{ $message }}</div>
+            @enderror
+        </div>
+
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Preview Import</button>
             <a href="{{ route('admin.siswa.import.template') }}" class="btn btn-secondary">Download Template Import</a>
@@ -110,14 +118,41 @@
                 <p>Total baris: {{ $previewSummary['total'] }}</p>
                 <p>Valid: {{ $previewSummary['valid'] }}</p>
                 <p>Tidak valid: {{ $previewSummary['invalid'] }}</p>
+                @if(isset($previewSummary['images']))
+                    <p>Gambar ditemukan: {{ $previewSummary['images']['found'] }}</p>
+                    <p>Gambar hilang: {{ $previewSummary['images']['missing'] }}</p>
+                    <p>Gambar tidak valid: {{ $previewSummary['images']['invalid'] }}</p>
+                    @if(!empty($previewSummary['images']['warnings']))
+                        <div class="alert alert-warning" style="margin-top:1rem; padding:0.75rem; background:#fff3cd; border:1px solid #ffeeba; color:#856404;">
+                            <strong>Peringatan gambar:</strong>
+                            <ul style="margin:0.5rem 0 0 1.25rem;">
+                                @foreach($previewSummary['images']['warnings'] as $warning)
+                                    <li>{{ $warning }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    @if(empty($previewSummary['images']['found']) && !empty($previewSummary['images']['missing']))
+                        <div class="alert alert-info" style="margin-top:1rem; padding:0.75rem; background:#d1ecf1; border:1px solid #bee5eb; color:#0c5460;">
+                            ZIP gambar tidak ditemukan atau tidak cocok. Foto akan menggunakan placeholder/default jika tersedia.
+                        </div>
+                    @endif
+                @endif
             </div>
             <div class="table-card">
                 <table>
                     <thead>
                         <tr>
-                            @foreach($previewHeaders as $header)
-                                <th>{{ $header }}</th>
-                            @endforeach
+                            <th>No</th>
+                            <th>NIS</th>
+                            <th>Nomor Absen</th>
+                            <th>Nama</th>
+                            <th>Kelas</th>
+                            <th>Foto</th>
+                            <th>Status Gambar</th>
+                            <th>Keterangan Gambar</th>
+                            <th>Valid</th>
+                            <th>Errors</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -129,6 +164,8 @@
                                 <td>{{ $row['data']['nama'] }}</td>
                                 <td>{{ $row['data']['kelas'] }}</td>
                                 <td>{{ $row['data']['foto'] }}</td>
+                                <td>{{ ucfirst($row['image_status'] ?? 'tidak ada') }}</td>
+                                <td>{{ $row['image_warning'] ?? '-' }}</td>
                                 <td>{{ $row['valid'] ? 'Ya' : 'Tidak' }}</td>
                                 <td>{{ implode(', ', $row['errors']) }}</td>
                             </tr>
