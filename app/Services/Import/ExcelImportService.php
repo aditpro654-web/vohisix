@@ -3,24 +3,30 @@
 namespace App\Services\Import;
 
 use App\Imports\GenericHeadingRowImport;
+use App\Http\Controllers\Traits\ExcelImportTrait;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Maatwebsite\Excel\Facades\Excel;
 
 class ExcelImportService
 {
+    use ExcelImportTrait;
+
     public function parseFile(UploadedFile $file): array
     {
-        $extension = strtolower($file->getClientOriginalExtension());
-        if (in_array($extension, ['csv', 'txt'])) {
-            $delimiter = $this->detectDelimiter($file->getRealPath());
-            $sheets = Excel::toArray(new GenericHeadingRowImport($delimiter), $file);
-        } else {
-            $sheets = Excel::toArray(new GenericHeadingRowImport(), $file);
+        if (class_exists(\Maatwebsite\Excel\Facades\Excel::class)) {
+            $extension = strtolower($file->getClientOriginalExtension());
+            if (in_array($extension, ['csv', 'txt'])) {
+                $delimiter = $this->detectDelimiter($file->getRealPath());
+                $sheets = \Maatwebsite\Excel\Facades\Excel::toArray(new GenericHeadingRowImport($delimiter), $file);
+            } else {
+                $sheets = \Maatwebsite\Excel\Facades\Excel::toArray(new GenericHeadingRowImport(), $file);
+            }
+
+            return $sheets[0] ?? [];
         }
 
-        return $sheets[0] ?? [];
+        return $this->parseImportFile($file);
     }
 
     public function detectDelimiter(string $path): string

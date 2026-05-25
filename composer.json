@@ -59,6 +59,10 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true
+        },
+        "audit": {
+            "block-insecure": false,
+            "ignore": []
         }
     },
     "minimum-stability": "stable",

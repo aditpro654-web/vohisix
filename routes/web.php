@@ -27,24 +27,24 @@ Route::middleware('web')->group(function () {
 Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     
-    Route::resource('/admin/siswa', AdminSiswaController::class, ['names' => 'admin.siswa']);
     Route::get('/admin/siswa/export', [AdminSiswaController::class, 'export'])->name('admin.siswa.export');
     Route::get('/admin/siswa/import/template', [AdminSiswaController::class, 'downloadImportTemplate'])->name('admin.siswa.import.template');
     Route::post('/admin/siswa/import/preview', [AdminSiswaController::class, 'importPreview'])->name('admin.siswa.import.preview');
     Route::post('/admin/siswa/import', [AdminSiswaController::class, 'import'])->name('admin.siswa.import');
+    Route::resource('/admin/siswa', AdminSiswaController::class, ['names' => 'admin.siswa']);
 
-    Route::resource('/admin/dudi', AdminDudiController::class, ['names' => 'admin.dudi']);
     Route::get('/admin/dudi/export', [AdminDudiController::class, 'export'])->name('admin.dudi.export');
     Route::post('/admin/dudi/import', [AdminDudiController::class, 'import'])->name('admin.dudi.import');
+    Route::resource('/admin/dudi', AdminDudiController::class, ['names' => 'admin.dudi']);
 
-    Route::resource('/admin/booking', AdminBookingController::class, ['names' => 'admin.booking']);
     Route::get('/admin/booking/export', [AdminBookingController::class, 'export'])->name('admin.booking.export');
+    Route::resource('/admin/booking', AdminBookingController::class, ['names' => 'admin.booking']);
 
-    Route::resource('/admin/login', AdminLoginController::class, ['names' => 'admin.login']);
     Route::get('/admin/login/export', [AdminLoginController::class, 'export'])->name('admin.login.export');
     Route::get('/admin/login/import/template', [AdminLoginController::class, 'downloadImportTemplate'])->name('admin.login.import.template');
     Route::post('/admin/login/import/preview', [AdminLoginController::class, 'previewImport'])->name('admin.login.import.preview');
     Route::post('/admin/login/import', [AdminLoginController::class, 'import'])->name('admin.login.import');
+    Route::resource('/admin/login', AdminLoginController::class, ['names' => 'admin.login']);
 });
 
 // Siswa Routes
