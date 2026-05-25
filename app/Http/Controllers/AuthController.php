@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -22,6 +23,14 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+        Log::debug('AuthController@login attempt', [
+            'username' => $request->input('username'),
+            'request_csrf' => $request->input('_token'),
+            'session_csrf' => $request->session()->token(),
+            'session_id' => $request->session()->getId(),
+            'cookies' => $request->cookies->all(),
+        ]);
+
         $credentials = $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
