@@ -14,11 +14,25 @@ return new class extends Migration
                 $table->integer('nomor_absen')->nullable()->after('kelas');
             }
         });
+
+        // Add unique index if it doesn't exist
+        try {
+            Schema::table('siswas', function (Blueprint $table) {
+                $table->unique('nomor_absen');
+            });
+        } catch (\Exception $e) {
+            // Index already exists or other error, continue anyway
+        }
     }
 
     public function down(): void
     {
         Schema::table('siswas', function (Blueprint $table) {
+            try {
+                $table->dropUnique('siswas_nomor_absen_unique');
+            } catch (\Exception $e) {
+                // Index doesn't exist, continue anyway
+            }
             if (Schema::hasColumn('siswas', 'nomor_absen')) {
                 $table->dropColumn('nomor_absen');
             }

@@ -1,0 +1,18 @@
+- saya ada 1 hal kelewatan, saat ini terdapat kolom “No” yang tampil menggunakan nomor default/auto increment database.
+Yang seharusnya ditampilkan adalah nomor absen siswa.
+Masalahnya:
+1. Database/data siswa belum memiliki field nomor_absen
+2. Semua halaman data masih memakai ID/default number
+3. Form tambah/edit siswa juga belum ada input nomor absen
+Tolong bantu perbaiki dengan:
+Menambahkan field nomor_absen pada database
+Menampilkan nomor absen di tabel data siswa dan booking
+Mengubah semua tampilan nomor default menjadi nomor absen siswa
+Menambahkan input nomor absen pada form tambah/edit
+Memastikan sorting dan pencarian bisa berdasarkan nomor absen
+Menyesuaikan relasi/query yang berkaitan
+Jangan merusak fitur lama
+Berikan query SQL migration yang diperlukan
+Rapikan tampilan tabel jika ada perubahan kolom
+
+jadi sehingga nanti data yg tampil sesuai urutan nomor absen (semisal absen 1 diinput terakhir, dia tetep akan tampil pertama bukan terakhir)
