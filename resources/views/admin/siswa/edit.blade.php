@@ -48,7 +48,6 @@
             <div class="form-row">
                 <label class="radio-option"><input type="radio" name="kelas" value="XII SIJA 1" {{ old('kelas', $siswa->kelas) == 'XII SIJA 1' ? 'checked' : '' }}> XII SIJA 1</label>
                 <label class="radio-option"><input type="radio" name="kelas" value="XII SIJA 2" {{ old('kelas', $siswa->kelas) == 'XII SIJA 2' ? 'checked' : '' }}> XII SIJA 2</label>
-                <label class="radio-option"><input type="radio" name="kelas" value="XII SIJA 3" {{ old('kelas', $siswa->kelas) == 'XII SIJA 3' ? 'checked' : '' }}> XII SIJA 3</label>
             </div>
             @error('kelas')
                 <div class="form-error">{{ $message }}</div>

@@ -72,11 +72,6 @@
                         <td>
                             <div class="action-group">
                                 <a href="{{ route('admin.dudi.edit', $dudi->id_dudi) }}" class="edit">Edit</a>
-                                <form action="{{ route('admin.dudi.destroy', $dudi->id_dudi) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus?');" class="inline-form">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="delete">Hapus</button>
-                                </form>
                             </div>
                         </td>
                     </tr>

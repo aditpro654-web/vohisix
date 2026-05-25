@@ -76,17 +76,24 @@ class AdminLoginController extends Controller
     {
         $validated = $request->validated();
         $password = $validated['password'] ?? $validated['username'];
+        // Normalize kelas values and protect against unexpected values
+        $kelasId = in_array($validated['kelas_id'] ?? null, ['XII SIJA 1', 'XII SIJA 2'], true) ? $validated['kelas_id'] : null;
+        $kelasSecond = in_array($validated['kelas_second'] ?? null, ['XII SIJA 1', 'XII SIJA 2'], true) ? $validated['kelas_second'] : null;
 
-        User::create([
-            'username' => $validated['username'],
-            'name' => $validated['name'],
-            'role' => $validated['role'],
-            'kelas_id' => $validated['kelas_id'] ?? null,
-            'kelas_second' => $validated['kelas_second'] ?? null,
-            'password' => Hash::make($password),
-        ]);
+        try {
+            User::create([
+                'username' => trim($validated['username']),
+                'name' => trim($validated['name']),
+                'role' => $validated['role'],
+                'kelas_id' => $kelasId,
+                'kelas_second' => $kelasSecond,
+                'password' => Hash::make($password),
+            ]);
 
-        return redirect()->route('admin.login.index')->with('success', 'User berhasil ditambahkan');
+            return redirect()->route('admin.login.index')->with('success', 'User berhasil ditambahkan');
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', 'Gagal menyimpan user: ' . $e->getMessage());
+        }
     }
 
     /**

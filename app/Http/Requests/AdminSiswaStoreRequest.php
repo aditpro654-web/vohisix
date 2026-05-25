@@ -17,7 +17,7 @@ class AdminSiswaStoreRequest extends FormRequest
             'nis' => 'required|numeric|unique:siswas,nis',
             'nomor_absen' => 'required|integer|min:1|unique:siswas,nomor_absen',
             'nama' => 'required|string|max:255',
-            'kelas' => ['required', 'in:XII SIJA 1,XII SIJA 2,XII SIJA 3'],
+            'kelas' => ['required', 'in:XII SIJA 1,XII SIJA 2'],
             'foto' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif,bmp,heic,heif|max:2048',
         ];
     }

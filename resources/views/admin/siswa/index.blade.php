@@ -18,7 +18,8 @@
                 @endforeach
             </select>
             <!-- live search: removed submit button -->
-            <a href="{{ route('admin.siswa.export', request()->query()) }}" class="btn btn-secondary">Export</a>
+            <a href="{{ route('admin.siswa.export', request()->query()) }}" class="btn btn-secondary">Export CSV</a>
+            <a href="{{ route('admin.siswa.export.pdf', request()->query()) }}" class="btn btn-secondary">Export PDF</a>
             <a href="{{ route('admin.siswa.create') }}" class="btn btn-primary">+ Tambah Siswa Baru</a>
         </form>
     </div>

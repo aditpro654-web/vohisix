@@ -20,22 +20,22 @@ class AdminLoginStoreRequest extends FormRequest
                 'string',
                 'max:255',
                 'unique:users,username',
-                $this->role === 'siswa' ? 'numeric' : 'string',
+                $this->input('role') === 'siswa' ? 'numeric' : 'string',
             ],
             'name' => ['required', 'string', 'max:255'],
             'role' => ['required', Rule::in(['admin', 'siswa', 'wali_kelas', 'kakonsli'])],
             'password' => [
-                Rule::requiredIf(fn () => $this->role !== 'siswa'),
+                Rule::requiredIf(fn () => $this->input('role') !== 'siswa'),
                 'nullable',
                 'string',
                 'min:6',
             ],
             'kelas_id' => [
-                Rule::requiredIf(fn () => in_array($this->role, ['wali_kelas', 'kakonsli'], true)),
+                Rule::requiredIf(fn () => in_array($this->input('role'), ['wali_kelas', 'kakonsli'], true)),
                 Rule::in(['XII SIJA 1', 'XII SIJA 2']),
             ],
             'kelas_second' => [
-                Rule::requiredIf(fn () => $this->role === 'kakonsli'),
+                Rule::requiredIf(fn () => $this->input('role') === 'kakonsli'),
                 Rule::in(['XII SIJA 1', 'XII SIJA 2']),
             ],
         ];

@@ -18,7 +18,7 @@ $siswas = [
     ['nis' => '002', 'nama' => 'Budi Santoso', 'kelas' => 'XII SIJA 1'],
     ['nis' => '003', 'nama' => 'Citra Dewi', 'kelas' => 'XII SIJA 2'],
     ['nis' => '004', 'nama' => 'Dina Kusuma', 'kelas' => 'XII SIJA 2'],
-    ['nis' => '005', 'nama' => 'Eka Wijaya', 'kelas' => 'XII SIJA 3'],
+    ['nis' => '005', 'nama' => 'Eka Wijaya', 'kelas' => 'XII SIJA 2'],
 ];
 
 foreach ($siswas as $s) {

@@ -228,7 +228,7 @@ class SiswaImportService
             'nis' => ['required', 'string', 'max:255', 'regex:/^\d+$/'],
             'nomor_absen' => ['required', 'integer', 'min:1'],
             'nama' => ['required', 'string', 'max:255'],
-            'kelas' => ['required', Rule::in(['XII SIJA 1', 'XII SIJA 2', 'XII SIJA 3'])],
+            'kelas' => ['required', Rule::in(['XII SIJA 1', 'XII SIJA 2'])],
             'foto' => ['nullable', 'string', 'max:255'],
         ];
     }

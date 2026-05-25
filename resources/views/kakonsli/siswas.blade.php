@@ -14,6 +14,9 @@
     </div>
     
     @if($siswas->count() > 0)
+        <div style="margin-bottom:0.75rem;">
+            <a href="{{ route('kakonsli.siswas.export.pdf', request()->query()) }}" class="btn btn-secondary">Export PDF</a>
+        </div>
         <table class="table">
             <thead>
                 <tr>

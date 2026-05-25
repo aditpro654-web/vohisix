@@ -143,7 +143,7 @@ class AdminSiswaController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'kelas' => 'required|in:XII SIJA 1,XII SIJA 2,XII SIJA 3',
+            'kelas' => 'required|in:XII SIJA 1,XII SIJA 2',
             'nis' => 'nullable|string|unique:siswas,nis,' . $siswa->nis . ',nis',
             'nomor_absen' => 'required|integer|min:1|unique:siswas,nomor_absen,' . $siswa->nis . ',nis',
             'foto' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif,bmp,heic,heif|max:2048',
@@ -283,7 +283,7 @@ class AdminSiswaController extends Controller
             [
                 ['1210001', '1', 'Budi Santoso', 'XII SIJA 1', 'budi.jpg'],
                 ['1210002', '2', 'Ani Putri', 'XII SIJA 2', 'ani.jpg'],
-                ['1210003', '3', 'Candra Wijaya', 'XII SIJA 3', 'candra.jpg'],
+                ['1210003', '3', 'Candra Wijaya', 'XII SIJA 2', 'candra.jpg'],
             ]
         );
     }

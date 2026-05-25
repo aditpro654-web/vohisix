@@ -28,6 +28,7 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     
     Route::get('/admin/siswa/export', [AdminSiswaController::class, 'export'])->name('admin.siswa.export');
+    Route::get('/admin/siswa/export/pdf', [App\Http\Controllers\PdfExportController::class, 'siswa'])->name('admin.siswa.export.pdf');
     Route::get('/admin/siswa/import/template', [AdminSiswaController::class, 'downloadImportTemplate'])->name('admin.siswa.import.template');
     Route::post('/admin/siswa/import/preview', [AdminSiswaController::class, 'importPreview'])->name('admin.siswa.import.preview');
     Route::post('/admin/siswa/import', [AdminSiswaController::class, 'import'])->name('admin.siswa.import');
@@ -65,6 +66,7 @@ Route::middleware(['auth', 'is_siswa'])->group(function () {
 Route::middleware(['auth', 'is_wali_kelas'])->group(function () {
     Route::get('/wali-kelas/dashboard', [WaliKelasDashboardController::class, 'index'])->name('wali-kelas.dashboard');
     Route::get('/wali-kelas/siswas', [WaliKelasDashboardController::class, 'siswas'])->name('wali-kelas.siswas');
+    Route::get('/wali-kelas/siswas/export/pdf', [App\Http\Controllers\PdfExportController::class, 'siswa'])->name('wali-kelas.siswas.export.pdf');
     Route::get('/wali-kelas/bookings', [WaliKelasDashboardController::class, 'bookings'])->name('wali-kelas.bookings');
 });
 
@@ -72,6 +74,7 @@ Route::middleware(['auth', 'is_wali_kelas'])->group(function () {
 Route::middleware(['auth', 'is_kakonsli'])->group(function () {
     Route::get('/kakonsli/dashboard', [KakonslDashboardController::class, 'index'])->name('kakonsli.dashboard');
     Route::get('/kakonsli/siswas', [KakonslDashboardController::class, 'siswas'])->name('kakonsli.siswas');
+    Route::get('/kakonsli/siswas/export/pdf', [App\Http\Controllers\PdfExportController::class, 'siswa'])->name('kakonsli.siswas.export.pdf');
     Route::get('/kakonsli/bookings', [KakonslDashboardController::class, 'bookings'])->name('kakonsli.bookings');
 });
 

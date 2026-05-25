@@ -120,7 +120,30 @@ class AdminBookingController extends Controller
             'status' => 'required|in:Direview,Diterima,Ditolak',
         ]);
 
-        $booking->update($validated);
+        $oldStatus = $booking->status;
+        $newStatus = $validated['status'];
+
+        \DB::transaction(function () use ($booking, $oldStatus, $newStatus, $validated) {
+            $booking->update($validated);
+
+            // Adjust DUDI kuota when status transitions
+            $dudi = $booking->dudi;
+            if ($dudi) {
+                // If moved from non-Diterima to Diterima => reduce kuota by 1 (if available)
+                if ($oldStatus !== 'Diterima' && $newStatus === 'Diterima') {
+                    if ($dudi->kuota > 0) {
+                        $dudi->kuota = max(0, $dudi->kuota - 1);
+                        $dudi->save();
+                    }
+                }
+
+                // If moved from Diterima to Ditolak => return kuota +1
+                if ($oldStatus === 'Diterima' && $newStatus === 'Ditolak') {
+                    $dudi->kuota = ($dudi->kuota ?? 0) + 1;
+                    $dudi->save();
+                }
+            }
+        });
 
         return redirect()->route('admin.booking.index')->with('success', 'Status booking berhasil diperbarui');
     }
