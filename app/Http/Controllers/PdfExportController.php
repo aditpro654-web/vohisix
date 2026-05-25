@@ -11,8 +11,6 @@ class PdfExportController extends Controller
 {
     public function siswa(Request $request)
     {
-        $this->authorize('viewAny', Siswa::class);
-
         $status = $request->input('status'); // Direview, Diterima, Ditolak or empty (all)
         $kelas = $request->input('kelas'); // XII SIJA 1 / XII SIJA 2 or empty
 
