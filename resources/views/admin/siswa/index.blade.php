@@ -10,14 +10,14 @@
             <p class="form-helper">Filter dan cari siswa berdasarkan nama atau kelas untuk mempercepat akses data.</p>
         </div>
         <form action="{{ route('admin.siswa.index') }}" method="GET" class="toolbar-grid" id="filterForm">
-            <input type="text" name="search" placeholder="Cari NIS atau Nama..." value="{{ $search ?? '' }}" id="searchInput" />
+            <input type="text" name="search" placeholder="Cari NIS atau Nama..." value="{{ $search ?? '' }}" id="searchInput" oninput="document.getElementById('filterForm').submit()" />
             <select name="kelas" id="kelasSelect">
                 <option value="">Semua Kelas</option>
                 @foreach($allKelas as $k)
                     <option value="{{ $k }}" {{ ($kelas ?? '') == $k ? 'selected' : '' }}>{{ $k }}</option>
                 @endforeach
             </select>
-            <button type="submit">Cari</button>
+            <!-- live search: removed submit button -->
             <a href="{{ route('admin.siswa.export', request()->query()) }}" class="btn btn-secondary">Export</a>
             <a href="{{ route('admin.siswa.create') }}" class="btn btn-primary">+ Tambah Siswa Baru</a>
         </form>
@@ -229,41 +229,53 @@
 @endif
 
 <script>
+    const searchInputEl = document.getElementById('searchInput');
+    if (searchInputEl) {
+        searchInputEl.addEventListener('input', function() {
+            document.getElementById('filterForm').submit();
+        });
+    }
+    const kelasSelectEl = document.getElementById('kelasSelect');
+    if (kelasSelectEl) {
+        kelasSelectEl.addEventListener('change', function() {
+            document.getElementById('filterForm').submit();
+        });
+    }
+
+    // improve preview handling: show fallback text if image fails to load
     function viewDocument(title, url) {
         document.getElementById('modalTitle').innerText = title;
         const img = document.getElementById('modalImage');
+        const modalBody = document.querySelector('.modal-body');
+        const existingNoImg = document.getElementById('noImageText');
+        if (existingNoImg) existingNoImg.remove();
         if (url && url !== '') {
             img.src = url;
             img.style.display = 'block';
-        } else {
-            img.src = '';
-            img.style.display = 'none';
-            // Tampilkan teks jika tidak ada gambar
-            if (!document.getElementById('noImageText')) {
+            img.onerror = function() {
+                img.style.display = 'none';
                 const noImg = document.createElement('div');
                 noImg.id = 'noImageText';
                 noImg.style.color = '#94a3b8';
-                noImg.innerText = 'Dokumen tidak tersedia';
-                document.querySelector('.modal-body').appendChild(noImg);
-            } else {
-                document.getElementById('noImageText').style.display = 'block';
-            }
+                noImg.innerText = 'Gambar tidak dapat ditampilkan';
+                modalBody.appendChild(noImg);
+            };
+        } else {
+            img.src = '';
+            img.style.display = 'none';
+            const noImg = document.createElement('div');
+            noImg.id = 'noImageText';
+            noImg.style.color = '#94a3b8';
+            noImg.innerText = 'Dokumen tidak tersedia';
+            modalBody.appendChild(noImg);
             return;
         }
-        const noImg = document.getElementById('noImageText');
-        if (noImg) noImg.style.display = 'none';
         document.getElementById('docModal').style.display = 'flex';
     }
     function closeModal() {
         document.getElementById('docModal').style.display = 'none';
     }
-    
-    document.getElementById('searchInput').addEventListener('change', function() {
-        document.getElementById('filterForm').submit();
-    });
-    document.getElementById('kelasSelect').addEventListener('change', function() {
-        document.getElementById('filterForm').submit();
-    });
+    window.viewDocument = viewDocument;
 </script>
 @endsection
 

@@ -162,8 +162,8 @@
                                 </div>
                                 <div class="dudi-search">
                                     <i class="fas fa-search"></i>
-                                    <input type="text" id="searchInput" name="search" placeholder="Cari nama perusahaan atau bidang..." value="{{ $search ?? '' }}">
-                                    <button type="submit">Cari</button>
+                                    <input type="text" id="searchInput" name="search" placeholder="Cari nama perusahaan atau bidang..." value="{{ $search ?? '' }}" oninput="document.getElementById('filterForm').submit()">
+                                    <!-- live search: removed Cari button; form submits on input/change -->
                                 </div>
                             </div>
                         </div>

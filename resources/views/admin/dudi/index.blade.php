@@ -10,14 +10,14 @@
             <p class="form-helper">Gunakan pencarian dan filter untuk menemukan perusahaan mitra dengan cepat.</p>
         </div>
         <form action="{{ route('admin.dudi.index') }}" method="GET" class="toolbar-grid">
-            <input type="text" name="search" placeholder="Cari Nama atau Bidang Industri..." value="{{ $search ?? '' }}" />
-            <select name="bidang_usaha">
+            <input type="text" name="search" placeholder="Cari Nama atau Bidang Industri..." value="{{ $search ?? '' }}" oninput="this.form.submit()" />
+            <select name="bidang_usaha" onchange="this.form.submit()">
                 <option value="">Semua Bidang</option>
                 @foreach($allBidang as $bidangItem)
                     <option value="{{ $bidangItem }}" {{ ($bidang == $bidangItem) ? 'selected' : '' }}>{{ $bidangItem }}</option>
                 @endforeach
             </select>
-            <button type="submit">Cari</button>
+            <!-- live search: removed submit button -->
             <a href="{{ route('admin.dudi.export', request()->query()) }}" class="btn btn-secondary">Export</a>
             <a href="{{ route('admin.dudi.create') }}" class="btn btn-primary">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

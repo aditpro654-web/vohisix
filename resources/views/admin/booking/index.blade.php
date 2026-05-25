@@ -10,20 +10,20 @@
             <p class="form-helper">Filter, cari, dan kelola semua pengajuan PKL siswa di satu tempat.</p>
         </div>
         <form action="{{ route('admin.booking.index') }}" method="GET" class="toolbar-grid">
-            <input type="text" name="search" placeholder="Cari nama atau NIS siswa..." value="{{ $search }}" />
-            <select name="status">
+            <input type="text" name="search" placeholder="Cari nama atau NIS siswa..." value="{{ $search }}" oninput="this.form.submit()" />
+            <select name="status" onchange="this.form.submit()">
                 <option value="">Semua Status</option>
                 <option value="Direview" {{ $status == 'Direview' ? 'selected' : '' }}>Direview</option>
                 <option value="Diterima" {{ $status == 'Diterima' ? 'selected' : '' }}>Diterima</option>
                 <option value="Ditolak" {{ $status == 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
             </select>
-            <select name="sort_by">
+            <select name="sort_by" onchange="this.form.submit()">
                 <option value="newest" {{ $sortBy == 'newest' ? 'selected' : '' }}>Terbaru</option>
                 <option value="oldest" {{ $sortBy == 'oldest' ? 'selected' : '' }}>Terlama</option>
                 <option value="siswa_asc" {{ $sortBy == 'siswa_asc' ? 'selected' : '' }}>NIS A-Z</option>
                 <option value="siswa_desc" {{ $sortBy == 'siswa_desc' ? 'selected' : '' }}>NIS Z-A</option>
             </select>
-            <button type="submit">Cari</button>
+            <!-- live search: removed submit button -->
             <a href="{{ route('admin.booking.export', request()->query()) }}" class="btn btn-secondary">Export</a>
             <a href="{{ route('admin.booking.create') }}" class="btn btn-primary">+ Tambah Booking</a>
         </form>

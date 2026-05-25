@@ -47,41 +47,7 @@
             </div>
 
             @if(Auth::check() && Auth::user()->role === 'admin')
-            <div class="nav-stats">
-                @if(request()->routeIs('admin.siswa.*'))
-                    <div class="nav-stat-item">
-                        <span class="stat-label">Total Siswa:</span>
-                        <span class="stat-value">{{ \App\Models\Siswa::count() }}</span>
-                    </div>
-                @elseif(request()->routeIs('admin.dudi.*'))
-                    <div class="nav-stat-item">
-                        <span class="stat-label">Total DUDI:</span>
-                        <span class="stat-value">{{ \App\Models\Dudi::count() }}</span>
-                    </div>
-                @elseif(request()->routeIs('admin.booking.*'))
-                    <div class="nav-stat-item">
-                        <span class="stat-label">Total Booking:</span>
-                        <span class="stat-value">{{ \App\Models\Booking::count() }}</span>
-                    </div>
-                    <div class="nav-stat-item">
-                        <span class="stat-label">Direview:</span>
-                        <span class="stat-value">{{ \App\Models\Booking::where('status', 'direview')->count() }}</span>
-                    </div>
-                    <div class="nav-stat-item">
-                        <span class="stat-label">Diterima:</span>
-                        <span class="stat-value">{{ \App\Models\Booking::where('status', 'diterima')->count() }}</span>
-                    </div>
-                @elseif(request()->routeIs('admin.dashboard'))
-                    <div class="nav-stat-item">
-                        <span class="stat-label">Total Siswa:</span>
-                        <span class="stat-value">{{ \App\Models\Siswa::count() }}</span>
-                    </div>
-                    <div class="nav-stat-item">
-                        <span class="stat-label">Total Booking:</span>
-                        <span class="stat-value">{{ \App\Models\Booking::count() }}</span>
-                    </div>
-                @endif
-            </div>
+            {{-- small recap stats positioned to the right near the user greeting --}}
             @elseif(Auth::check() && Auth::user()->role === 'siswa')
             <div class="nav-stats">
                 @if(request()->routeIs('siswa.booking.*'))
@@ -94,11 +60,60 @@
             @endif
         </div>
 
-        <div class="nav-right">
+        <div class="nav-right" style="display:flex; align-items:center; gap:12px;">
             @if(Auth::check())
-                <div class="user-greeting">
+                {{-- Compact recap boxes placed left of greeting --}}
+                <div style="display:flex; gap:8px; align-items:center; margin-right:6px;">
+                    @if(request()->routeIs('admin.booking.*') || request()->routeIs('admin.booking.index'))
+                        <div style="background:#fff; padding:6px 10px; border-radius:8px; font-size:12px; font-weight:700; color:#003056; text-align:center;">
+                            <div style="font-size:13px">{{ \App\Models\Booking::count() }}</div>
+                            <div style="font-size:9px; color:#6b7280;">Total</div>
+                        </div>
+                        <div style="background:#fff; padding:6px 10px; border-radius:8px; font-size:12px; font-weight:700; color:#b45309; text-align:center;">
+                            <div style="font-size:13px">{{ \App\Models\Booking::where('status', 'direview')->count() }}</div>
+                            <div style="font-size:9px; color:#6b7280;">Direview</div>
+                        </div>
+                        <div style="background:#fff; padding:6px 10px; border-radius:8px; font-size:12px; font-weight:700; color:#15803d; text-align:center;">
+                            <div style="font-size:13px">{{ \App\Models\Booking::where('status', 'diterima')->count() }}</div>
+                            <div style="font-size:9px; color:#6b7280;">Diterima</div>
+                        </div>
+                        <div style="background:#fff; padding:6px 10px; border-radius:8px; font-size:12px; font-weight:700; color:#b91c1c; text-align:center;">
+                            <div style="font-size:13px">{{ \App\Models\Booking::where('status', 'ditolak')->count() }}</div>
+                            <div style="font-size:9px; color:#6b7280;">Ditolak</div>
+                        </div>
+                    @elseif(request()->routeIs('admin.dudi.*') || request()->routeIs('admin.dudi.index'))
+                        <div style="background:#fff; padding:6px 10px; border-radius:8px; font-size:12px; font-weight:700; color:#003056; text-align:center;">
+                            <div style="font-size:13px">{{ \App\Models\Dudi::count() }}</div>
+                            <div style="font-size:9px; color:#6b7280;">Total DUDI</div>
+                        </div>
+                        <div style="background:#fff; padding:6px 10px; border-radius:8px; font-size:12px; font-weight:700; color:#003056; text-align:center;">
+                            <div style="font-size:13px">{{ \App\Models\Dudi::sum('kuota') }}</div>
+                            <div style="font-size:9px; color:#6b7280;">Total Kuota</div>
+                        </div>
+                    @elseif(request()->routeIs('admin.siswa.*') || request()->routeIs('admin.siswa.index'))
+                        <div style="background:#fff; padding:6px 10px; border-radius:8px; font-size:12px; font-weight:700; color:#003056; text-align:center;">
+                            <div style="font-size:13px">{{ \App\Models\Siswa::count() }}</div>
+                            <div style="font-size:9px; color:#6b7280;">Total Siswa</div>
+                        </div>
+                        <div style="background:#fff; padding:6px 10px; border-radius:8px; font-size:12px; font-weight:700; color:#15803d; text-align:center;">
+                            <div style="font-size:13px">{{ \App\Models\Berkas::where('lengkap', true)->count() }}</div>
+                            <div style="font-size:9px; color:#6b7280;">Siswa Berkas Lengkap</div>
+                        </div>
+                    @elseif(request()->routeIs('wali-kelas.*') || request()->routeIs('wali-kelas.dashboard'))
+                        <div style="background:#fff; padding:6px 10px; border-radius:8px; font-size:12px; font-weight:700; color:#003056; text-align:center;">
+                            <div style="font-size:13px">{{ \App\Models\Siswa::count() }}</div>
+                            <div style="font-size:9px; color:#6b7280;">Total Siswa</div>
+                        </div>
+                        <div style="background:#fff; padding:6px 10px; border-radius:8px; font-size:12px; font-weight:700; color:#15803d; text-align:center;">
+                            <div style="font-size:13px">{{ \App\Models\Berkas::where('lengkap', true)->count() }}</div>
+                            <div style="font-size:9px; color:#6b7280;">Siswa Berkas Lengkap</div>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="user-greeting" style="display:flex; align-items:center; gap:8px;">
                     <div class="user-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
-                    <span>Halo, {{ Auth::user()->name }}</span>
+                    <span style="white-space:nowrap;">Halo, {{ Auth::user()->name }}</span>
                 </div>
             @endif
         </div>

@@ -643,20 +643,7 @@
                     <h1 class="header-title">${PAGE_TITLE}</h1>
                     <p class="header-subtitle">${PAGE_SUBTITLE}</p>
                 </div>
-                <div class="header-stats">
-                    <div class="header-stat">
-                        <strong>${stats.total}</strong>
-                        <span>Total Siswa</span>
-                    </div>
-                    <div class="header-stat">
-                        <strong style="color: #86efac;">${stats.ditempatkan}</strong>
-                        <span>Ditempatkan</span>
-                    </div>
-                    <div class="header-stat">
-                        <strong style="color: #fca5a5;">${stats.berkasKurang}</strong>
-                        <span>Berkas Kurang</span>
-                    </div>
-                </div>
+                <!-- header stats moved to navbar (compact recap) -->
             </header>
 
             <main class="dashboard-card">

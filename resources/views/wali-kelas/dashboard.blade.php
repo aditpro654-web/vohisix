@@ -558,20 +558,7 @@
                     <h1 class="header-title">Dashboard Wali Kelas</h1>
                     <p class="header-subtitle">Booking PKL SMKN 6 Malang • Kelas ${KELAS_WALI}</p>
                 </div>
-                <div class="header-stats">
-                    <div class="header-stat">
-                        <strong>${TOTAL_SISWA}</strong>
-                        <span>Total Siswa</span>
-                    </div>
-                    <div class="header-stat">
-                        <strong style="color: #86efac;">${BOOKING_DITERIMA}</strong>
-                        <span>Ditempatkan</span>
-                    </div>
-                    <div class="header-stat">
-                        <strong style="color: #fca5a5;">${BERKAS_KURANG}</strong>
-                        <span>Berkas Kurang</span>
-                    </div>
-                </div>
+                <!-- header stats moved to navbar (compact recap) -->
             </header>
 
             <main class="dashboard-card">
