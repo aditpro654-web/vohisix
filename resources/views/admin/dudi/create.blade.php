@@ -160,15 +160,25 @@
         @csrf
 
         <div class="form-group">
-            <label for="csv_file">Pilih File CSV</label>
+            <label for="csv_file">Pilih File CSV/XLSX</label>
             <input type="file" id="csv_file" name="file" accept=".csv,.xlsx" required>
             @error('file')
                 <div class="form-error">{{ $message }}</div>
             @enderror
         </div>
 
+        <div class="form-group">
+            <label for="zip_file">Pilih File ZIP Logo (opsional)</label>
+            <input type="file" id="zip_file" name="zip" accept=".zip">
+            @error('zip')
+                <div class="form-error">{{ $message }}</div>
+            @enderror
+            <p class="form-helper" style="margin-top:0.5rem;">Jika ingin memuat logo, sertakan nama file logo sesuai kolom Logo di CSV.</p>
+        </div>
+
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Import Data</button>
+            <a href="{{ route('admin.dudi.import.template') }}" class="btn btn-secondary">Download Template Import</a>
             <a href="{{ route('admin.dudi.index') }}" class="btn btn-secondary">Kembali</a>
         </div>
     </form>
