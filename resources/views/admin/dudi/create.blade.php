@@ -14,7 +14,7 @@
         <p class="form-helper">Lengkapi detail DUDI untuk proses booking siswa.</p>
     </div>
 
-    <form action="{{ route('admin.dudi.store') }}" method="POST">
+    <form action="{{ route('admin.dudi.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="form-row">
@@ -69,6 +69,14 @@
                     <div class="form-error">{{ $message }}</div>
                 @enderror
             </div>
+        </div>
+
+        <div class="form-group">
+            <label for="logo">Logo DUDI (opsional)</label>
+            <input type="file" id="logo" name="logo" accept="image/*">
+            @error('logo')
+                <div class="form-error">{{ $message }}</div>
+            @enderror
         </div>
 
         <div class="form-row">

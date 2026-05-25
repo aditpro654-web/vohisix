@@ -48,7 +48,7 @@
         <table>
             <thead>
                 <tr>
-                    <th class="w-70">No</th>
+                    <th class="w-70">No Absen</th>
                     <th>Nama Siswa</th>
                     <th>NIS</th>
                     <th>DUDI</th>
@@ -60,8 +60,8 @@
             <tbody>
                 @forelse($bookings as $key => $booking)
                     <tr>
-                        <td>{{ ($bookings->currentPage() - 1) * $bookings->perPage() + $loop->iteration }}</td>
-                        <td><strong>{{ $booking->siswa->nama }}</strong></td>
+                        <td>{{ $booking->siswa?->nomor_absen ?? '-' }}</td>
+                        <td><strong>{{ $booking->siswa?->nama }}</strong></td>
                         <td>{{ $booking->nis }}</td>
                         <td>{{ $booking->dudi->nama_dudi }}</td>
                         <td>
@@ -99,19 +99,19 @@
             @if($bookings->onFirstPage())
                 <span>← Sebelumnya</span>
             @else
-                <a href="{{ $bookings->previousPageUrl() }}{{ !empty($search) ? '&search='.$search : '' }}{{ !empty($status) ? '&status='.$status : '' }}{{ $sortBy != 'newest' ? '&sort_by='.$sortBy : '' }}">← Sebelumnya</a>
+                <a href="{{ $bookings->appends(request()->except('page'))->previousPageUrl() }}">← Sebelumnya</a>
             @endif
 
             @foreach($bookings->getUrlRange(1, $bookings->lastPage()) as $page => $url)
                 @if($page == $bookings->currentPage())
                     <span class="active"><span>{{ $page }}</span></span>
                 @else
-                    <a href="{{ $url }}{{ !empty($search) ? '&search='.$search : '' }}{{ !empty($status) ? '&status='.$status : '' }}{{ $sortBy != 'newest' ? '&sort_by='.$sortBy : '' }}">{{ $page }}</a>
+                    <a href="{{ $url }}{{ request()->except('page') ? '&' . http_build_query(request()->except('page')) : '' }}">{{ $page }}</a>
                 @endif
             @endforeach
 
             @if($bookings->hasMorePages())
-                <a href="{{ $bookings->nextPageUrl() }}{{ !empty($search) ? '&search='.$search : '' }}{{ !empty($status) ? '&status='.$status : '' }}{{ $sortBy != 'newest' ? '&sort_by='.$sortBy : '' }}">Selanjutnya →</a>
+                <a href="{{ $bookings->appends(request()->except('page'))->nextPageUrl() }}">Selanjutnya →</a>
             @else
                 <span>Selanjutnya →</span>
             @endif

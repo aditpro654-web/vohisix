@@ -55,6 +55,7 @@ class KakonslDashboardController extends Controller
 
         $siswas = Siswa::with(['berkas', 'bookings.dudi'])
             ->whereIn('kelas', $allowedKelas)
+            ->orderByRaw('nomor_absen IS NULL, nomor_absen asc')
             ->get()
             ->map(function ($siswa) {
                 $latestBooking = $siswa->bookings->sortByDesc('created_at')->first();
@@ -62,6 +63,7 @@ class KakonslDashboardController extends Controller
 
                 return [
                     'id' => $siswa->nis,
+                    'nomor_absen' => $siswa->nomor_absen,
                     'nama' => $siswa->nama,
                     'nis' => $siswa->nis,
                     'kelas' => $siswa->kelas,
@@ -119,7 +121,9 @@ class KakonslDashboardController extends Controller
         $user = auth()->user();
         $kelas1 = $user->kelas_id;
         $kelas2 = $user->kelas_second;
-        $siswas = Siswa::whereIn('kelas', [$kelas1, $kelas2])->paginate(15);
+        $siswas = Siswa::whereIn('kelas', [$kelas1, $kelas2])
+            ->orderByRaw('nomor_absen IS NULL, nomor_absen asc')
+            ->paginate(15);
 
         return view('kakonsli.siswas', compact('siswas', 'kelas1', 'kelas2'));
     }

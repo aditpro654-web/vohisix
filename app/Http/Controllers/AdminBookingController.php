@@ -25,7 +25,8 @@ class AdminBookingController extends Controller
         if ($search) {
             $bookings->whereHas('siswa', function($query) use ($search) {
                 $query->where('nama', 'like', "%$search%")
-                      ->orWhere('nis', 'like', "%$search%");
+                      ->orWhere('nis', 'like', "%$search%")
+                      ->orWhere('nomor_absen', 'like', "%$search%");
             });
         }
 
@@ -44,8 +45,8 @@ class AdminBookingController extends Controller
             case 'siswa_desc':
                 $bookings->orderBy('nis', 'desc');
                 break;
-            default: // newest
-                $bookings->orderBy('created_at', 'desc');
+            default: // newest by nomor_absen
+                $bookings->orderByRaw('(select nomor_absen from siswas where siswas.nis = bookings.nis) asc');
         }
 
         $bookings = $bookings->paginate(10);
@@ -150,10 +151,11 @@ class AdminBookingController extends Controller
             $bookings->where('status', $status);
         }
 
-        $bookings = $bookings->orderBy('created_at', 'desc')->get();
+        $bookings = $bookings->orderByRaw('(select nomor_absen from siswas where siswas.nis = bookings.nis) asc')->get();
         $rows = $bookings->map(function ($booking) {
             return [
                 $booking->siswa?->nis,
+                $booking->siswa?->nomor_absen,
                 $booking->siswa?->nama,
                 $booking->siswa?->kelas,
                 $booking->dudi?->nama_dudi,
@@ -164,7 +166,7 @@ class AdminBookingController extends Controller
 
         return $this->streamCsvDownload(
             'booking_export_' . now()->format('Y-m-d') . '.csv',
-            ['NIS', 'Nama Siswa', 'Kelas', 'DUDI', 'Status', 'Tanggal'],
+            ['NIS', 'Nomor Absen', 'Nama Siswa', 'Kelas', 'DUDI', 'Status', 'Tanggal'],
             $rows
         );
     }

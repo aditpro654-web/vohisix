@@ -86,7 +86,13 @@ class AdminDudiController extends Controller
             'jam_pulang' => 'nullable|string|max:20',
             'kota' => 'nullable|string|max:255',
             'kuota' => 'nullable|integer|min:0',
+            'logo' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif,bmp|max:2048',
         ]);
+
+        // Store logo file if provided
+        if ($request->hasFile('logo')) {
+            $validated['logo'] = $request->file('logo')->store('dudis', 'public');
+        }
 
         // Set default kuota if not provided
         if (!isset($validated['kuota'])) {
@@ -133,7 +139,15 @@ class AdminDudiController extends Controller
             'jam_pulang' => 'nullable|string|max:20',
             'kota' => 'nullable|string|max:255',
             'kuota' => 'nullable|integer|min:0',
+            'logo' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif,bmp|max:2048',
         ]);
+
+        if ($request->hasFile('logo')) {
+            if ($dudi->logo && \Storage::disk('public')->exists($dudi->logo)) {
+                \Storage::disk('public')->delete($dudi->logo);
+            }
+            $validated['logo'] = $request->file('logo')->store('dudis', 'public');
+        }
 
         if (!isset($validated['kuota'])) {
             $validated['kuota'] = $dudi->kuota ?? 5;
@@ -186,12 +200,13 @@ class AdminDudiController extends Controller
                 $dudi->jam_pulang,
                 $dudi->kota,
                 $dudi->kuota,
+                $dudi->logo ? asset('storage/'.$dudi->logo) : null,
             ];
         })->toArray();
 
         return $this->streamCsvDownload(
             'dudi_export_' . now()->format('Y-m-d') . '.csv',
-            ['Nama DUDI', 'Alamat', 'Telepon', 'Email', 'Bidang Industri', 'Website', 'Jumlah Pegawai', 'Pembimbing', 'Jam Masuk', 'Jam Pulang', 'Kota', 'Kuota'],
+            ['Nama DUDI', 'Alamat', 'Telepon', 'Email', 'Bidang Industri', 'Website', 'Jumlah Pegawai', 'Pembimbing', 'Jam Masuk', 'Jam Pulang', 'Kota', 'Kuota', 'Logo URL'],
             $rows
         );
     }
@@ -229,6 +244,7 @@ class AdminDudiController extends Controller
                 'jam_pulang' => $row['jam_pulang'] ?? null,
                 'kota' => $row['kota'] ?? null,
                 'kuota' => is_numeric($row['kuota'] ?? null) ? (int) $row['kuota'] : 5,
+                'logo' => $row['logo'] ?? null,
             ];
 
             $existing = Dudi::where('nama_dudi', $nama_dudi)->first();

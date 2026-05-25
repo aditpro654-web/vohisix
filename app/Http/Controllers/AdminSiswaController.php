@@ -23,7 +23,7 @@ class AdminSiswaController extends Controller
     {
         $search = $request->input('search');
         $kelas = $request->input('kelas');
-        $sortBy = $request->input('sort_by', 'newest');
+        $sortBy = $request->input('sort_by', 'nomor_absen');
 
         $siswas = Siswa::with('berkas');
 
@@ -31,7 +31,8 @@ class AdminSiswaController extends Controller
             $siswas->where(function($q) use ($search) {
                 $q->where('nama', 'like', "%$search%")
                   ->orWhere('nis', 'like', "%$search%")
-                  ->orWhere('kelas', 'like', "%$search%");
+                  ->orWhere('kelas', 'like', "%$search%")
+                  ->orWhere('nomor_absen', 'like', "%$search%");
             });
         }
 
@@ -50,8 +51,9 @@ class AdminSiswaController extends Controller
             case 'name_desc':
                 $siswas->orderBy('nama', 'desc');
                 break;
-            default: // newest
-                $siswas->orderBy('created_at', 'desc');
+            case 'nomor_absen':
+            default:
+                $siswas->orderByRaw('nomor_absen IS NULL, nomor_absen asc');
         }
 
         $siswas = $siswas->paginate(10);
@@ -89,6 +91,7 @@ class AdminSiswaController extends Controller
 
         Siswa::create([
             'nis' => $validated['nis'],
+            'nomor_absen' => $validated['nomor_absen'],
             'nama' => $validated['nama'],
             'kelas' => $validated['kelas'],
             'foto' => $fotoPath,
@@ -141,6 +144,7 @@ class AdminSiswaController extends Controller
             'nama' => 'required|string|max:255',
             'kelas' => 'required|in:XII SIJA 1,XII SIJA 2,XII SIJA 3',
             'nis' => 'nullable|string|unique:siswas,nis,' . $siswa->nis . ',nis',
+            'nomor_absen' => 'required|integer|min:1|unique:siswas,nomor_absen,' . $siswa->nis . ',nis',
             'foto' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif,bmp,heic,heif|max:2048',
         ]);
 
@@ -243,11 +247,11 @@ class AdminSiswaController extends Controller
     {
         return $this->streamCsvDownload(
             'siswa_import_template.csv',
-            ['NIS', 'Nama', 'Kelas'],
+            ['NIS', 'Nomor Absen', 'Nama', 'Kelas', 'Foto'],
             [
-                ['1210001', 'Budi Santoso', 'XII SIJA 1'],
-                ['1210002', 'Ani Putri', 'XII SIJA 2'],
-                ['1210003', 'Candra Wijaya', 'XII SIJA 3'],
+                ['1210001', '1', 'Budi Santoso', 'XII SIJA 1', 'budi.jpg'],
+                ['1210002', '2', 'Ani Putri', 'XII SIJA 2', 'ani.jpg'],
+                ['1210003', '3', 'Candra Wijaya', 'XII SIJA 3', 'candra.jpg'],
             ]
         );
     }
@@ -269,13 +273,15 @@ class AdminSiswaController extends Controller
             $siswas->where('kelas', $kelas);
         }
 
-        $siswas = $siswas->orderBy('created_at', 'desc')->get();
+        $siswas = $siswas->orderByRaw('nomor_absen IS NULL, nomor_absen asc')->get();
         $rows = $siswas->map(function ($siswa) {
             $berkas = $siswa->berkas;
             return [
                 $siswa->nis,
+                $siswa->nomor_absen,
                 $siswa->nama,
                 $siswa->kelas,
+                $siswa->foto ? asset('storage/'.$siswa->foto) : null,
                 $berkas?->ktp_kia ? 'Selesai' : 'Belum',
                 $berkas?->surat_sehat ? 'Selesai' : 'Belum',
                 $berkas?->kartu_bpjs ? 'Selesai' : 'Belum',
@@ -284,7 +290,7 @@ class AdminSiswaController extends Controller
 
         return $this->streamCsvDownload(
             'siswa_export_' . now()->format('Y-m-d') . '.csv',
-            ['NIS', 'Nama', 'Kelas', 'KTP/KIA', 'Surat Sehat', 'BPJS'],
+            ['NIS', 'Nomor Absen', 'Nama', 'Kelas', 'Foto URL', 'KTP/KIA', 'Surat Sehat', 'BPJS'],
             $rows
         );
     }

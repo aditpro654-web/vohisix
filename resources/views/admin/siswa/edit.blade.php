@@ -28,6 +28,14 @@
         </div>
 
         <div class="form-group">
+            <label for="nomor_absen">Nomor Absen *</label>
+            <input type="number" id="nomor_absen" name="nomor_absen" value="{{ old('nomor_absen', $siswa->nomor_absen) }}" required>
+            @error('nomor_absen')
+                <div class="form-error">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="form-group">
             <label for="nama">Nama Lengkap *</label>
             <input type="text" id="nama" name="nama" value="{{ old('nama', $siswa->nama) }}" required>
             @error('nama')

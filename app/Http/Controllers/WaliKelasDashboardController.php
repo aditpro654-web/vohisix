@@ -45,6 +45,7 @@ class WaliKelasDashboardController extends Controller
 
             $siswas = Siswa::with(['berkas', 'bookings.dudi'])
                 ->where('kelas', $kelas)
+                ->orderByRaw('nomor_absen IS NULL, nomor_absen asc')
                 ->get()
                 ->map(function ($siswa) {
                     $latestBooking = $siswa->bookings->sortByDesc('created_at')->first();
@@ -52,6 +53,7 @@ class WaliKelasDashboardController extends Controller
 
                     return [
                         'id' => $siswa->nis,
+                        'nomor_absen' => $siswa->nomor_absen,
                         'nama' => $siswa->nama,
                         'nis' => $siswa->nis,
                         'kelas' => $siswa->kelas,
@@ -123,10 +125,12 @@ class WaliKelasDashboardController extends Controller
         }
 
         if ($kelas) {
-            $siswas = Siswa::where('kelas', $kelas)->paginate(15);
+            $siswas = Siswa::where('kelas', $kelas)
+                ->orderByRaw('nomor_absen IS NULL, nomor_absen asc')
+                ->paginate(15);
         } else {
             // no kelas determined — show all as fallback
-            $siswas = Siswa::paginate(15);
+            $siswas = Siswa::orderByRaw('nomor_absen IS NULL, nomor_absen asc')->paginate(15);
         }
 
         return view('wali-kelas.siswas', compact('siswas', 'kelas'));

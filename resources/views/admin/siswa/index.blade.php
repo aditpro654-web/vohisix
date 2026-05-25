@@ -32,11 +32,11 @@
         </form>
     </div>
 
-    <div class="table-card">
+    <div class="table-card" id="tableAnchor">
                 <table class="w-full text-left">
                     <thead>
                         <tr class="bg-primary/5 text-primary text-xs uppercase font-bold tracking-widest border-b border-slate-200">
-                            <th class="px-4 py-5 text-center w-70">No</th>
+                            <th class="px-4 py-5 text-center w-70">No Absen</th>
                             <th class="px-4 py-5 text-center w-120">Foto</th>
                             <th class="px-4 py-5 w-180">Nama</th>
                             <th class="px-4 py-5 w-140">NIS</th>
@@ -48,7 +48,7 @@
                     <tbody class="divide-y divide-slate-100">
                         @forelse($siswas as $key => $siswa)
                         <tr class="hover-row transition-colors group">
-                            <td class="px-4 py-4 text-center text-slate-400 font-mono text-xs">{{ str_pad(($siswas->currentPage() - 1) * $siswas->perPage() + $loop->iteration, 2, '0', STR_PAD_LEFT) }}</td>
+                            <td class="px-4 py-4 text-center text-slate-400 font-mono text-xs">{{ $siswa->nomor_absen ?? '-' }}</td>
                             <td class="px-4 py-4 text-center">
                                 <div class="avatar-wrapper" onclick="viewDocument('Foto Profil - {{ $siswa->nama }}', '{{ $siswa->foto ? asset('storage/'.$siswa->foto) : '' }}')">
                                     @if($siswa->foto)
@@ -126,19 +126,19 @@
                     @if($siswas->onFirstPage())
                         <span class="disabled">← Sebelumnya</span>
                     @else
-                        <a href="{{ $siswas->previousPageUrl() }}{{ request()->getQueryString() ? '&'.request()->getQueryString() : '' }}">← Sebelumnya</a>
+                        <a href="{{ $siswas->appends(request()->except('page'))->previousPageUrl() }}">← Sebelumnya</a>
                     @endif
 
                     @foreach($siswas->getUrlRange(1, $siswas->lastPage()) as $page => $url)
                         @if($page == $siswas->currentPage())
                             <span class="active">{{ $page }}</span>
                         @else
-                            <a href="{{ $url }}{{ request()->getQueryString() ? '&'.request()->getQueryString() : '' }}">{{ $page }}</a>
+                            <a href="{{ $url }}{{ request()->except('page') ? '&'.http_build_query(request()->except('page')) : '' }}">{{ $page }}</a>
                         @endif
                     @endforeach
 
                     @if($siswas->hasMorePages())
-                        <a href="{{ $siswas->nextPageUrl() }}{{ request()->getQueryString() ? '&'.request()->getQueryString() : '' }}">Selanjutnya →</a>
+                        <a href="{{ $siswas->appends(request()->except('page'))->nextPageUrl() }}">Selanjutnya →</a>
                     @else
                         <span class="disabled">Selanjutnya →</span>
                     @endif

@@ -613,7 +613,7 @@
 <script>
     // Data dari server
     const documents = @json($documents);
-    let isSaved = false;
+    const isSaved = documents.every(doc => doc.status === 'uploaded');
 
     // Ikon SVG
     function getFileTextIcon() {
@@ -726,7 +726,7 @@
         } else if (isComplete) {
             if (statusBadge) {
                 statusBadge.classList.add('status-badge-green');
-                statusText.innerText = 'Status: Lengkap (Belum Disimpan)';
+                statusText.innerText = 'Status: Lengkap';
             }
             if (pulseDot) pulseDot.style.backgroundColor = '#10b981';
         } else {
@@ -738,16 +738,16 @@
         }
 
         if (saveBtn) {
-            if (isComplete && !isSaved) {
+            if (isSaved) {
+                saveBtn.disabled = true;
+                saveBtn.classList.remove('btn-disabled', 'btn-primary');
+                saveBtn.classList.add('btn-saved');
+                saveBtn.innerText = '✓ Tersimpan';
+            } else if (isComplete) {
                 saveBtn.disabled = false;
                 saveBtn.classList.remove('btn-disabled', 'btn-saved');
                 saveBtn.classList.add('btn-primary');
                 saveBtn.innerText = 'Simpan Seluruh Progress';
-            } else if (isSaved) {
-                saveBtn.disabled = false;
-                saveBtn.classList.remove('btn-disabled', 'btn-primary');
-                saveBtn.classList.add('btn-saved');
-                saveBtn.innerText = '✓ Tersimpan';
             } else {
                 saveBtn.disabled = true;
                 saveBtn.classList.remove('btn-primary', 'btn-saved');

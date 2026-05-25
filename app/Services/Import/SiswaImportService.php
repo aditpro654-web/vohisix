@@ -56,6 +56,10 @@ class SiswaImportService
                 $errors[] = 'NIS sudah terdaftar.';
             }
 
+            if (!empty($row['nomor_absen']) && Siswa::where('nomor_absen', $row['nomor_absen'])->exists()) {
+                $errors[] = 'Nomor absen sudah digunakan.';
+            }
+
             if (!empty($row['nis']) && ($rowCounts[$row['nis']] ?? 0) > 1) {
                 $errors[] = 'NIS duplikat dalam file.';
             }
@@ -72,7 +76,7 @@ class SiswaImportService
         $invalidCount = count($results) - $validCount;
 
         return [
-            'headers' => ['No', 'NIS', 'Nama', 'Kelas', 'Valid', 'Errors'],
+            'headers' => ['No', 'NIS', 'Nomor Absen', 'Nama', 'Kelas', 'Foto', 'Valid', 'Errors'],
             'previewRows' => $results,
             'summary' => [
                 'total' => count($results),
@@ -104,8 +108,10 @@ class SiswaImportService
 
             $siswaRows[] = [
                 'nis' => $row['nis'],
+                'nomor_absen' => $row['nomor_absen'] ? intval($row['nomor_absen']) : null,
                 'nama' => $row['nama'],
                 'kelas' => $this->normalizeKelas($row['kelas']),
+                'foto' => $row['foto'] ?? null,
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
             ];
@@ -149,10 +155,11 @@ class SiswaImportService
     {
         return [
             'nis' => ['required', 'string', 'max:255', 'regex:/^\d+$/'],
+            'nomor_absen' => ['required', 'integer', 'min:1'],
             'nama' => ['required', 'string', 'max:255'],
             'kelas' => ['required', Rule::in(['XII SIJA 1', 'XII SIJA 2', 'XII SIJA 3'])],
+            'foto' => ['nullable', 'string', 'max:255'],
         ];
-    }
 
     private function normalizeKelas(string $kelas): string
     {

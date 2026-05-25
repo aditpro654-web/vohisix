@@ -26,6 +26,14 @@
         </div>
 
         <div class="form-group">
+            <label for="nomor_absen">Nomor Absen *</label>
+            <input type="number" id="nomor_absen" name="nomor_absen" value="{{ old('nomor_absen') }}" required>
+            @error('nomor_absen')
+                <div class="form-error">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="form-group">
             <label for="nama">Nama Lengkap *</label>
             <input type="text" id="nama" name="nama" value="{{ old('nama') }}" required>
             @error('nama')
@@ -117,8 +125,10 @@
                             <tr class="{{ $row['valid'] ? '' : 'invalid-row' }}">
                                 <td>{{ $row['row_number'] }}</td>
                                 <td>{{ $row['data']['nis'] }}</td>
+                                <td>{{ $row['data']['nomor_absen'] }}</td>
                                 <td>{{ $row['data']['nama'] }}</td>
                                 <td>{{ $row['data']['kelas'] }}</td>
+                                <td>{{ $row['data']['foto'] }}</td>
                                 <td>{{ $row['valid'] ? 'Ya' : 'Tidak' }}</td>
                                 <td>{{ implode(', ', $row['errors']) }}</td>
                             </tr>

@@ -107,19 +107,19 @@
             @if($dudis->onFirstPage())
                 <span>← Sebelumnya</span>
             @else
-                <a href="{{ $dudis->previousPageUrl() }}{{ !empty($search) ? '&search='.$search : '' }}{{ !empty($bidang) ? '&bidang_usaha='.$bidang : '' }}{{ $sortBy != 'newest' ? '&sort_by='.$sortBy : '' }}">← Sebelumnya</a>
+                <a href="{{ $dudis->appends(request()->except('page'))->previousPageUrl() }}">← Sebelumnya</a>
             @endif
 
             @foreach($dudis->getUrlRange(1, $dudis->lastPage()) as $page => $url)
                 @if($page == $dudis->currentPage())
                     <span class="active"><span>{{ $page }}</span></span>
                 @else
-                    <a href="{{ $url }}{{ !empty($search) ? '&search='.$search : '' }}{{ !empty($bidang) ? '&bidang_usaha='.$bidang : '' }}{{ $sortBy != 'newest' ? '&sort_by='.$sortBy : '' }}">{{ $page }}</a>
+                    <a href="{{ $url }}{{ request()->except('page') ? '&' . http_build_query(request()->except('page')) : '' }}">{{ $page }}</a>
                 @endif
             @endforeach
 
             @if($dudis->hasMorePages())
-                <a href="{{ $dudis->nextPageUrl() }}{{ !empty($search) ? '&search='.$search : '' }}{{ !empty($bidang) ? '&bidang_usaha='.$bidang : '' }}{{ $sortBy != 'newest' ? '&sort_by='.$sortBy : '' }}">Selanjutnya →</a>
+                <a href="{{ $dudis->appends(request()->except('page'))->nextPageUrl() }}">Selanjutnya →</a>
             @else
                 <span>Selanjutnya →</span>
             @endif

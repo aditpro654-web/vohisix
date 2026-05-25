@@ -14,7 +14,7 @@
         <p class="form-helper">Sesuaikan detail perusahaan dan jam operasional.</p>
     </div>
 
-    <form action="{{ route('admin.dudi.update', $dudi->id_dudi) }}" method="POST">
+    <form action="{{ route('admin.dudi.update', $dudi->id_dudi) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -70,6 +70,19 @@
                     <div class="form-error">{{ $message }}</div>
                 @enderror
             </div>
+        </div>
+
+        <div class="form-group">
+            <label for="logo">Logo DUDI (opsional)</label>
+            <input type="file" id="logo" name="logo" accept="image/*">
+            @error('logo')
+                <div class="form-error">{{ $message }}</div>
+            @enderror
+            @if($dudi->logo)
+                <div class="image-preview mt-3">
+                    <img src="{{ asset('storage/'.$dudi->logo) }}" alt="Logo DUDI" class="preview-image max-w-[120px]">
+                </div>
+            @endif
         </div>
 
         <div class="form-row">

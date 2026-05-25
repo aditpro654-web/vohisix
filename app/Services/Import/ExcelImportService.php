@@ -110,8 +110,10 @@ class ExcelImportService
 
         return [
             'nis' => $row['nis'] ?? $row['username'] ?? '',
+            'nomor_absen' => $row['nomor_absen'] ?? $row['absen'] ?? '',
             'nama' => $row['nama'] ?? $row['name'] ?? '',
             'kelas' => strtoupper(trim($row['kelas'] ?? '')),
+            'foto' => $row['foto'] ?? '',
         ];
     }
 }

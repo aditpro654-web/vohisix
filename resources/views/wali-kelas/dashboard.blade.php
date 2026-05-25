@@ -479,6 +479,7 @@
             const searchLower = searchQuery.toLowerCase();
             const matchSearch = student.nama.toLowerCase().includes(searchLower) ||
                 student.nis.toLowerCase().includes(searchLower) ||
+                (student.nomor_absen && student.nomor_absen.toString().includes(searchLower)) ||
                 (student.perusahaan && student.perusahaan.toLowerCase().includes(searchLower));
             const matchStatus = statusFilter === 'Semua Status' || student.status_lamaran === statusFilter;
             return matchSearch && matchStatus;
@@ -594,7 +595,7 @@
                     <table class="dashboard-table">
                         <thead>
                             <tr>
-                                <th style="text-align:center; width:70px;">No</th>
+                                <th style="text-align:center; width:70px;">No Absen</th>
                                 <th>Foto</th>
                                 <th>Nama Siswa</th>
                                 <th>NIS</th>
@@ -624,7 +625,7 @@
 
                 html += `
                     <tr>
-                        <td style="text-align:center; color:#94a3b8; font-size:0.75rem; font-weight:700;">${index + 1}</td>
+                        <td style="text-align:center; color:#94a3b8; font-size:0.75rem; font-weight:700;">${student.nomor_absen || '-'}</td>
                         <td class="avatar-cell"><img src="${photo}" alt="${student.nama}" onclick="showImagePreview('${photo}', '${student.nama}')" onerror="this.src='https://placehold.co/100x100/003056/white?text=User'"></td>
                         <td style="font-weight:700; color:#003056;">${student.nama}</td>
                         <td style="color:#64748b; font-size:0.75rem; font-weight:700;">${student.nis}</td>
