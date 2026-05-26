@@ -44,6 +44,8 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::get('/admin/booking/export', [AdminBookingController::class, 'export'])->name('admin.booking.export');
     Route::resource('/admin/booking', AdminBookingController::class, ['names' => 'admin.booking', 'except' => ['destroy']]);
 
+    Route::view('/admin/pengembang', 'pengembang.index')->name('admin.pengembang');
+
     Route::get('/admin/login/export', [AdminLoginController::class, 'export'])->name('admin.login.export');
     Route::get('/admin/login/import/template', [AdminLoginController::class, 'downloadImportTemplate'])->name('admin.login.import.template');
     Route::post('/admin/login/import/preview', [AdminLoginController::class, 'previewImport'])->name('admin.login.import.preview');
@@ -57,6 +59,7 @@ Route::middleware(['auth', 'is_siswa'])->group(function () {
     
     Route::get('/siswa/profile', [SiswaPklController::class, 'index'])->name('siswa.profile.index');
     Route::post('/siswa/profile/upload', [SiswaPklController::class, 'uploadBerkas'])->name('siswa.profile.upload-berkas');
+    Route::view('/siswa/pengembang', 'pengembang.index')->name('siswa.pengembang');
     
     Route::resource('/siswa/dudi', SiswaDudiController::class, ['names' => 'siswa.dudi', 'only' => ['index']]);
     Route::post('/siswa/dudi/{dudi}/ajukan', [SiswaDudiController::class, 'ajukan'])->name('siswa.dudi.ajukan');

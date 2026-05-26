@@ -39,6 +39,10 @@
                 <i class="fas fa-user-shield"></i>
                 <span>Manajemen Login</span>
             </a>
+            <a href="{{ route('admin.pengembang') }}" class="sidebar-nav-item {{ request()->routeIs('admin.pengembang') ? 'active' : '' }}">
+                <i class="fas fa-code"></i>
+                <span>Pengembang</span>
+            </a>
         @elseif(Auth::check() && Auth::user()->role === 'siswa')
             <a href="{{ route('siswa.dashboard') }}" class="sidebar-nav-item {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">
                 <i class="fas fa-th"></i>
@@ -55,6 +59,10 @@
             <a href="{{ route('siswa.booking.index') }}" class="sidebar-nav-item {{ request()->routeIs('siswa.booking.*') ? 'active' : '' }}">
                 <i class="fas fa-file"></i>
                 <span>Status Pengajuan</span>
+            </a>
+            <a href="{{ route('siswa.pengembang') }}" class="sidebar-nav-item {{ request()->routeIs('siswa.pengembang') ? 'active' : '' }}">
+                <i class="fas fa-code"></i>
+                <span>Pengembang</span>
             </a>
         @endif
     </nav>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Dudi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\Traits\ExcelExportTrait;
@@ -36,7 +37,7 @@ class AdminDudiController extends Controller
             $dudis->where('bidang_usaha', $bidang);
         }
 
-        if ($status && in_array($status, ['active', 'inactive'])) {
+        if ($status && $this->hasDudiStatusColumn() && in_array($status, ['active', 'inactive'])) {
             $dudis->where('status', $status);
         }
 
@@ -106,9 +107,12 @@ class AdminDudiController extends Controller
         if (!isset($validated['kuota'])) {
             $validated['kuota'] = 5;
         }
-
-        if (!isset($validated['status'])) {
-            $validated['status'] = 'active';
+        if ($this->hasDudiStatusColumn()) {
+            if (!isset($validated['status'])) {
+                $validated['status'] = 'active';
+            }
+        } else {
+            unset($validated['status']);
         }
 
         Dudi::create($validated);
@@ -166,8 +170,12 @@ class AdminDudiController extends Controller
             $validated['kuota'] = $dudi->kuota ?? 5;
         }
 
-        if (!isset($validated['status'])) {
-            $validated['status'] = $dudi->status ?? 'active';
+        if ($this->hasDudiStatusColumn()) {
+            if (!isset($validated['status'])) {
+                $validated['status'] = $dudi->status ?? 'active';
+            }
+        } else {
+            unset($validated['status']);
         }
 
         $dudi->update($validated);
@@ -460,9 +468,11 @@ class AdminDudiController extends Controller
                 'jam_pulang' => $row['jam_pulang'] ?: null,
                 'kota' => $row['kota'] ?: null,
                 'kuota' => is_numeric($row['kuota'] ?? null) ? (int) $row['kuota'] : 5,
-                'status' => $row['status'] ?? 'active',
                 'logo' => $logoPath,
             ];
+            if ($this->hasDudiStatusColumn()) {
+                $data['status'] = $row['status'] ?? 'active';
+            }
 
             $existing = Dudi::where('nama_dudi', $row['nama_dudi'])->first();
             if ($existing) {
@@ -502,9 +512,11 @@ class AdminDudiController extends Controller
             'jam_pulang' => $row['jam_pulang'] ?? null,
             'kota' => $row['kota'] ?? null,
             'kuota' => $row['kuota'] ?? null,
-            'status' => $row['status'] ?? 'active',
             'logo' => $row['logo'] ?? null,
         ];
+            if ($this->hasDudiStatusColumn()) {
+                $data['status'] = $row['status'] ?? 'active';
+            }
     }
 
     private function dudiPreviewRules(): array
@@ -526,6 +538,11 @@ class AdminDudiController extends Controller
             'status' => ['nullable', 'in:active,inactive'],
             'logo' => ['nullable', 'string', 'max:255'],
         ];
+    }
+
+    private function hasDudiStatusColumn(): bool
+    {
+        return Schema::hasColumn('dudis', 'status');
     }
 
     private function dudiPreviewMessages(): array
