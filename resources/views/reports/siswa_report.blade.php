@@ -7,16 +7,21 @@
     <style>
         @page { margin: 36pt 36pt; }
         body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 12px; color: #222; }
-        .header { display:flex; align-items:center; margin-bottom:10px; }
+        .header { display:flex; align-items:center; justify-content: space-between; margin-bottom:18px; }
         .logo { width:72px; height:72px; object-fit:contain; margin-right:12px; }
-        .title { font-size:18px; font-weight:700; }
-        .meta { font-size:11px; color:#444; margin-top:4px; }
-        table { width:100%; border-collapse: collapse; margin-top:12px; }
-        th, td { border:1px solid #ddd; padding:6px 8px; }
-        th { background:#f5f5f5; font-weight:700; font-size:12px; }
-        .small { font-size:11px; color:#666; }
-        .footer { position: fixed; bottom: 0; left: 0; right: 0; text-align: center; font-size:11px; color:#666; }
-        .page-break { page-break-after: always; }
+        .title { font-size:18px; font-weight:700; margin-bottom:2px; }
+        .meta { font-size:11px; color:#444; margin-top:6px; line-height:1.4; }
+        .table-wrapper { overflow-x: auto; }
+        table { width:100%; border-collapse: collapse; margin-top:12px; font-size:11px; }
+        th, td { border:1px solid #ddd; padding:8px 10px; vertical-align: middle; }
+        th { background:#f5f5f5; font-weight:700; font-size:11px; text-align:left; }
+        tbody tr:nth-child(odd) { background:#fbfbfb; }
+        tbody tr:hover { background:#f0f4f8; }
+        .text-muted { color:#666; }
+        .footer { position: fixed; bottom: 12pt; left: 36pt; right: 36pt; text-align: center; font-size:10px; color:#666; }
+        .summary { margin-top:16px; font-weight:700; }
+        .summary span { display:inline-block; margin-right:1.25rem; }
+        .filters { margin-top:4px; }
     </style>
 </head>
 <body>

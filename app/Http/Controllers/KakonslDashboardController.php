@@ -121,9 +121,20 @@ class KakonslDashboardController extends Controller
         $user = auth()->user();
         $kelas1 = $user->kelas_id;
         $kelas2 = $user->kelas_second;
-        $siswas = Siswa::whereIn('kelas', [$kelas1, $kelas2])
-            ->orderByRaw('nomor_absen IS NULL, nomor_absen asc')
-            ->paginate(15);
+        $status = request('status');
+        $kelasIds = array_filter([$kelas1, $kelas2], fn($kelas) => !is_null($kelas) && $kelas !== '');
+
+        $query = Siswa::query();
+        if (!empty($kelasIds)) {
+            $query->whereIn('kelas', $kelasIds);
+        }
+        if (!empty($status) && in_array($status, ['Direview', 'Diterima', 'Ditolak'], true)) {
+            $query->whereHas('bookings', function ($q) use ($status) {
+                $q->where('status', $status);
+            });
+        }
+
+        $siswas = $query->orderByRaw('nomor_absen IS NULL, nomor_absen asc')->paginate(15);
 
         return view('kakonsli.siswas', compact('siswas', 'kelas1', 'kelas2'));
     }

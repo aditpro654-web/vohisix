@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Siswa;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -28,9 +29,16 @@ class PdfExportController extends Controller
 
         // If Wali Kelas or Kakonsli, restrict to their kelas
         $user = Auth::user();
-        if ($user && in_array($user->role, ['wali_kelas', 'kakonsli'], true)) {
-            if (!empty($user->kelas_id)) {
+        if ($user) {
+            if ($user->role === 'wali_kelas' && !empty($user->kelas_id)) {
                 $query->where('kelas', $user->kelas_id);
+            }
+
+            if ($user->role === 'kakonsli') {
+                $kelasIds = array_filter([$user->kelas_id, $user->kelas_second], fn ($value) => !empty($value));
+                if (!empty($kelasIds)) {
+                    $query->whereIn('kelas', $kelasIds);
+                }
             }
         }
 
@@ -56,8 +64,8 @@ class PdfExportController extends Controller
         ];
 
         // Use barryvdh/laravel-dompdf facade if available
-        if (class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)) {
-            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('reports.siswa_report', $data)
+        if (class_exists(Pdf::class)) {
+            $pdf = Pdf::loadView('reports.siswa_report', $data)
                 ->setPaper('a4', 'portrait')
                 ->setOption('dpi', 150)
                 ->setOption('isRemoteEnabled', true);

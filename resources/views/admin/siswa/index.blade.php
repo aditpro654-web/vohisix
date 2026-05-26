@@ -11,15 +11,21 @@
         </div>
         <form action="{{ route('admin.siswa.index') }}" method="GET" class="toolbar-grid" id="filterForm">
             <input type="text" name="search" placeholder="Cari NIS atau Nama..." value="{{ $search ?? '' }}" id="searchInput" oninput="document.getElementById('filterForm').submit()" />
-            <select name="kelas" id="kelasSelect">
+            <select name="kelas" id="kelasSelect" onchange="document.getElementById('filterForm').submit()">
                 <option value="">Semua Kelas</option>
                 @foreach($allKelas as $k)
                     <option value="{{ $k }}" {{ ($kelas ?? '') == $k ? 'selected' : '' }}>{{ $k }}</option>
                 @endforeach
             </select>
+            <select name="status" id="statusSelect" onchange="document.getElementById('filterForm').submit()">
+                <option value="">Semua Status</option>
+                <option value="Direview" {{ (request('status') ?? '') === 'Direview' ? 'selected' : '' }}>Direview</option>
+                <option value="Diterima" {{ (request('status') ?? '') === 'Diterima' ? 'selected' : '' }}>Diterima</option>
+                <option value="Ditolak" {{ (request('status') ?? '') === 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
+            </select>
             <!-- live search: removed submit button -->
             <a href="{{ route('admin.siswa.export', request()->query()) }}" class="btn btn-secondary">Export CSV</a>
-            <a href="{{ route('admin.siswa.export.pdf', request()->query()) }}" class="btn btn-secondary">Export PDF</a>
+            <a href="{{ route('admin.siswa.export.pdf', request()->query()) }}" class="btn btn-secondary" target="_blank" rel="noopener">Export PDF</a>
             <a href="{{ route('admin.siswa.create') }}" class="btn btn-primary">+ Tambah Siswa Baru</a>
         </form>
     </div>

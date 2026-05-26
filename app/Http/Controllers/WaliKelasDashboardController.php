@@ -119,18 +119,26 @@ class WaliKelasDashboardController extends Controller
     {
         $user = auth()->user();
         $kelas = $user->kelas_id ?? $user->kelas ?? null;
+        $status = request('status');
 
         if (empty($kelas)) {
             $kelas = Siswa::select('kelas')->distinct()->orderBy('kelas')->pluck('kelas')->first();
         }
 
+        $query = Siswa::query();
         if ($kelas) {
-            $siswas = Siswa::where('kelas', $kelas)
-                ->orderByRaw('nomor_absen IS NULL, nomor_absen asc')
-                ->paginate(15);
+            $query->where('kelas', $kelas);
+        }
+        if (!empty($status) && in_array($status, ['Direview', 'Diterima', 'Ditolak'], true)) {
+            $query->whereHas('bookings', function ($q) use ($status) {
+                $q->where('status', $status);
+            });
+        }
+
+        if ($kelas) {
+            $siswas = $query->orderByRaw('nomor_absen IS NULL, nomor_absen asc')->paginate(15);
         } else {
-            // no kelas determined — show all as fallback
-            $siswas = Siswa::orderByRaw('nomor_absen IS NULL, nomor_absen asc')->paginate(15);
+            $siswas = $query->orderByRaw('nomor_absen IS NULL, nomor_absen asc')->paginate(15);
         }
 
         return view('wali-kelas.siswas', compact('siswas', 'kelas'));

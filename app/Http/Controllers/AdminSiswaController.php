@@ -292,8 +292,9 @@ class AdminSiswaController extends Controller
     {
         $search = $request->input('search');
         $kelas = $request->input('kelas');
+        $status = $request->input('status');
 
-        $siswas = Siswa::with('berkas');
+        $siswas = Siswa::with(['berkas', 'bookings']);
         if ($search) {
             $siswas->where(function ($q) use ($search) {
                 $q->where('nama', 'like', "%$search%")
@@ -303,6 +304,11 @@ class AdminSiswaController extends Controller
         }
         if ($kelas) {
             $siswas->where('kelas', $kelas);
+        }
+        if (!empty($status) && in_array($status, ['Direview', 'Diterima', 'Ditolak'], true)) {
+            $siswas->whereHas('bookings', function ($query) use ($status) {
+                $query->where('status', $status);
+            });
         }
 
         $siswas = $siswas->orderByRaw('nomor_absen IS NULL, nomor_absen asc')->get();

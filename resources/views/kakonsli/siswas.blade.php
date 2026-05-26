@@ -13,10 +13,19 @@
         <h2>Data Siswa Kedua Kelas</h2>
     </div>
     
+    <form action="{{ route('kakonsli.siswas') }}" method="GET" class="flex gap-3 items-center mb-4">
+        <label for="status" class="text-sm">Filter status:</label>
+        <select name="status" id="status" class="form-control">
+            <option value="">Semua Status</option>
+            <option value="Direview" {{ request('status') === 'Direview' ? 'selected' : '' }}>Direview</option>
+            <option value="Diterima" {{ request('status') === 'Diterima' ? 'selected' : '' }}>Diterima</option>
+            <option value="Ditolak" {{ request('status') === 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Terapkan</button>
+        <a href="{{ route('kakonsli.siswas.export.pdf', request()->query()) }}" class="btn btn-secondary" target="_blank" rel="noopener">Export PDF</a>
+    </form>
+
     @if($siswas->count() > 0)
-        <div style="margin-bottom:0.75rem;">
-            <a href="{{ route('kakonsli.siswas.export.pdf', request()->query()) }}" class="btn btn-secondary">Export PDF</a>
-        </div>
         <table class="table">
             <thead>
                 <tr>
