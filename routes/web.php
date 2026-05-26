@@ -37,6 +37,7 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
 
     Route::get('/admin/dudi/export', [AdminDudiController::class, 'export'])->name('admin.dudi.export');
     Route::get('/admin/dudi/import/template', [AdminDudiController::class, 'downloadImportTemplate'])->name('admin.dudi.import.template');
+    Route::post('/admin/dudi/import/preview', [AdminDudiController::class, 'previewImport'])->name('admin.dudi.import.preview');
     Route::post('/admin/dudi/import', [AdminDudiController::class, 'import'])->name('admin.dudi.import');
     Route::resource('/admin/dudi', AdminDudiController::class, ['names' => 'admin.dudi']);
 

@@ -25,7 +25,6 @@
             </select>
             <!-- live search: removed submit button -->
             <a href="{{ route('admin.booking.export', request()->query()) }}" class="btn btn-secondary">Export</a>
-            <a href="{{ route('admin.booking.create') }}" class="btn btn-primary">+ Tambah Booking</a>
         </form>
     </div>
 

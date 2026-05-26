@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Berkas;
 use App\Services\Import\SiswaImportService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
@@ -200,10 +201,10 @@ class AdminSiswaController extends Controller
      */
     public function destroy(Siswa $siswa)
     {
-        // Hapus user terkait
-        User::where('username', $siswa->nis)->delete();
-
-        $siswa->delete();
+        DB::transaction(function () use ($siswa) {
+            User::where('username', $siswa->nis)->delete();
+            $siswa->delete();
+        });
 
         return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil dihapus');
     }

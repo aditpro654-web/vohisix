@@ -156,7 +156,7 @@
         <p class="form-helper">Unggah file CSV untuk menambahkan banyak DUDI sekaligus.</p>
     </div>
 
-    <form action="{{ route('admin.dudi.import') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.dudi.import.preview') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="form-group">
@@ -177,10 +177,78 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Import Data</button>
+            <button type="submit" class="btn btn-primary">Preview Import</button>
             <a href="{{ route('admin.dudi.import.template') }}" class="btn btn-secondary">Download Template Import</a>
             <a href="{{ route('admin.dudi.index') }}" class="btn btn-secondary">Kembali</a>
         </div>
     </form>
+
+    @if(!empty($previewMode) && !empty($previewRows))
+        <div class="preview-card" style="margin-top:1.5rem;">
+            <div class="card-header">
+                <h2>Preview Import DUDI</h2>
+                <p class="form-helper">Periksa data valid dan kesalahan sebelum melakukan import.</p>
+            </div>
+            <div class="preview-summary">
+                <p>Total baris: {{ $previewSummary['total'] }}</p>
+                <p>Valid: {{ $previewSummary['valid'] }}</p>
+                <p>Tidak valid: {{ $previewSummary['invalid'] }}</p>
+                @if(isset($previewSummary['logos']))
+                    <p>Logo ditemukan: {{ $previewSummary['logos']['found'] }}</p>
+                    <p>Logo hilang: {{ $previewSummary['logos']['missing'] }}</p>
+                    <p>Logo tidak valid: {{ $previewSummary['logos']['invalid'] }}</p>
+                    @if(!empty($previewSummary['logos']['warnings']))
+                        <div class="alert alert-warning" style="margin-top:1rem; padding:0.75rem; background:#fff3cd; border:1px solid #ffeeba; color:#856404;">
+                            <strong>Peringatan logo:</strong>
+                            <ul style="margin:0.5rem 0 0 1.25rem;">
+                                @foreach($previewSummary['logos']['warnings'] as $warning)
+                                    <li>{{ $warning }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                @endif
+            </div>
+            <div class="table-card">
+                <table>
+                    <thead>
+                        <tr>
+                            @foreach($previewHeaders as $header)
+                                <th>{{ $header }}</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($previewRows as $row)
+                            <tr class="{{ $row['valid'] ? '' : 'invalid-row' }}">
+                                <td>{{ $row['row_number'] }}</td>
+                                <td>{{ $row['data']['nama_dudi'] }}</td>
+                                <td>{{ $row['data']['alamat'] }}</td>
+                                <td>{{ $row['data']['telepon'] }}</td>
+                                <td>{{ $row['data']['email'] }}</td>
+                                <td>{{ $row['data']['bidang_usaha'] }}</td>
+                                <td>{{ $row['data']['website'] }}</td>
+                                <td>{{ $row['data']['jumlah_pegawai'] }}</td>
+                                <td>{{ $row['data']['pembimbing_dudi'] }}</td>
+                                <td>{{ $row['data']['jam_masuk'] }}</td>
+                                <td>{{ $row['data']['jam_pulang'] }}</td>
+                                <td>{{ $row['data']['kota'] }}</td>
+                                <td>{{ $row['data']['kuota'] }}</td>
+                                <td>{{ $row['data']['logo'] }}</td>
+                                <td>{{ ucfirst($row['data']['logo_status'] ?? 'missing') }}</td>
+                                <td>{{ $row['data']['logo_warning'] ?? '-' }}</td>
+                                <td>{{ $row['valid'] ? 'Ya' : 'Tidak' }}</td>
+                                <td>{{ implode(', ', $row['errors']) }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <form action="{{ route('admin.dudi.import') }}" method="POST" style="margin-top: 1rem;">
+                @csrf
+                <button type="submit" class="btn btn-success">Import Semua Baris Valid</button>
+            </form>
+        </div>
+    @endif
 </div>
 @endsection

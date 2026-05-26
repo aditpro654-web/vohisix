@@ -601,8 +601,8 @@
                 </svg>
             </button>
         </div>
-        <div class="modal-body">
-            <img id="modalImage" src="" alt="Preview">
+        <div class="modal-body" id="modalBodyContainer">
+            <!-- Preview content will be injected here -->
         </div>
         <div class="modal-footer">
             <button onclick="closeModal()" class="modal-btn">Tutup</button>
@@ -680,13 +680,25 @@
         container.innerHTML = html;
     }
 
-    function viewDocument(title, imageUrl) {
-        if (!imageUrl || imageUrl === '#') {
+    function viewDocument(title, fileUrl) {
+        if (!fileUrl || fileUrl === '#') {
             alert('Dokumen belum tersedia');
             return;
         }
+
+        const container = document.getElementById('modalBodyContainer');
+        if (!container) {
+            alert('Preview tidak tersedia saat ini.');
+            return;
+        }
+
         document.getElementById('modalTitle').innerText = title;
-        document.getElementById('modalImage').src = imageUrl;
+        if (fileUrl.toLowerCase().endsWith('.pdf')) {
+            container.innerHTML = `<iframe src="${fileUrl}" frameborder="0" style="width:100%;height:72vh;border:none;"></iframe>`;
+        } else {
+            container.innerHTML = `<img src="${fileUrl}" alt="Preview" style="max-width:100%;max-height:72vh;object-fit:contain;" onerror="this.onerror=null;this.src='https://placehold.co/600x800/003056/white?text=Preview+tidak+dapat+ditampilkan';">`;
+        }
+
         document.getElementById('previewModal').style.display = 'flex';
     }
 
@@ -695,8 +707,15 @@
             alert('Foto belum tersedia');
             return;
         }
+
+        const container = document.getElementById('modalBodyContainer');
+        if (!container) {
+            alert('Preview tidak tersedia saat ini.');
+            return;
+        }
+
         document.getElementById('modalTitle').innerText = 'Foto - ' + name;
-        document.getElementById('modalImage').src = url;
+        container.innerHTML = `<img src="${url}" alt="Foto ${name}" style="max-width:100%;max-height:72vh;object-fit:contain;" onerror="this.onerror=null;this.src='https://placehold.co/600x800/003056/white?text=Foto+tidak+dapat+ditampilkan';">`;
         document.getElementById('previewModal').style.display = 'flex';
     }
 

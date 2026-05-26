@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Dudi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\Traits\ExcelExportTrait;
 use App\Http\Controllers\Traits\ExcelImportTrait;
 
@@ -224,7 +225,7 @@ class AdminDudiController extends Controller
         );
     }
 
-    public function import(Request $request)
+    public function previewImport(Request $request)
     {
         $validated = $request->validate([
             'file' => 'required|file|mimes:csv,txt,xlsx|max:5120',
@@ -234,52 +235,188 @@ class AdminDudiController extends Controller
         $zipPath = null;
         if ($request->hasFile('zip')) {
             $zipPath = $request->file('zip')->storeAs('imports/temp', uniqid('dudi_logos_') . '.zip');
+            Session::put('admin_dudi_import_zip', $zipPath);
+        } else {
+            Session::forget('admin_dudi_import_zip');
         }
 
         $rows = $this->parseImportFile($request->file('file'));
         if (empty($rows)) {
             if ($zipPath) {
                 Storage::disk('local')->delete($zipPath);
+                Session::forget('admin_dudi_import_zip');
             }
 
-            return redirect()->route('admin.dudi.index')->with('error', 'File tidak dapat dibaca. Gunakan format CSV atau XLSX dengan header yang tepat.');
+            return redirect()->route('admin.dudi.create')->with('error', 'File tidak dapat dibaca. Gunakan format CSV atau XLSX dengan header yang tepat.');
         }
 
+        $preview = $this->previewDudiRows($rows, $zipPath);
+        Session::put('admin_dudi_import_preview', $preview['previewRows']);
+
+        return view('admin.dudi.create', [
+            'previewRows' => $preview['previewRows'],
+            'previewSummary' => $preview['summary'],
+            'previewHeaders' => $preview['headers'],
+            'previewMode' => true,
+            'zipUploaded' => $zipPath !== null,
+        ]);
+    }
+
+    public function import(Request $request)
+    {
+        $previewRows = Session::get('admin_dudi_import_preview', []);
+        $zipPath = Session::get('admin_dudi_import_zip');
+
+        if (empty($previewRows)) {
+            $validated = $request->validate([
+                'file' => 'required|file|mimes:csv,txt,xlsx|max:5120',
+                'zip' => 'nullable|file|mimes:zip|max:51200',
+            ]);
+
+            if ($request->hasFile('zip')) {
+                $zipPath = $request->file('zip')->storeAs('imports/temp', uniqid('dudi_logos_') . '.zip');
+            }
+
+            $rows = $this->parseImportFile($request->file('file'));
+            if (empty($rows)) {
+                if ($zipPath) {
+                    Storage::disk('local')->delete($zipPath);
+                }
+                return redirect()->route('admin.dudi.index')->with('error', 'File tidak dapat dibaca. Gunakan format CSV atau XLSX dengan header yang tepat.');
+            }
+
+            $previewRows = $this->previewDudiRows($rows, $zipPath)['previewRows'];
+        }
+
+        $result = $this->importDudiRows($previewRows, $zipPath);
+        Session::forget(['admin_dudi_import_preview', 'admin_dudi_import_zip']);
+        if ($zipPath) {
+            Storage::disk('local')->delete($zipPath);
+        }
+
+        $message = "{$result['imported']} DUDI berhasil diimpor";
+        if ($result['skipped'] > 0) {
+            $message .= ", {$result['skipped']} baris dilewati karena nama DUDI kosong atau sudah ada";
+        }
+        if ($result['logosSaved'] > 0) {
+            $message .= ", {$result['logosSaved']} logo disimpan";
+        }
+        if ($result['logosMissing'] > 0) {
+            $message .= ", {$result['logosMissing']} logo tidak ditemukan";
+        }
+        if ($result['logosInvalid'] > 0) {
+            $message .= ", {$result['logosInvalid']} logo tidak valid";
+        }
+
+        return redirect()->route('admin.dudi.index')->with('success', $message);
+    }
+
+    private function previewDudiRows(array $rows, ?string $zipPath = null): array
+    {
+        $zipMap = $this->buildZipImageMap($zipPath);
+        $existingNames = Dudi::whereIn('nama_dudi', collect($rows)
+            ->map(fn($row) => $this->normalizeDudiImportRow($row)['nama_dudi'])
+            ->filter()
+            ->unique()
+            ->values()
+            ->toArray()
+        )->pluck('nama_dudi')
+         ->mapWithKeys(fn($item) => [$item => true])
+         ->toArray();
+
+        $rowCounts = collect($rows)
+            ->map(fn($row) => $this->normalizeDudiImportRow($row)['nama_dudi'])
+            ->filter()
+            ->countBy()
+            ->toArray();
+
+        $results = [];
+        $logoSummary = ['found' => 0, 'missing' => 0, 'invalid' => 0, 'warnings' => []];
+
+        foreach ($rows as $index => $row) {
+            $normalized = $this->normalizeDudiImportRow($row);
+            $rowNumber = $index + 2;
+            $validator = \Validator::make($normalized, $this->dudiPreviewRules(), $this->dudiPreviewMessages());
+            $errors = $validator->fails() ? $validator->errors()->all() : [];
+
+            if (!empty($normalized['nama_dudi']) && ($rowCounts[$normalized['nama_dudi']] ?? 0) > 1) {
+                $errors[] = 'Nama DUDI duplikat dalam file.';
+            }
+
+            $logoData = $this->resolveLogoReference($normalized['logo'] ?? '', $zipMap, $zipPath);
+            $normalized['logo_status'] = $logoData['status'];
+            $normalized['logo_warning'] = $logoData['status'] === 'storage_path' ? null : $logoData['warning'];
+
+            if ($logoData['status'] === 'found') {
+                $logoSummary['found']++;
+            } elseif ($logoData['status'] === 'missing') {
+                $logoSummary['missing']++;
+                if ($logoData['warning']) {
+                    $logoSummary['warnings'][] = $logoData['warning'];
+                }
+            } elseif ($logoData['status'] === 'invalid') {
+                $logoSummary['invalid']++;
+                if ($logoData['warning']) {
+                    $logoSummary['warnings'][] = $logoData['warning'];
+                }
+            }
+
+            if (!empty($normalized['nama_dudi']) && isset($existingNames[$normalized['nama_dudi']])) {
+                $normalized['existing'] = true;
+            }
+
+            $results[] = [
+                'row_number' => $rowNumber,
+                'data' => $normalized,
+                'valid' => empty($errors),
+                'errors' => array_values(array_unique($errors)),
+            ];
+        }
+
+        $validCount = collect($results)->where('valid', true)->count();
+
+        return [
+            'headers' => ['No', 'Nama DUDI', 'Alamat', 'Telepon', 'Email', 'Bidang Usaha', 'Website', 'Jumlah Pegawai', 'Pembimbing', 'Jam Masuk', 'Jam Pulang', 'Kota', 'Kuota', 'Logo', 'Status Logo', 'Peringatan', 'Valid', 'Errors'],
+            'previewRows' => $results,
+            'summary' => [
+                'total' => count($results),
+                'valid' => $validCount,
+                'invalid' => count($results) - $validCount,
+                'logos' => $logoSummary,
+            ],
+        ];
+    }
+
+    private function importDudiRows(array $previewRows, ?string $zipPath = null): array
+    {
+        $validRows = collect($previewRows)
+            ->filter(fn($row) => $row['valid'])
+            ->pluck('data')
+            ->values();
+
+        if ($validRows->isEmpty()) {
+            return [
+                'imported' => 0,
+                'skipped' => count($previewRows),
+                'logosSaved' => 0,
+                'logosMissing' => 0,
+                'logosInvalid' => 0,
+            ];
+        }
+
+        $zipMap = $this->buildZipImageMap($zipPath);
         $imported = 0;
         $skipped = 0;
         $logosSaved = 0;
         $logosMissing = 0;
         $logosInvalid = 0;
 
-        $zipMap = $this->buildZipImageMap($zipPath);
-
-        foreach ($rows as $row) {
-            $nama_dudi = $row['nama_dudi'] ?? null;
-            if (!$nama_dudi) {
-                $skipped++;
-                continue;
-            }
-
-            $data = [
-                'alamat' => $row['alamat'] ?? null,
-                'telepon' => $row['telepon'] ?? null,
-                'email' => $row['email'] ?? null,
-                'deskripsi' => $row['deskripsi'] ?? null,
-                'bidang_usaha' => $row['bidang_usaha'] ?? null,
-                'website' => $row['website'] ?? null,
-                'jumlah_pegawai' => $row['jumlah_pegawai'] ?? null,
-                'pembimbing_dudi' => $row['pembimbing_dudi'] ?? null,
-                'jam_masuk' => $row['jam_masuk'] ?? null,
-                'jam_pulang' => $row['jam_pulang'] ?? null,
-                'kota' => $row['kota'] ?? null,
-                'kuota' => is_numeric($row['kuota'] ?? null) ? (int) $row['kuota'] : 5,
-            ];
-
+        foreach ($validRows as $row) {
             $logoPath = null;
             if (!empty($row['logo'])) {
                 $logoData = $this->resolveLogoReference($row['logo'], $zipMap, $zipPath);
-                if ($logoData['status'] === 'found') {
-                    $stored = $this->storeLogoFromZip($zipPath, $logoData['zip_name'], $nama_dudi);
+                if ($logoData['status'] === 'found' && !empty($logoData['zip_name'])) {
+                    $stored = $this->storeLogoFromZip($zipPath, $logoData['zip_name'], $row['nama_dudi']);
                     if ($stored) {
                         $logoPath = $stored;
                         $logosSaved++;
@@ -294,38 +431,94 @@ class AdminDudiController extends Controller
                 }
             }
 
-            $data['logo'] = $logoPath;
+            $data = [
+                'alamat' => $row['alamat'] ?: null,
+                'telepon' => $row['telepon'] ?: null,
+                'email' => $row['email'] ?: null,
+                'deskripsi' => $row['deskripsi'] ?: null,
+                'bidang_usaha' => $row['bidang_usaha'] ?: null,
+                'website' => $row['website'] ?: null,
+                'jumlah_pegawai' => $row['jumlah_pegawai'] ?: null,
+                'pembimbing_dudi' => $row['pembimbing_dudi'] ?: null,
+                'jam_masuk' => $row['jam_masuk'] ?: null,
+                'jam_pulang' => $row['jam_pulang'] ?: null,
+                'kota' => $row['kota'] ?: null,
+                'kuota' => is_numeric($row['kuota'] ?? null) ? (int) $row['kuota'] : 5,
+                'logo' => $logoPath,
+            ];
 
-            $existing = Dudi::where('nama_dudi', $nama_dudi)->first();
+            $existing = Dudi::where('nama_dudi', $row['nama_dudi'])->first();
             if ($existing) {
                 $existing->update($data);
                 $skipped++;
                 continue;
             }
 
-            Dudi::create(array_merge(['nama_dudi' => $nama_dudi], $data));
+            Dudi::create(array_merge(['nama_dudi' => $row['nama_dudi']], $data));
             $imported++;
         }
 
-        if ($zipPath) {
-            Storage::disk('local')->delete($zipPath);
-        }
+        return [
+            'imported' => $imported,
+            'skipped' => $skipped,
+            'logosSaved' => $logosSaved,
+            'logosMissing' => $logosMissing,
+            'logosInvalid' => $logosInvalid,
+        ];
+    }
 
-        $message = "$imported DUDI berhasil diimpor";
-        if ($skipped > 0) {
-            $message .= ", $skipped baris dilewati karena nama DUDI kosong atau sudah ada";
-        }
-        if ($logosSaved > 0) {
-            $message .= ", $logosSaved logo disimpan";
-        }
-        if ($logosMissing > 0) {
-            $message .= ", $logosMissing logo tidak ditemukan";
-        }
-        if ($logosInvalid > 0) {
-            $message .= ", $logosInvalid logo tidak valid";
-        }
+    private function normalizeDudiImportRow(array $row): array
+    {
+        $row = collect($row)->mapWithKeys(fn($value, $key) => [trim(strtolower($key)) => trim((string) $value)])->toArray();
 
-        return redirect()->route('admin.dudi.index')->with('success', $message);
+        return [
+            'nama_dudi' => $row['nama_dudi'] ?? $row['name'] ?? $row['dudi_name'] ?? $row['nama'] ?? '',
+            'alamat' => $row['alamat'] ?? $row['address'] ?? null,
+            'telepon' => $row['telepon'] ?? $row['phone'] ?? null,
+            'email' => $row['email'] ?? null,
+            'deskripsi' => $row['deskripsi'] ?? $row['description'] ?? null,
+            'bidang_usaha' => $row['bidang_usaha'] ?? $row['bidang'] ?? null,
+            'website' => $row['website'] ?? null,
+            'jumlah_pegawai' => $row['jumlah_pegawai'] ?? $row['jumlah'] ?? null,
+            'pembimbing_dudi' => $row['pembimbing_dudi'] ?? $row['pembimbing'] ?? null,
+            'jam_masuk' => $row['jam_masuk'] ?? null,
+            'jam_pulang' => $row['jam_pulang'] ?? null,
+            'kota' => $row['kota'] ?? null,
+            'kuota' => $row['kuota'] ?? null,
+            'logo' => $row['logo'] ?? null,
+        ];
+    }
+
+    private function dudiPreviewRules(): array
+    {
+        return [
+            'nama_dudi' => ['required', 'string', 'max:255'],
+            'alamat' => ['nullable', 'string', 'max:500'],
+            'telepon' => ['nullable', 'string', 'max:50'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'deskripsi' => ['nullable', 'string', 'max:1000'],
+            'bidang_usaha' => ['nullable', 'string', 'max:255'],
+            'website' => ['nullable', 'string', 'max:255'],
+            'jumlah_pegawai' => ['nullable', 'string', 'max:255'],
+            'pembimbing_dudi' => ['nullable', 'string', 'max:255'],
+            'jam_masuk' => ['nullable', 'string', 'max:20'],
+            'jam_pulang' => ['nullable', 'string', 'max:20'],
+            'kota' => ['nullable', 'string', 'max:255'],
+            'kuota' => ['nullable', 'integer', 'min:0'],
+            'logo' => ['nullable', 'string', 'max:255'],
+        ];
+    }
+
+    private function dudiPreviewMessages(): array
+    {
+        return [
+            'nama_dudi.required' => 'Nama DUDI wajib diisi.',
+            'nama_dudi.max' => 'Nama DUDI maksimal 255 karakter.',
+            'email.email' => 'Email tidak valid.',
+            'email.max' => 'Email maksimal 255 karakter.',
+            'kuota.integer' => 'Kuota harus berupa angka.',
+            'kuota.min' => 'Kuota minimal 0.',
+        ];
     }
 
     private function buildZipImageMap(?string $zipPath): array
