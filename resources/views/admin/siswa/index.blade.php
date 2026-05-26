@@ -25,7 +25,9 @@
             </select>
             <!-- live search: removed submit button -->
             <a href="{{ route('admin.siswa.export', request()->query()) }}" class="btn btn-secondary">Export CSV</a>
-            <a href="{{ route('admin.siswa.export.pdf', request()->query()) }}" class="btn btn-secondary" target="_blank" rel="noopener">Export PDF</a>
+            <a href="{{ route('admin.siswa.export.pdf.preview', request()->query()) }}" class="btn btn-secondary" target="_blank" rel="noopener">Preview PDF</a>
+            <a href="{{ route('admin.siswa.export.pdf.preview', array_merge(request()->query(), ['auto_download' => 1])) }}" class="btn btn-secondary" target="_blank" rel="noopener">Preview + Unduh Otomatis</a>
+            <a href="{{ route('admin.siswa.export.pdf', array_merge(request()->query(), ['download' => 1])) }}" class="btn btn-secondary" target="_blank" rel="noopener">Unduh PDF</a>
             <a href="{{ route('admin.siswa.create') }}" class="btn btn-primary">+ Tambah Siswa Baru</a>
         </form>
     </div>

@@ -22,7 +22,9 @@
             <option value="Ditolak" {{ request('status') === 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
         </select>
         <button type="submit" class="btn btn-primary">Terapkan</button>
-        <a href="{{ route('kakonsli.siswas.export.pdf', request()->query()) }}" class="btn btn-secondary" target="_blank" rel="noopener">Export PDF</a>
+        <a href="{{ route('kakonsli.siswas.export.pdf.preview', request()->query()) }}" class="btn btn-secondary" target="_blank" rel="noopener">Preview PDF</a>
+        <a href="{{ route('kakonsli.siswas.export.pdf.preview', array_merge(request()->query(), ['auto_download' => 1])) }}" class="btn btn-secondary" target="_blank" rel="noopener">Preview + Unduh Otomatis</a>
+        <a href="{{ route('kakonsli.siswas.export.pdf', array_merge(request()->query(), ['download' => 1])) }}" class="btn btn-secondary" target="_blank" rel="noopener">Unduh PDF</a>
     </form>
 
     @if($siswas->count() > 0)
