@@ -15,7 +15,13 @@ class PdfExportController extends Controller
         $status = $request->input('status'); // Direview, Diterima, Ditolak or empty (all)
         $kelas = $request->input('kelas'); // XII SIJA 1 / XII SIJA 2 or empty
 
-        $query = Siswa::query()->with(['bookings' => function($q) { $q->orderBy('created_at', 'desc'); }, 'berkas']);
+        $query = Siswa::query()->with([
+            'bookings' => function ($q) {
+                $q->orderBy('created_at', 'desc');
+            },
+            'bookings.dudi',
+            'berkas',
+        ]);
 
         if (!empty($kelas) && in_array($kelas, ['XII SIJA 1', 'XII SIJA 2'], true)) {
             $query->where('kelas', $kelas);
