@@ -26,7 +26,8 @@ class SiswaDudiController extends Controller
         $kuota = $request->input('kuota');
         $sort = $request->input('sort', 'default');
         
-        $query = Dudi::query();
+        $query = Dudi::query()
+            ->where('status', 'active');
 
         // Search filter
         if ($search) {
@@ -169,6 +170,10 @@ class SiswaDudiController extends Controller
 
         if ($jumlahPendaftar >= $dudi->kuota) {
             return back()->with('error', 'Kuota pendaftar untuk DUDI ini sudah penuh. Silakan pilih DUDI lain.');
+        }
+
+        if ($dudi->status !== 'active') {
+            return back()->with('error', 'DUDI ini tidak aktif dan tidak dapat dipilih.');
         }
 
         Booking::create([

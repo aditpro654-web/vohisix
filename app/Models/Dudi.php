@@ -26,6 +26,7 @@ class Dudi extends Model
         'jam_pulang',
         'kota',
         'kuota',
+        'status',
     ];
 
     public function bookings()

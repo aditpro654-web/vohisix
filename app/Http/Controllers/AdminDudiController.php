@@ -19,6 +19,7 @@ class AdminDudiController extends Controller
     {
         $search = $request->input('search');
         $bidang = $request->input('bidang_usaha');
+        $status = $request->input('status');
         $sortBy = $request->input('sort_by', 'newest');
 
         $dudis = Dudi::query();
@@ -33,6 +34,10 @@ class AdminDudiController extends Controller
 
         if ($bidang) {
             $dudis->where('bidang_usaha', $bidang);
+        }
+
+        if ($status && in_array($status, ['active', 'inactive'])) {
+            $dudis->where('status', $status);
         }
 
         // Apply sorting
@@ -58,7 +63,7 @@ class AdminDudiController extends Controller
         $totalKuota = Dudi::sum('kuota') ?? 0;
         $bukuTerdaftar = \App\Models\Booking::whereIn('status', ['Direview', 'Diterima'])->count();
 
-        return view('admin.dudi.index', compact('dudis', 'search', 'bidang', 'sortBy', 'totalDudi', 'allBidang', 'totalKuota', 'bukuTerdaftar'));
+        return view('admin.dudi.index', compact('dudis', 'search', 'bidang', 'status', 'sortBy', 'totalDudi', 'allBidang', 'totalKuota', 'bukuTerdaftar'));
     }
 
     /**
@@ -88,6 +93,7 @@ class AdminDudiController extends Controller
             'jam_pulang' => 'nullable|string|max:20',
             'kota' => 'nullable|string|max:255',
             'kuota' => 'nullable|integer|min:0',
+            'status' => 'nullable|in:active,inactive',
             'logo' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif,bmp|max:2048',
         ]);
 
@@ -99,6 +105,10 @@ class AdminDudiController extends Controller
         // Set default kuota if not provided
         if (!isset($validated['kuota'])) {
             $validated['kuota'] = 5;
+        }
+
+        if (!isset($validated['status'])) {
+            $validated['status'] = 'active';
         }
 
         Dudi::create($validated);
@@ -141,6 +151,7 @@ class AdminDudiController extends Controller
             'jam_pulang' => 'nullable|string|max:20',
             'kota' => 'nullable|string|max:255',
             'kuota' => 'nullable|integer|min:0',
+            'status' => 'nullable|in:active,inactive',
             'logo' => 'nullable|file|mimes:jpg,jpeg,png,webp,gif,bmp|max:2048',
         ]);
 
@@ -153,6 +164,10 @@ class AdminDudiController extends Controller
 
         if (!isset($validated['kuota'])) {
             $validated['kuota'] = $dudi->kuota ?? 5;
+        }
+
+        if (!isset($validated['status'])) {
+            $validated['status'] = $dudi->status ?? 'active';
         }
 
         $dudi->update($validated);
@@ -202,13 +217,14 @@ class AdminDudiController extends Controller
                 $dudi->jam_pulang,
                 $dudi->kota,
                 $dudi->kuota,
+                $dudi->status,
                 $dudi->logo ? asset('storage/'.$dudi->logo) : null,
             ];
         })->toArray();
 
         return $this->streamCsvDownload(
             'dudi_export_' . now()->format('Y-m-d') . '.csv',
-            ['Nama DUDI', 'Alamat', 'Telepon', 'Email', 'Bidang Industri', 'Website', 'Jumlah Pegawai', 'Pembimbing', 'Jam Masuk', 'Jam Pulang', 'Kota', 'Kuota', 'Logo URL'],
+            ['Nama DUDI', 'Alamat', 'Telepon', 'Email', 'Bidang Industri', 'Website', 'Jumlah Pegawai', 'Pembimbing', 'Jam Masuk', 'Jam Pulang', 'Kota', 'Kuota', 'Status', 'Logo URL'],
             $rows
         );
     }
@@ -217,10 +233,10 @@ class AdminDudiController extends Controller
     {
         return $this->streamCsvDownload(
             'dudi_import_template.csv',
-            ['Nama DUDI', 'Alamat', 'Telepon', 'Email', 'Bidang Industri', 'Website', 'Jumlah Pegawai', 'Pembimbing', 'Jam Masuk', 'Jam Pulang', 'Kota', 'Kuota', 'Logo'],
+            ['Nama DUDI', 'Alamat', 'Telepon', 'Email', 'Bidang Industri', 'Website', 'Jumlah Pegawai', 'Pembimbing', 'Jam Masuk', 'Jam Pulang', 'Kota', 'Kuota', 'Status', 'Logo'],
             [
-                ['PT. Mitra Sukses', 'Jl. Merdeka No. 10', '081234567890', 'info@mitrasukses.co.id', 'Teknologi Informasi', 'www.mitrasukses.co.id', '100', 'Ibu Sari', '08:00', '16:00', 'Kota Malang', '10', 'mitrasukses.jpg'],
-                ['CV. Harapan Bangsa', 'Jl. Kemerdekaan No. 22', '087654321098', 'contact@harapanbangsa.id', 'Manufaktur', 'www.harapanbangsa.id', '50', 'Bapak Agus', '09:00', '17:00', 'Kota Surabaya', '8', 'harapanbangsa.png'],
+                ['PT. Mitra Sukses', 'Jl. Merdeka No. 10', '081234567890', 'info@mitrasukses.co.id', 'Teknologi Informasi', 'www.mitrasukses.co.id', '100', 'Ibu Sari', '08:00', '16:00', 'Kota Malang', '10', 'active', 'mitrasukses.jpg'],
+                ['CV. Harapan Bangsa', 'Jl. Kemerdekaan No. 22', '087654321098', 'contact@harapanbangsa.id', 'Manufaktur', 'www.harapanbangsa.id', '50', 'Bapak Agus', '09:00', '17:00', 'Kota Surabaya', '8', 'inactive', 'harapanbangsa.png'],
             ]
         );
     }
@@ -345,7 +361,7 @@ class AdminDudiController extends Controller
 
             $logoData = $this->resolveLogoReference($normalized['logo'] ?? '', $zipMap, $zipPath);
             $normalized['logo_status'] = $logoData['status'];
-            $normalized['logo_warning'] = $logoData['status'] === 'storage_path' ? null : $logoData['warning'];
+            $normalized['logo_warning'] = $logoData['warning'] ?? null;
 
             if ($logoData['status'] === 'found') {
                 $logoSummary['found']++;
@@ -376,7 +392,7 @@ class AdminDudiController extends Controller
         $validCount = collect($results)->where('valid', true)->count();
 
         return [
-            'headers' => ['No', 'Nama DUDI', 'Alamat', 'Telepon', 'Email', 'Bidang Usaha', 'Website', 'Jumlah Pegawai', 'Pembimbing', 'Jam Masuk', 'Jam Pulang', 'Kota', 'Kuota', 'Logo', 'Status Logo', 'Peringatan', 'Valid', 'Errors'],
+            'headers' => ['No', 'Nama DUDI', 'Alamat', 'Telepon', 'Email', 'Bidang Usaha', 'Website', 'Jumlah Pegawai', 'Pembimbing', 'Jam Masuk', 'Jam Pulang', 'Kota', 'Kuota', 'Logo', 'Status', 'Status Logo', 'Peringatan', 'Valid', 'Errors'],
             'previewRows' => $results,
             'summary' => [
                 'total' => count($results),
@@ -444,6 +460,7 @@ class AdminDudiController extends Controller
                 'jam_pulang' => $row['jam_pulang'] ?: null,
                 'kota' => $row['kota'] ?: null,
                 'kuota' => is_numeric($row['kuota'] ?? null) ? (int) $row['kuota'] : 5,
+                'status' => $row['status'] ?? 'active',
                 'logo' => $logoPath,
             ];
 
@@ -485,6 +502,7 @@ class AdminDudiController extends Controller
             'jam_pulang' => $row['jam_pulang'] ?? null,
             'kota' => $row['kota'] ?? null,
             'kuota' => $row['kuota'] ?? null,
+            'status' => $row['status'] ?? 'active',
             'logo' => $row['logo'] ?? null,
         ];
     }
@@ -505,6 +523,7 @@ class AdminDudiController extends Controller
             'jam_pulang' => ['nullable', 'string', 'max:20'],
             'kota' => ['nullable', 'string', 'max:255'],
             'kuota' => ['nullable', 'integer', 'min:0'],
+            'status' => ['nullable', 'in:active,inactive'],
             'logo' => ['nullable', 'string', 'max:255'],
         ];
     }
@@ -554,7 +573,7 @@ class AdminDudiController extends Controller
     {
         $logo = trim($logo);
         if ($logo === '') {
-            return ['status' => 'missing', 'zip_name' => null];
+            return ['status' => 'missing', 'zip_name' => null, 'warning' => 'Logo tidak ditemukan dalam file ZIP atau path penyimpanan.'];
         }
 
         if (filter_var($logo, FILTER_VALIDATE_URL)) {
@@ -563,26 +582,26 @@ class AdminDudiController extends Controller
             if ($position !== false) {
                 $relativePath = substr($logo, $position + strlen($storageSegment));
                 if (Storage::disk('public')->exists($relativePath)) {
-                    return ['status' => 'storage_path', 'storage_path' => $relativePath, 'zip_name' => null];
+                    return ['status' => 'storage_path', 'storage_path' => $relativePath, 'zip_name' => null, 'warning' => null];
                 }
             }
-            return ['status' => 'missing', 'zip_name' => null];
+            return ['status' => 'missing', 'zip_name' => null, 'warning' => 'Logo tidak ditemukan dalam file ZIP atau path penyimpanan.'];
         }
 
         if (Storage::disk('public')->exists($logo)) {
-            return ['status' => 'storage_path', 'storage_path' => $logo, 'zip_name' => null];
+            return ['status' => 'storage_path', 'storage_path' => $logo, 'zip_name' => null, 'warning' => null];
         }
 
         if (empty($zipMap)) {
-            return ['status' => 'missing', 'zip_name' => null];
+            return ['status' => 'missing', 'zip_name' => null, 'warning' => 'Logo tidak ditemukan dalam file ZIP atau path penyimpanan.'];
         }
 
         $normalized = $this->normalizeImageKey($logo);
         if (!isset($zipMap[$normalized])) {
-            return ['status' => 'missing', 'zip_name' => null];
+            return ['status' => 'missing', 'zip_name' => null, 'warning' => 'Logo tidak ditemukan dalam file ZIP atau path penyimpanan.'];
         }
 
-        return ['status' => 'found', 'zip_name' => $zipMap[$normalized]];
+        return ['status' => 'found', 'zip_name' => $zipMap[$normalized], 'warning' => null];
     }
 
     private function storeLogoFromZip(string $zipPath, string $zipImageName, string $namaDudi): ?string

@@ -42,7 +42,7 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::resource('/admin/dudi', AdminDudiController::class, ['names' => 'admin.dudi']);
 
     Route::get('/admin/booking/export', [AdminBookingController::class, 'export'])->name('admin.booking.export');
-    Route::resource('/admin/booking', AdminBookingController::class, ['names' => 'admin.booking']);
+    Route::resource('/admin/booking', AdminBookingController::class, ['names' => 'admin.booking', 'except' => ['destroy']]);
 
     Route::get('/admin/login/export', [AdminLoginController::class, 'export'])->name('admin.login.export');
     Route::get('/admin/login/import/template', [AdminLoginController::class, 'downloadImportTemplate'])->name('admin.login.import.template');

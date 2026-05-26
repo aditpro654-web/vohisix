@@ -19,18 +19,21 @@
             'name' => 'Fotocopy KTP / KIA',
             'status' => $berkas && $berkas->ktp_kia ? 'uploaded' : 'empty',
             'imageUrl' => $berkas && $berkas->ktp_kia ? asset('storage/' . $berkas->ktp_kia) : null,
+            'originalName' => $berkas->ktp_kia_name ?? null,
         ],
         [
             'id' => 'surat_sehat',
             'name' => 'Surat Keterangan Sehat',
             'status' => $berkas && $berkas->surat_sehat ? 'uploaded' : 'empty',
             'imageUrl' => $berkas && $berkas->surat_sehat ? asset('storage/' . $berkas->surat_sehat) : null,
+            'originalName' => $berkas->surat_sehat_name ?? null,
         ],
         [
             'id' => 'kartu_bpjs',
             'name' => 'Kartu BPJS Ketenagakerjaan',
             'status' => $berkas && $berkas->kartu_bpjs ? 'uploaded' : 'empty',
             'imageUrl' => $berkas && $berkas->kartu_bpjs ? asset('storage/' . $berkas->kartu_bpjs) : null,
+            'originalName' => $berkas->kartu_bpjs_name ?? null,
         ],
     ];
 @endphp
@@ -652,7 +655,7 @@
                         <div class="uploaded-card" onclick="viewDocument('${doc.name}', '${doc.imageUrl || '#'}')">
                             <div class="p-2 rounded-xl" style="background: rgba(255,255,255,0.2);">${getFileTextIcon()}</div>
                             <div class="uploaded-card-content">
-                                <p class="text-sm font-bold text-white" style="letter-spacing: 0.025em;">${doc.id.toUpperCase()}_SCAN.pdf</p>
+                                <p class="text-sm font-bold text-white" style="letter-spacing: 0.025em;">${doc.originalName || `${doc.id.toUpperCase()}_SCAN.pdf`}</p>
                                 <p class="click-text">Klik untuk melihat berkas</p>
                             </div>
                             <button class="ganti-button" onclick="event.stopPropagation(); handleGanti('${doc.id}')">Ganti</button>

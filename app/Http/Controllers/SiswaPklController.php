@@ -6,6 +6,7 @@ use App\Models\Siswa;
 use App\Models\Berkas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class SiswaPklController extends Controller
 {
@@ -42,6 +43,7 @@ class SiswaPklController extends Controller
                 $filename = time() . '_' . $siswa->nis . '_' . $field . '.' . $file->getClientOriginalExtension();
                 $file->storeAs('berkas', $filename, 'public');
                 $files[$field] = $filename;
+                $files[$field . '_name'] = $file->getClientOriginalName();
             }
         }
 

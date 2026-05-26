@@ -17,6 +17,11 @@
                     <option value="{{ $bidangItem }}" {{ ($bidang == $bidangItem) ? 'selected' : '' }}>{{ $bidangItem }}</option>
                 @endforeach
             </select>
+            <select name="status" onchange="this.form.submit()">
+                <option value="">Semua Status</option>
+                <option value="active" {{ (request('status') ?? '') === 'active' ? 'selected' : '' }}>Aktif</option>
+                <option value="inactive" {{ (request('status') ?? '') === 'inactive' ? 'selected' : '' }}>Nonaktif</option>
+            </select>
             <!-- live search: removed submit button -->
             <a href="{{ route('admin.dudi.export', request()->query()) }}" class="btn btn-secondary">Export</a>
             <a href="{{ route('admin.dudi.create') }}" class="btn btn-primary">
@@ -39,6 +44,7 @@
                     <th class="w-120">Jam Berangkat</th>
                     <th class="w-120">Jam Pulang</th>
                     <th>Bidang Industri</th>
+                    <th>Status</th>
                     <th class="w-120">Jumlah Pegawai</th>
                     <th>Website</th>
                     <th>No. Telp</th>
@@ -57,6 +63,13 @@
                         <td>{{ $dudi->jam_masuk ?? '-' }}</td>
                         <td>{{ $dudi->jam_pulang ?? '-' }}</td>
                         <td>{{ $dudi->bidang_usaha }}</td>
+                        <td>
+                            @if($dudi->status === 'active')
+                                <span class="status-pill accept">Aktif</span>
+                            @else
+                                <span class="status-pill reject">Nonaktif</span>
+                            @endif
+                        </td>
                         <td>{{ $dudi->jumlah_pegawai }}</td>
                         <td>
                             @if($dudi->website)

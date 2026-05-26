@@ -12,8 +12,11 @@ class Berkas extends Model
     protected $fillable = [
         'nis',
         'ktp_kia',
+        'ktp_kia_name',
         'surat_sehat',
+        'surat_sehat_name',
         'kartu_bpjs',
+        'kartu_bpjs_name',
         'surat_balasan',
         'buku_tabungan',
         'lengkap',

@@ -33,6 +33,16 @@
                     <div class="form-error">{{ $message }}</div>
                 @enderror
             </div>
+            <div class="form-group">
+                <label for="status">Status DUDI</label>
+                <select id="status" name="status">
+                    <option value="active" {{ old('status') === 'active' ? 'selected' : '' }}>Aktif</option>
+                    <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Nonaktif</option>
+                </select>
+                @error('status')
+                    <div class="form-error">{{ $message }}</div>
+                @enderror
+            </div>
         </div>
 
         <div class="form-row">
@@ -235,6 +245,7 @@
                                 <td>{{ $row['data']['kota'] }}</td>
                                 <td>{{ $row['data']['kuota'] }}</td>
                                 <td>{{ $row['data']['logo'] }}</td>
+                                <td>{{ ucfirst($row['data']['status'] ?? 'active') }}</td>
                                 <td>{{ ucfirst($row['data']['logo_status'] ?? 'missing') }}</td>
                                 <td>{{ $row['data']['logo_warning'] ?? '-' }}</td>
                                 <td>{{ $row['valid'] ? 'Ya' : 'Tidak' }}</td>

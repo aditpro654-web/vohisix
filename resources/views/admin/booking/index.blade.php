@@ -61,11 +61,6 @@
                         <td>
                             <div class="action-group">
                                 <a href="{{ route('admin.booking.edit', $booking->id_booking) }}" class="edit">Edit</a>
-                                <form action="{{ route('admin.booking.destroy', $booking->id_booking) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus?');" class="inline-form">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="delete">Hapus</button>
-                                </form>
                             </div>
                         </td>
                     </tr>
