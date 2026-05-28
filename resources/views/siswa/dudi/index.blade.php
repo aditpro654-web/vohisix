@@ -467,27 +467,32 @@
             </div>
         @endif
 
-        @if($dudis->hasPages() && $dudis->total() >= 100)
-            <div class="pagination">
-                @if ($dudis->onFirstPage())
-                    <span class="disabled">← Sebelumnya</span>
-                @else
-                    <a href="{{ $dudis->previousPageUrl() }}">← Sebelumnya</a>
-                @endif
-
-                @foreach ($dudis->getUrlRange(1, $dudis->lastPage()) as $page => $url)
-                    @if ($page == $dudis->currentPage())
-                        <span class="active"><span>{{ $page }}</span></span>
+        @if($dudis->hasPages())
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    Menampilkan {{ $dudis->firstItem() ?? 0 }} - {{ $dudis->lastItem() ?? 0 }} dari {{ $dudis->total() }} data
+                </div>
+                <div class="pagination-links">
+                    @if ($dudis->onFirstPage())
+                        <span class="disabled">← Sebelumnya</span>
                     @else
-                        <a href="{{ $url }}">{{ $page }}</a>
+                        <a href="{{ $dudis->appends(request()->except('page'))->previousPageUrl() }}">← Sebelumnya</a>
                     @endif
-                @endforeach
 
-                @if ($dudis->hasMorePages())
-                    <a href="{{ $dudis->nextPageUrl() }}">Selanjutnya →</a>
-                @else
-                    <span class="disabled">Selanjutnya →</span>
-                @endif
+                    @foreach ($dudis->getUrlRange(1, $dudis->lastPage()) as $page => $url)
+                        @if ($page == $dudis->currentPage())
+                            <span class="active">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}{{ request()->except('page') ? '&' . http_build_query(request()->except('page')) : '' }}">{{ $page }}</a>
+                        @endif
+                    @endforeach
+
+                    @if ($dudis->hasMorePages())
+                        <a href="{{ $dudis->appends(request()->except('page'))->nextPageUrl() }}">Selanjutnya →</a>
+                    @else
+                        <span class="disabled">Selanjutnya →</span>
+                    @endif
+                </div>
             </div>
         @endif
     </div>

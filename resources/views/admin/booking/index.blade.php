@@ -74,26 +74,31 @@
     </div>
 
     @if($bookings->hasPages())
-        <div class="pagination">
-            @if($bookings->onFirstPage())
-                <span>← Sebelumnya</span>
-            @else
-                <a href="{{ $bookings->appends(request()->except('page'))->previousPageUrl() }}">← Sebelumnya</a>
-            @endif
-
-            @foreach($bookings->getUrlRange(1, $bookings->lastPage()) as $page => $url)
-                @if($page == $bookings->currentPage())
-                    <span class="active"><span>{{ $page }}</span></span>
+        <div class="pagination-container">
+            <div class="pagination-info">
+                Menampilkan {{ $bookings->firstItem() ?? 0 }} - {{ $bookings->lastItem() ?? 0 }} dari {{ $bookings->total() }} data
+            </div>
+            <div class="pagination-links">
+                @if($bookings->onFirstPage())
+                    <span class="disabled">← Sebelumnya</span>
                 @else
-                    <a href="{{ $url }}{{ request()->except('page') ? '&' . http_build_query(request()->except('page')) : '' }}">{{ $page }}</a>
+                    <a href="{{ $bookings->appends(request()->except('page'))->previousPageUrl() }}">← Sebelumnya</a>
                 @endif
-            @endforeach
 
-            @if($bookings->hasMorePages())
-                <a href="{{ $bookings->appends(request()->except('page'))->nextPageUrl() }}">Selanjutnya →</a>
-            @else
-                <span>Selanjutnya →</span>
-            @endif
+                @foreach($bookings->getUrlRange(1, $bookings->lastPage()) as $page => $url)
+                    @if($page == $bookings->currentPage())
+                        <span class="active">{{ $page }}</span>
+                    @else
+                        <a href="{{ $url }}{{ request()->except('page') ? '&' . http_build_query(request()->except('page')) : '' }}">{{ $page }}</a>
+                    @endif
+                @endforeach
+
+                @if($bookings->hasMorePages())
+                    <a href="{{ $bookings->appends(request()->except('page'))->nextPageUrl() }}">Selanjutnya →</a>
+                @else
+                    <span class="disabled">Selanjutnya →</span>
+                @endif
+            </div>
         </div>
     @endif
 </div>

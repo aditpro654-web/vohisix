@@ -638,14 +638,6 @@
         const statusOptions = ['Semua Status', 'Diterima', 'Ditolak', 'Direview'];
 
         let html = `
-            <header class="kakonsli-header">
-                <div>
-                    <h1 class="header-title">${PAGE_TITLE}</h1>
-                    <p class="header-subtitle">${PAGE_SUBTITLE}</p>
-                </div>
-                <!-- header stats moved to navbar (compact recap) -->
-            </header>
-
             <main class="dashboard-card">
                 <div class="dashboard-toolbar">
                     <div class="dashboard-toolbar-left">
@@ -713,10 +705,6 @@
         html += `
                         </tbody>
                     </table>
-                </div>
-                <div style="background-color: #003056; color: rgba(255,255,255,0.7); padding: 16px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">
-                    <span>Kelas: ${selectedClass || '-'} | Total data: ${filteredData.length} dari ${stats.total} Siswa</span>
-                    <span>Update: ${formattedDate}, ${formattedTime}</span>
                 </div>
             </main>
 

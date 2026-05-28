@@ -477,26 +477,29 @@
         </div>
 
         @if($bookings->hasPages())
-            <div style="margin-top: 48px; text-align: center;">
-                <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    Menampilkan {{ $bookings->firstItem() ?? 0 }} - {{ $bookings->lastItem() ?? 0 }} dari {{ $bookings->total() }} data
+                </div>
+                <div class="pagination-links">
                     @if($bookings->onFirstPage())
-                        <span style="padding: 8px 12px; color: #94a3b8;">← Sebelumnya</span>
+                        <span class="disabled">← Sebelumnya</span>
                     @else
-                        <a href="{{ $bookings->previousPageUrl() }}" style="padding: 8px 12px; background: #003056; color: white; border-radius: 8px; text-decoration: none;">← Sebelumnya</a>
+                        <a href="{{ $bookings->appends(request()->except('page'))->previousPageUrl() }}">← Sebelumnya</a>
                     @endif
 
                     @foreach($bookings->getUrlRange(1, $bookings->lastPage()) as $page => $url)
                         @if($page == $bookings->currentPage())
-                            <span style="padding: 8px 12px; background: #003056; color: white; border-radius: 8px; font-weight: 600;">{{ $page }}</span>
+                            <span class="active">{{ $page }}</span>
                         @else
-                            <a href="{{ $url }}" style="padding: 8px 12px; background: #f1f5f9; color: #003056; border-radius: 8px; text-decoration: none;">{{ $page }}</a>
+                            <a href="{{ $url }}{{ request()->except('page') ? '&' . http_build_query(request()->except('page')) : '' }}">{{ $page }}</a>
                         @endif
                     @endforeach
 
                     @if($bookings->hasMorePages())
-                        <a href="{{ $bookings->nextPageUrl() }}" style="padding: 8px 12px; background: #003056; color: white; border-radius: 8px; text-decoration: none;">Selanjutnya →</a>
+                        <a href="{{ $bookings->appends(request()->except('page'))->nextPageUrl() }}">Selanjutnya →</a>
                     @else
-                        <span style="padding: 8px 12px; color: #94a3b8;">Selanjutnya →</span>
+                        <span class="disabled">Selanjutnya →</span>
                     @endif
                 </div>
             </div>

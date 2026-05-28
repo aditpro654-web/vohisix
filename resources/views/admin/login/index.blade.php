@@ -75,5 +75,33 @@
         </table>
     </div>
 
+    @if($users->hasPages())
+        <div class="pagination-container">
+            <div class="pagination-info">
+                Menampilkan {{ $users->firstItem() ?? 0 }} - {{ $users->lastItem() ?? 0 }} dari {{ $users->total() }} data
+            </div>
+            <div class="pagination-links">
+                @if($users->onFirstPage())
+                    <span class="disabled">← Sebelumnya</span>
+                @else
+                    <a href="{{ $users->appends(request()->except('page'))->previousPageUrl() }}">← Sebelumnya</a>
+                @endif
+
+                @foreach($users->getUrlRange(1, $users->lastPage()) as $page => $url)
+                    @if($page == $users->currentPage())
+                        <span class="active">{{ $page }}</span>
+                    @else
+                        <a href="{{ $url }}{{ request()->except('page') ? '&' . http_build_query(request()->except('page')) : '' }}">{{ $page }}</a>
+                    @endif
+                @endforeach
+
+                @if($users->hasMorePages())
+                    <a href="{{ $users->appends(request()->except('page'))->nextPageUrl() }}">Selanjutnya →</a>
+                @else
+                    <span class="disabled">Selanjutnya →</span>
+                @endif
+            </div>
+        </div>
+    @endif
 </div>
 @endsection

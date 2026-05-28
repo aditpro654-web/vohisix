@@ -8,6 +8,7 @@ use App\Models\Location;
 use App\Models\Siswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class SiswaDudiController extends Controller
 {
@@ -26,8 +27,10 @@ class SiswaDudiController extends Controller
         $kuota = $request->input('kuota');
         $sort = $request->input('sort', 'default');
         
-        $query = Dudi::query()
-            ->where('status', 'active');
+        $query = Dudi::query();
+        if ($this->hasDudiStatusColumn()) {
+            $query->where('status', 'active');
+        }
 
         // Search filter
         if ($search) {
@@ -131,6 +134,10 @@ class SiswaDudiController extends Controller
         return view('siswa.dudi.index', compact('dudis', 'search', 'provinsi', 'kota', 'jamBerangkat', 'jamPulang', 'kuota', 'sort', 'siswa', 'provinces', 'kabupatensByProvince', 'bookingAktif'));
     }
 
+    private function hasDudiStatusColumn(): bool
+    {
+        return Schema::hasColumn('dudis', 'status');
+    }
 
     /**
      * Ajukan PKL ke DUDI
@@ -172,7 +179,7 @@ class SiswaDudiController extends Controller
             return back()->with('error', 'Kuota pendaftar untuk DUDI ini sudah penuh. Silakan pilih DUDI lain.');
         }
 
-        if ($dudi->status !== 'active') {
+        if ($this->hasDudiStatusColumn() && $dudi->status !== 'active') {
             return back()->with('error', 'DUDI ini tidak aktif dan tidak dapat dipilih.');
         }
 
