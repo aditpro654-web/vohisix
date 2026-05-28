@@ -37,8 +37,8 @@
             <div class="form-group">
                 <label for="status">Status DUDI</label>
                 <select id="status" name="status">
-                    <option value="active" {{ old('status', $dudi->status) === 'active' ? 'selected' : '' }}>Aktif</option>
-                    <option value="inactive" {{ old('status', $dudi->status) === 'inactive' ? 'selected' : '' }}>Nonaktif</option>
+                    <option value="active" {{ old('status', $dudi->status ?? 'active') === 'active' ? 'selected' : '' }}>Aktif</option>
+                    <option value="inactive" {{ old('status', $dudi->status ?? 'active') === 'inactive' ? 'selected' : '' }}>Nonaktif</option>
                 </select>
                 @error('status')
                     <div class="form-error">{{ $message }}</div>

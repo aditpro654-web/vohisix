@@ -14,7 +14,7 @@
         <p class="form-helper">Username tidak dapat diubah, tetapi role dan nama pengguna bisa disesuaikan.</p>
     </div>
 
-    <form action="{{ route('admin.login.update', $user->id) }}" method="POST">
+<form action="{{ route('admin.login.update', ['login' => $user->id]) }}" method="POST">
         @csrf
         @method('PUT')
 

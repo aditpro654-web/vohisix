@@ -62,7 +62,7 @@
                         </td>
                         <td>
                             <div class="action-group">
-                                <a href="{{ route('admin.login.edit', $user->id) }}" class="edit">Edit</a>
+                                <a href="{{ route('admin.login.edit', ['login' => $user->id]) }}" class="edit">Edit</a>
                             </div>
                         </td>
                     </tr>

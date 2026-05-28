@@ -64,7 +64,7 @@
                         <td>{{ $dudi->jam_pulang ?? '-' }}</td>
                         <td>{{ $dudi->bidang_usaha }}</td>
                         <td>
-                            @if($dudi->status === 'active')
+                            @if(strtolower($dudi->status ?? '') === 'active')
                                 <span class="status-pill accept">Aktif</span>
                             @else
                                 <span class="status-pill reject">Nonaktif</span>

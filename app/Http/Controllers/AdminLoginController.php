@@ -100,23 +100,23 @@ class AdminLoginController extends Controller
     /**
      * Show user details
      */
-    public function show(User $user)
+    public function show(User $login)
     {
-        return view('admin.login.show', compact('user'));
+        return view('admin.login.show', ['user' => $login]);
     }
 
     /**
      * Show form for editing user
      */
-    public function edit(User $user)
+    public function edit(User $login)
     {
-        return view('admin.login.edit', compact('user'));
+        return view('admin.login.edit', ['user' => $login]);
     }
 
     /**
      * Update user in database
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $login)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -126,16 +126,16 @@ class AdminLoginController extends Controller
             'kelas_second' => 'nullable|in:XII SIJA 1,XII SIJA 2',
         ]);
 
-        $user->name = $validated['name'];
-        $user->role = $validated['role'];
-        $user->kelas_id = $validated['role'] === 'wali_kelas' ? ($validated['kelas_id'] ?? null) : null;
-        $user->kelas_second = null;
+        $login->name = $validated['name'];
+        $login->role = $validated['role'];
+        $login->kelas_id = $validated['role'] === 'wali_kelas' ? ($validated['kelas_id'] ?? null) : null;
+        $login->kelas_second = null;
 
         if ($validated['password']) {
-            $user->password = Hash::make($validated['password']);
+            $login->password = Hash::make($validated['password']);
         }
 
-        $user->save();
+        $login->save();
 
         return redirect()->route('admin.login.index')->with('success', 'User berhasil diperbarui');
     }
@@ -143,14 +143,14 @@ class AdminLoginController extends Controller
     /**
      * Delete user
      */
-    public function destroy(User $user)
+    public function destroy(User $login)
     {
         // Cegah penghapusan admin pertama
-        if ($user->role === 'admin' && User::where('role', 'admin')->count() <= 1) {
+        if ($login->role === 'admin' && User::where('role', 'admin')->count() <= 1) {
             return back()->with('error', 'Tidak bisa menghapus admin terakhir');
         }
 
-        $user->delete();
+        $login->delete();
 
         return redirect()->route('admin.login.index')->with('success', 'User berhasil dihapus');
     }

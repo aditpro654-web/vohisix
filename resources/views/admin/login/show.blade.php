@@ -27,7 +27,7 @@
     </div>
 
     <div class="action-group">
-        <a href="{{ route('admin.login.edit', $user->id) }}" class="btn btn-primary">Edit</a>
+        <a href="{{ route('admin.login.edit', ['login' => $user->id]) }}" class="btn btn-primary">Edit</a>
         <a href="{{ route('admin.login.index') }}" class="btn btn-secondary">Kembali</a>
     </div>
 </div>

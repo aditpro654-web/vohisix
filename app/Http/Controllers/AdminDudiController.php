@@ -108,7 +108,10 @@ class AdminDudiController extends Controller
             $validated['kuota'] = 5;
         }
         if ($this->hasDudiStatusColumn()) {
-            if (!isset($validated['status'])) {
+            if (isset($validated['status'])) {
+                $validated['status'] = strtolower(trim($validated['status']));
+            }
+            if (!isset($validated['status']) || $validated['status'] === '') {
                 $validated['status'] = 'active';
             }
         } else {
@@ -171,7 +174,10 @@ class AdminDudiController extends Controller
         }
 
         if ($this->hasDudiStatusColumn()) {
-            if (!isset($validated['status'])) {
+            if (isset($validated['status'])) {
+                $validated['status'] = strtolower(trim($validated['status']));
+            }
+            if (!isset($validated['status']) || $validated['status'] === '') {
                 $validated['status'] = $dudi->status ?? 'active';
             }
         } else {

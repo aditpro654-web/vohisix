@@ -538,7 +538,7 @@
 
             <!-- Profile Card (lebih tinggi) -->
             <div class="profile-card">
-                <div class="profile-avatar" onclick="showImagePreview('{{ $siswaFoto ?: '' }}', '{{ $siswaNama }}')">
+                <div class="profile-avatar" onclick="showImagePreview({{ json_encode($siswaFoto ?: '') }}, {{ json_encode($siswaNama) }})">
                     @if($siswaFoto)
                         <img src="{{ $siswaFoto }}" alt="Foto Siswa">
                     @else
@@ -637,11 +637,24 @@
         return `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`;
     }
 
+    function escapeHtmlAttribute(value) {
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
     function renderDocuments() {
         const container = document.getElementById('documentsContainer');
         if (!container) return;
         let html = '';
         for (const doc of documents) {
+            const safeTitle = escapeHtmlAttribute(doc.name);
+            const safeUrl = escapeHtmlAttribute(doc.imageUrl || '#');
+            const safeId = escapeHtmlAttribute(doc.id);
+
             if (doc.status === 'uploaded') {
                 html += `
                     <div class="document-item">
@@ -652,13 +665,13 @@
                             </span>
                             <span class="font-bold text-xs uppercase tracking-wider" style="color: #003056;">✓ Sudah Diunggah</span>
                         </div>
-                        <div class="uploaded-card" onclick="viewDocument('${doc.name}', '${doc.imageUrl || '#'}')">
+                        <div class="uploaded-card" onclick="viewDocument('${safeTitle}', '${safeUrl}')">
                             <div class="p-2 rounded-xl" style="background: rgba(255,255,255,0.2);">${getFileTextIcon()}</div>
                             <div class="uploaded-card-content">
                                 <p class="text-sm font-bold text-white" style="letter-spacing: 0.025em;">${doc.originalName || `${doc.id.toUpperCase()}_SCAN.pdf`}</p>
                                 <p class="click-text">Klik untuk melihat berkas</p>
                             </div>
-                            <button class="ganti-button" onclick="event.stopPropagation(); handleGanti('${doc.id}')">Ganti</button>
+                            <button class="ganti-button" onclick="event.stopPropagation(); handleGanti('${safeId}')">Ganti</button>
                         </div>
                     </div>
                 `;
@@ -671,7 +684,7 @@
                                 ${doc.name}
                             </span>
                         </div>
-                        <div class="upload-zone" onclick="handleUpload('${doc.id}')">
+                        <div class="upload-zone" onclick="handleUpload('${safeId}')">
                             <div class="mb-3" style="color: #94A3B8;">${getUploadIcon()}</div>
                             <p class="text-sm font-bold uppercase tracking-wide" style="color: #003056;">Pilih atau Seret File Berkas</p>
                             <p class="upload-subtext">Format PDF / JPG, Maks 2MB</p>
