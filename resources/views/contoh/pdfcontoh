@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Dashboard Seleksi PKL - SMK Negeri 1 Informatika</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Recharts (untuk grafik, opsional tapi tetap dimuat) -->
+    <script src="https://cdn.jsdelivr.net/npm/recharts@2.12.0/umd/Recharts.js"></script>
+    <style>
+        /* Print styling untuk A4 */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printed-pdf-sheet, #printed-pdf-sheet * {
+                visibility: visible;
+            }
+            #printed-pdf-sheet {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                margin: 0;
+                padding: 20mm;
+                box-shadow: none;
+                border: none;
+            }
+            .no-print, .no-print * {
+                display: none !important;
+            }
+        }
+        .pdf-sheet {
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        body {
+            background: #f3f7fa;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .status-lolos { background-color: #dcfce7; color: #166534; border-color: #bbf7d0; }
+        .status-tidak { background-color: #fee2e2; color: #991b1b; border-color: #fecaca; }
+        .status-menunggu { background-color: #fef3c7; color: #92400e; border-color: #fde68a; }
+        /* Sembunyikan scrollbar namun tetap bisa scroll */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="antialiased">
+
+<div id="app" class="min-h-screen flex flex-col"></div>
+
+<script>
+    // ---------- DATA SISWA (sama seperti contoh) ----------
+    let students = [
+        { id: "st-1", name: "Ahmad Rizky Pratama", nisn: "0078423101", classMajor: "XII RPL 1", companyName: "PT GoTo Gojek Tokopedia", status: "Lolos", score: 88.5, contact: "0812-3456-7890", notes: "Portofolio React Native sangat baik." },
+        { id: "st-2", name: "Siti Nurhaliza", nisn: "0089124402", classMajor: "XII RPL 1", companyName: "Google Indonesia (Kemitraan)", status: "Lolos", score: 91.0, contact: "0812-2233-4455", notes: "Juara LKS Web Technologies." },
+        { id: "st-3", name: "Budi Santoso", nisn: "0071239923", classMajor: "XII RPL 2", companyName: "PT Telekomunikasi Indonesia", status: "Tidak Lolos", score: 72.0, contact: "0856-9111-2090", notes: "Nilai di bawah KKM." },
+        { id: "st-4", name: "Fajar Ramadan", nisn: "0083321110", classMajor: "XII TKJ 1", companyName: "PT Astra Internasional", status: "Lolos", score: 84.5, contact: "0898-4444-2222", notes: "Bersertifikat MTCNA." },
+        { id: "st-5", name: "Larasati Putri", nisn: "0087799211", classMajor: "XII TKJ 1", companyName: "Biznet Networks", status: "Menunggu", score: 79.0, contact: "0877-5050-6060", notes: "Review dokumen." },
+        { id: "st-6", name: "Rian Hidayat", nisn: "0081238841", classMajor: "XII MM", companyName: "Karya Kreatif Agency", status: "Lolos", score: 86.0, contact: "0813-9090-8811", notes: "Keahlian 3D blender." },
+        { id: "st-7", name: "Dewi Lestari", nisn: "0075544123", classMajor: "XII MM", companyName: "Karya Kreatif Agency", status: "Tidak Lolos", score: 68.5, contact: "0812-7000-8000", notes: "Portofolio terbatas." },
+        { id: "st-8", name: "Muhammad Hanif", nisn: "0084421102", classMajor: "XII RPL 2", companyName: "PT Tokopedia", status: "Lolos", score: 87.2, contact: "0821-2223-2224", notes: "Database solid." },
+        { id: "st-9", name: "Zahra Aulia", nisn: "0085521409", classMajor: "XII TKJ 2", companyName: "PT Telkom", status: "Lolos", score: 83.0, contact: "0857-8899-7711", notes: "Memahami IoT." },
+        { id: "st-10", name: "Kevin Sanjaya", nisn: "0076632009", classMajor: "XII TKJ 2", companyName: "Biznet Networks", status: "Tidak Lolos", score: 71.5, contact: "0895-1122-3344", notes: "Ketidakhadiran tinggi." }
+    ];
+
+    // Konfigurasi default dokumen
+    let config = {
+        title: "Surat Keputusan Hasil Seleksi & Booking Kelolosan Praktik Kerja Lapangan (PKL)",
+        documentNo: "421.5/142-SMK/HUBIN/V/2026",
+        date: "26 Mei 2026",
+        schoolName: "SMK NEGERI 1 INFORMATIKA UTAMA",
+        headmasterName: "Dr. Eng. H. Rachmat Hidayat, M.T.",
+        nip: "19740512 200212 1 003",
+        executiveSummary: "Berdasarkan hasil seleksi administratif, portfolio teknis, serta wawancara industri dengan Dunia Usaha & Dunia Industri (DUDI) mitra kerja sama, panitia penyelenggara Praktik Kerja Lapangan menetapkan status kelolosan dan booking penempatan siswa terlampir. Siswa yang dinyatakan Lolos diwajibkan mengikuti pembekalan umum sebelum ditempatkan di industri tujuan.",
+        designTheme: "navy",
+        fontFamily: "sans",
+        showStats: true,
+        showSignature: true
+    };
+
+    // State filter
+    let filterStatus = "Semua";
+    let filterClass = "Semua Kelas";
+
+    // Fungsi helper
+    function getFilteredStudents() {
+        return students.filter(s => {
+            const matchStatus = filterStatus === "Semua" || s.status === filterStatus;
+            const matchClass = filterClass === "Semua Kelas" || s.classMajor === filterClass;
+            return matchStatus && matchClass;
+        });
+    }
+
+    function getStats() {
+        const filtered = getFilteredStudents();
+        return {
+            total: filtered.length,
+            lolos: filtered.filter(s => s.status === "Lolos").length,
+            tidak: filtered.filter(s => s.status === "Tidak Lolos").length,
+            menunggu: filtered.filter(s => s.status === "Menunggu").length
+        };
+    }
+
+    function getChartData() {
+        const filtered = getFilteredStudents();
+        const map = {};
+        filtered.forEach(s => {
+            if (!map[s.classMajor]) map[s.classMajor] = { total: 0, lolos: 0 };
+            map[s.classMajor].total++;
+            if (s.status === "Lolos") map[s.classMajor].lolos++;
+        });
+        return Object.keys(map).map(k => ({ name: k, "Siswa Pendaftar": map[k].total, "Diterima / Lolos": map[k].lolos }));
+    }
+
+    // Render utama
+    function render() {
+        const filtered = getFilteredStudents();
+        const stats = getStats();
+        const chartData = getChartData();
+        const theme = config.designTheme === "navy" ? "bg-blue-950 text-white" : (config.designTheme === "sapphire" ? "bg-indigo-950 text-white" : (config.designTheme === "midnight" ? "bg-slate-900 text-white" : "bg-sky-950 text-white"));
+        const accentHex = config.designTheme === "navy" ? "#1e3a8a" : (config.designTheme === "sapphire" ? "#31108f" : (config.designTheme === "midnight" ? "#0f172a" : "#082f49"));
+        
+        let fontClass = "font-['Plus_Jakarta_Sans',sans-serif]";
+        if (config.fontFamily === "serif") fontClass = "font-['Playfair_Display',serif]";
+        if (config.fontFamily === "mono") fontClass = "font-['JetBrains_Mono',monospace]";
+        if (config.fontFamily === "grotesk") fontClass = "font-['Space_Grotesk',sans-serif]";
+
+        // HTML untuk bagian kontrol kiri dan pratinjau kanan
+        const html = `
+            <header class="no-print bg-gradient-to-r from-blue-950 via-blue-900 to-indigo-950 text-white px-4 py-4 sticky top-0 z-50 shadow-md">
+                <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="h-10 w-10 bg-white/20 rounded-xl flex items-center justify-center text-xl">📋</div>
+                        <div><span class="font-black text-base sm:text-lg">Kpanel Booking & Seleksi PKL</span><p class="text-xs text-blue-200">Portal Manajemen Keputusan Kelolosan & Cetak Laporan</p></div>
+                    </div>
+                    <div class="flex gap-2">
+                        <a href="#" onclick="window.open(window.location.href,'_blank')" class="bg-white hover:bg-slate-100 text-blue-900 border border-slate-200 text-xs px-3.5 py-2.5 rounded-xl shadow-sm flex items-center space-x-1 font-bold">👁️ <span class="hidden sm:inline">Buka di Tab Baru</span></a>
+                        <button onclick="openPrintModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-4 py-2.5 rounded-xl shadow-md flex items-center space-x-1.5 font-bold">🖨️ <span>Cetak / Simpan PDF</span></button>
+                        <button onclick="alert('Demo: Tautan berbagi (simulasi)')" class="bg-blue-800 hover:bg-blue-700 text-white text-xs px-3.5 py-2.5 rounded-xl flex items-center space-x-1.5 font-semibold">🔗 <span>Bagikan Laporan</span></button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 flex flex-col lg:flex-row max-w-7xl mx-auto p-4 gap-6">
+                <!-- PANEL KIRI: KONTROL (no-print) -->
+                <div class="no-print lg:w-[48%] space-y-5 overflow-y-auto max-h-[calc(100vh-100px)] pr-1">
+                    <div class="bg-white border rounded-3xl p-5 shadow-sm">
+                        <h3 class="text-sm font-extrabold flex items-center gap-2 border-b pb-3 mb-4">🖨️ Wisaya Cetak & Saringan</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                            <div><label class="text-[11px] font-bold block mb-1">Status Kelolosan</label>
+                                <select id="filterStatusSelect" class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-bold">
+                                    <option ${filterStatus === "Semua" ? "selected" : ""}>Semua</option>
+                                    <option ${filterStatus === "Lolos" ? "selected" : ""}>Lolos</option>
+                                    <option ${filterStatus === "Tidak Lolos" ? "selected" : ""}>Tidak Lolos</option>
+                                    <option ${filterStatus === "Menunggu" ? "selected" : ""}>Menunggu</option>
+                                </select>
+                            </div>
+                            <div><label class="text-[11px] font-bold block mb-1">Kelas</label>
+                                <select id="filterClassSelect" class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-bold">
+                                    <option ${filterClass === "Semua Kelas" ? "selected" : ""}>Semua Kelas</option>
+                                    <option ${filterClass === "XII RPL 1" ? "selected" : ""}>XII RPL 1</option>
+                                    <option ${filterClass === "XII RPL 2" ? "selected" : ""}>XII RPL 2</option>
+                                    <option ${filterClass === "XII TKJ 1" ? "selected" : ""}>XII TKJ 1</option>
+                                    <option ${filterClass === "XII TKJ 2" ? "selected" : ""}>XII TKJ 2</option>
+                                    <option ${filterClass === "XII MM" ? "selected" : ""}>XII MM</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2 text-center mb-4">
+                            <div class="bg-white rounded-xl p-2 border"><span class="block text-[9px]">Terpilih</span><span class="text-base font-black">${stats.total}</span></div>
+                            <div class="bg-emerald-50 rounded-xl p-2 border"><span class="block text-[9px]">Lolos</span><span class="text-base font-black">${stats.lolos}</span></div>
+                            <div class="bg-rose-50 rounded-xl p-2 border"><span class="block text-[9px]">Gagal</span><span class="text-base font-black">${stats.tidak}</span></div>
+                            <div class="bg-amber-50 rounded-xl p-2 border"><span class="block text-[9px]">Nanti</span><span class="text-base font-black">${stats.menunggu}</span></div>
+                        </div>
+                        <button onclick="window.print()" class="w-full bg-emerald-600 text-white py-3 rounded-2xl font-bold text-xs mb-2">🖨️ CETAK LAPORAN SEKARANG</button>
+                        <button onclick="downloadHTML()" class="w-full bg-blue-900 text-white py-2.5 rounded-2xl font-bold text-xs">📄 Unduh File HTML (Cetak Offline)</button>
+                        <div class="mt-4 text-xs border-t pt-3">
+                            <label class="font-bold block">Kop Surat (ringkas)</label>
+                            <input type="text" id="configTitle" value="${config.title.replace(/"/g, '&quot;')}" class="w-full border rounded-lg px-2 py-1 text-xs mb-1" />
+                            <div class="flex gap-2"><input type="text" id="configDocNo" value="${config.documentNo}" class="w-1/2 border rounded-lg px-2 py-1 text-xs" /><input type="text" id="configDate" value="${config.date}" class="w-1/2 border rounded-lg px-2 py-1 text-xs" /></div>
+                            <div class="flex gap-2 mt-2"><label class="flex items-center gap-1"><input type="checkbox" id="showStatsCheck" ${config.showStats ? "checked" : ""} /> Grafik</label>
+                            <select id="themeSelect" class="border rounded-lg px-2 py-1 text-xs"><option value="navy" ${config.designTheme === "navy" ? "selected" : ""}>Navy</option><option value="sapphire" ${config.designTheme === "sapphire" ? "selected" : ""}>Sapphire</option><option value="midnight" ${config.designTheme === "midnight" ? "selected" : ""}>Midnight</option><option value="royal" ${config.designTheme === "royal" ? "selected" : ""}>Royal</option></select></div>
+                        </div>
+                    </div>
+
+                    <!-- FORM TAMBAH SISWA (opsional) -->
+                    <div class="bg-white border rounded-3xl p-5">
+                        <h4 class="text-xs font-bold border-b pb-2 mb-3">➕ Pendaftaran Siswa Baru</h4>
+                        <form id="addStudentForm" class="space-y-2 text-xs">
+                            <div class="grid grid-cols-2 gap-2"><input name="name" placeholder="Nama" class="border rounded-lg px-2 py-1" required /><input name="nisn" placeholder="NISN" class="border rounded-lg px-2 py-1" required /></div>
+                            <input name="company" placeholder="Mitra Industri" class="w-full border rounded-lg px-2 py-1" required />
+                            <div class="grid grid-cols-3 gap-2"><select name="class"><option>XII RPL 1</option><option>XII RPL 2</option><option>XII TKJ 1</option><option>XII TKJ 2</option><option>XII MM</option></select><input name="score" type="number" placeholder="Nilai" class="border rounded-lg px-2 py-1" /><select name="status"><option>Lolos</option><option>Tidak Lolos</option><option>Menunggu</option></select></div>
+                            <input name="contact" placeholder="Kontak" class="w-full border rounded-lg px-2 py-1" />
+                            <input name="notes" placeholder="Catatan" class="w-full border rounded-lg px-2 py-1" />
+                            <button type="submit" class="w-full bg-blue-900 text-white py-2 rounded-xl font-bold">Tambah Siswa</button>
+                        </form>
+                    </div>
+
+                    <!-- DAFTAR SISWA (dengan tombol ubah status & hapus) -->
+                    <div class="bg-white border rounded-3xl p-5">
+                        <div class="flex justify-between items-center border-b pb-2 mb-2"><span class="text-xs font-bold">📋 Daftar Induk Siswa</span><span class="text-[9px] text-slate-500">Klik status untuk ubah</span></div>
+                        <div id="studentList" class="max-h-96 overflow-y-auto space-y-2"></div>
+                    </div>
+                </div>
+
+                <!-- PANEL KANAN: PRATINJAU A4 -->
+                <div class="flex-1 flex flex-col items-center overflow-y-auto max-h-[calc(100vh-100px)]">
+                    <div id="printed-pdf-sheet" class="pdf-sheet bg-white rounded-xl border border-slate-300 w-[210mm] min-h-[297mm] p-[20mm] ${fontClass}">
+                        <!-- KOP SURAT -->
+                        <div class="border-b-4 border-slate-900 pb-3 flex items-start gap-4 mb-6">
+                            <div class="h-16 w-16 bg-blue-900 rounded flex items-center justify-center text-white text-2xl font-black">SMK</div>
+                            <div class="flex-1 text-center"><h3 class="text-sm font-extrabold">PEMERINTAH PROVINSI DAERAH KHUSUS JAKARTA</h3><h2 class="text-base font-extrabold text-blue-900 uppercase">DEPARTEMEN PENDIDIKAN & HUBIN</h2><h1 class="text-lg font-black">${config.schoolName}</h1><p class="text-[9px] text-gray-500">Jalan Informatika Raya No. 42B, Jakarta. Telp: (021) 8877665</p></div>
+                        </div>
+                        <div class="text-center mb-5"><h2 class="text-[13px] font-black uppercase border-b pb-1 inline-block">${config.title}</h2><div class="text-[10px] font-mono mt-1">Nomor: ${config.documentNo} | Tanggal: ${config.date}</div></div>
+                        <div class="bg-gray-50 p-3 rounded-lg text-[11px] text-justify mb-5">${config.executiveSummary}</div>
+                        
+                        ${config.showStats && chartData.length ? `
+                        <div class="mb-5 p-2 bg-gray-50 border rounded">
+                            <p class="text-[9px] font-bold text-center mb-2">Visualisasi Kelolosan per Kelas</p>
+                            <canvas id="statsChart" width="400" height="150" style="width:100%; height:150px;"></canvas>
+                        </div>` : ''}
+                        
+                        <table class="w-full text-left border border-gray-200 rounded-lg overflow-hidden text-[11px] mb-6">
+                            <thead class="${theme}"><tr><th class="px-3 py-2 text-center w-8">No</th><th class="px-3 py-2">Nama / NISN</th><th class="px-3 py-2">Kelas</th><th class="px-3 py-2">Mitra DUDI</th><th class="px-3 py-2 text-center">Status</th></tr></thead>
+                            <tbody>
+                                ${filtered.map((s, idx) => `<tr class="border-b border-gray-100"><td class="px-3 py-2 text-center font-mono">${idx+1}</td><td class="px-3 py-2"><span class="font-bold">${s.name}</span><br/><span class="text-[9px] font-mono">${s.nisn}</span></td><td class="px-3 py-2 font-semibold">${s.classMajor}</td><td class="px-3 py-2">${s.companyName}${s.notes ? `<p class="text-[9px] italic">${s.notes}</p>` : ''}</td><td class="px-3 py-2 text-center"><span class="px-2 py-0.5 rounded text-[10px] font-bold border ${s.status === "Lolos" ? "status-lolos" : s.status === "Tidak Lolos" ? "status-tidak" : "status-menunggu"}">${s.status}</span></td></tr>`).join('')}
+                                ${filtered.length === 0 ? '<tr><td colspan="5" class="text-center py-8">Tidak ada data</td></tr>' : ''}
+                            </tbody>
+                        </table>
+                        <div class="mb-6 p-3 bg-gray-50 border border-dashed rounded-lg"><p class="text-[10px] font-bold">📌 Rekomendasi & Temuan Panitia:</p><ul class="list-disc pl-4 text-[10px]"><li>Diversifikasi Perusahaan: Penempatan di PT GoTo dan Google Indonesia menunjukkan minat tinggi pada sektor rekayasa perangkat lunak.</li><li>Bimbingan Remedi khusus: Siswa yang belum dinyatakan Lolos direkomendasikan mengikuti pembekalan intensif.</li><li>Rerata Kompetensi: Nilai rata-rata kualifikasi mencapai 80.7, kesiapan teknis siswa di atas standar.</li></ul></div>
+                        ${config.showSignature ? `
+                        <div class="flex justify-between pt-6 border-t mt-8 text-[11px]">
+                            <div class="text-center w-40"><p>Mengesahkan,</p><p class="font-bold">Ketua Komite Hubin SMK</p><div class="h-12 flex items-center justify-center"><span class="text-[8px] border border-emerald-500 rotate-12 px-1">DIVERIFIKASI</span></div><p class="font-bold underline">Drs. Hendra Wijaya</p></div>
+                            <div class="text-center w-48"><p>Jakarta, ${config.date}</p><p class="font-bold">Kepala Sekolah</p><div class="h-12 flex items-center justify-center"><span class="text-[8px] border border-blue-400 rounded-full px-2">SMK NEGERI 1</span></div><p class="font-bold underline">${config.headmasterName}</p><p class="text-[9px] font-mono">NIP. ${config.nip}</p></div>
+                        </div>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('app').innerHTML = html;
+
+        // GAMBAR GRAFIK (jika ada)
+        if (config.showStats && chartData.length) {
+            const canvas = document.getElementById('statsChart');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                const labels = chartData.map(d => d.name);
+                const pendaftar = chartData.map(d => d["Siswa Pendaftar"]);
+                const lolosData = chartData.map(d => d["Diterima / Lolos"]);
+                // Sederhana: buat bar chart manual (opsional) atau biarkan kosong, tapi kita akan gambar sederhana
+                canvas.width = 400; canvas.height = 150;
+                ctx.clearRect(0, 0, 400, 150);
+                const maxVal = Math.max(...pendaftar, ...lolosData, 1);
+                const barWidth = 30;
+                const startX = 40;
+                for (let i=0; i<labels.length; i++) {
+                    const x = startX + i * 70;
+                    const h1 = (pendaftar[i] / maxVal) * 120;
+                    const h2 = (lolosData[i] / maxVal) * 120;
+                    ctx.fillStyle = "#94a3b8";
+                    ctx.fillRect(x, 140 - h1, barWidth, h1);
+                    ctx.fillStyle = accentHex;
+                    ctx.fillRect(x + barWidth + 5, 140 - h2, barWidth, h2);
+                    ctx.fillStyle = "#0f172a";
+                    ctx.font = "8px sans-serif";
+                    ctx.fillText(labels[i], x, 150);
+                }
+            }
+        }
+
+        // Binding event listener untuk filter
+        document.getElementById('filterStatusSelect')?.addEventListener('change', (e) => { filterStatus = e.target.value; render(); });
+        document.getElementById('filterClassSelect')?.addEventListener('change', (e) => { filterClass = e.target.value; render(); });
+        document.getElementById('configTitle')?.addEventListener('input', (e) => { config.title = e.target.value; render(); });
+        document.getElementById('configDocNo')?.addEventListener('input', (e) => { config.documentNo = e.target.value; render(); });
+        document.getElementById('configDate')?.addEventListener('input', (e) => { config.date = e.target.value; render(); });
+        document.getElementById('showStatsCheck')?.addEventListener('change', (e) => { config.showStats = e.target.checked; render(); });
+        document.getElementById('themeSelect')?.addEventListener('change', (e) => { config.designTheme = e.target.value; render(); });
+        
+        // Form tambah siswa
+        const form = document.getElementById('addStudentForm');
+        if (form) {
+            form.onsubmit = (e) => {
+                e.preventDefault();
+                const name = form.querySelector('[name="name"]').value;
+                const nisn = form.querySelector('[name="nisn"]').value;
+                const company = form.querySelector('[name="company"]').value;
+                if (!name || !nisn || !company) { alert("Lengkapi Nama, NISN, dan Mitra Industri"); return; }
+                const newStudent = {
+                    id: "st-" + Date.now(),
+                    name, nisn,
+                    classMajor: form.querySelector('[name="class"]').value,
+                    companyName: company,
+                    status: form.querySelector('[name="status"]').value,
+                    score: parseInt(form.querySelector('[name="score"]').value) || 80,
+                    contact: form.querySelector('[name="contact"]').value,
+                    notes: form.querySelector('[name="notes"]').value
+                };
+                students.unshift(newStudent);
+                render();
+                form.reset();
+            };
+        }
+
+        // Render daftar siswa (list dinamis)
+        const studentListDiv = document.getElementById('studentList');
+        if (studentListDiv) {
+            studentListDiv.innerHTML = students.map(s => `
+                <div class="bg-slate-50 p-2 rounded-xl flex flex-col sm:flex-row justify-between gap-2">
+                    <div><div class="font-bold text-xs">${s.name} <span class="text-[9px] font-mono">${s.nisn}</span></div><div class="text-[10px] text-slate-600">${s.companyName}</div></div>
+                    <div class="flex items-center gap-2">
+                        <div class="flex bg-slate-200 rounded-lg text-[9px]">
+                            <button onclick="updateStatus('${s.id}', 'Lolos')" class="px-2 py-0.5 rounded ${s.status==="Lolos"?"bg-white text-emerald-700":"text-slate-600"}">Lolos</button>
+                            <button onclick="updateStatus('${s.id}', 'Tidak Lolos')" class="px-2 py-0.5 rounded ${s.status==="Tidak Lolos"?"bg-white text-red-700":"text-slate-600"}">Tidak</button>
+                            <button onclick="updateStatus('${s.id}', 'Menunggu')" class="px-2 py-0.5 rounded ${s.status==="Menunggu"?"bg-white text-amber-700":"text-slate-600"}">Nanti</button>
+                        </div>
+                        <button onclick="deleteStudent('${s.id}')" class="text-red-500">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+
+    // Fungsi global untuk update status & delete
+    window.updateStatus = (id, newStatus) => {
+        const student = students.find(s => s.id === id);
+        if (student) student.status = newStatus;
+        render();
+    };
+    window.deleteStudent = (id) => {
+        if (confirm("Yakin hapus?")) {
+            students = students.filter(s => s.id !== id);
+            render();
+        }
+    };
+    window.openPrintModal = () => {
+        // Langsung panggil print setelah konfirmasi sederhana
+        if (confirm("Cetak laporan? Pastikan filter sudah sesuai.")) {
+            window.print();
+        }
+    };
+    window.downloadHTML = () => {
+        const printElem = document.getElementById("printed-pdf-sheet");
+        if (!printElem) return;
+        const htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Laporan PKL - ${config.schoolName}</title><link href="https://cdn.tailwindcss.com/3.3.5/tailwind.min.css" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display&family=JetBrains+Mono&family=Space+Grotesk&display=swap" rel="stylesheet"><style>body{padding:40px; background:#f1f5f9;} .pdf-sheet{max-width:210mm; margin:0 auto; background:white; padding:20mm; box-shadow:0 0 10px rgba(0,0,0,0.1);}</style></head><body><div class="pdf-sheet">${printElem.innerHTML}</div><script>window.onload=()=>{window.print();};<\/script></body></html>`;
+        const blob = new Blob([htmlContent], { type: "text/html" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `Laporan_PKL_${config.schoolName.replace(/\s/g, "_")}.html`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    };
+
+    // Render awal
+    render();
+</script>
+</body>
+</html>
