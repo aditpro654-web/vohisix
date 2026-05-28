@@ -462,6 +462,62 @@
     let selectedStudent = null;
     let activeTab = 'berkas';
     let filePreviewData = null;
+    let currentPage = 1;
+    const pageSize = 10;
+
+    function getPaginatedData(filteredData) {
+        const totalPages = Math.max(1, Math.ceil(filteredData.length / pageSize));
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
+        }
+        const start = (currentPage - 1) * pageSize;
+        return filteredData.slice(start, start + pageSize);
+    }
+
+    function getPaginationMarkup(totalItems) {
+        if (!totalItems) {
+            return '';
+        }
+
+        const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+        let markup = `
+            <div class="pagination-container">
+                <div class="pagination-info">Menampilkan halaman ${currentPage} dari ${totalPages} (${totalItems} data)</div>
+                <div class="pagination-links">
+        `;
+
+        if (currentPage > 1) {
+            markup += `<a href="#" data-page="${currentPage - 1}">← Sebelumnya</a>`;
+        } else {
+            markup += `<span class="disabled">← Sebelumnya</span>`;
+        }
+
+        for (let page = 1; page <= totalPages; page += 1) {
+            if (page === currentPage) {
+                markup += `<span class="active">${page}</span>`;
+            } else {
+                markup += `<a href="#" data-page="${page}">${page}</a>`;
+            }
+        }
+
+        if (currentPage < totalPages) {
+            markup += `<a href="#" data-page="${currentPage + 1}">Selanjutnya →</a>`;
+        } else {
+            markup += `<span class="disabled">Selanjutnya →</span>`;
+        }
+
+        markup += `</div></div>`;
+        return markup;
+    }
+
+    function setPage(page) {
+        currentPage = page;
+        render();
+    }
+
+    function resetPagination() {
+        currentPage = 1;
+    }
 
     function getStatusClass(status) {
         if (status === 'Diterima') return 'badge-diterima';
@@ -549,10 +605,19 @@
 
     function render() {
         const filteredData = getFilteredData();
+        const paginatedData = getPaginatedData(filteredData);
         const { formattedDate, formattedTime } = formatDate();
         const statusOptions = ['Semua Status', 'Diterima', 'Ditolak', 'Direview'];
 
         let html = `
+            <header class="wali-header">
+                <div>
+                    <h1 class="header-title">Dashboard Wali Kelas</h1>
+                    <p class="header-subtitle">Booking PKL SMKN 6 Malang • Kelas ${KELAS_WALI}</p>
+                </div>
+                <!-- header stats moved to navbar (compact recap) -->
+            </header>
+
             <main class="dashboard-card">
                 <div class="dashboard-toolbar">
                     <div class="dashboard-toolbar-left">
@@ -580,6 +645,7 @@
                                 <th>NIS</th>
                                 <th>Berkas</th>
                                 <th>Perusahaan Mitra</th>
+                                <th>Bidang Industri</th>
                                 <th style="text-align:center;">Status</th>
                                 <th style="text-align:center;">Aksi</th>
                             </tr>
@@ -590,14 +656,14 @@
         if (!filteredData.length) {
             html += `
                 <tr>
-                    <td colspan="8" style="padding: 80px 24px; text-align: center; color: #94a3b8;">
+                    <td colspan="9" style="padding: 80px 24px; text-align: center; color: #94a3b8;">
                         Data tidak ditemukan<br>
                         <small>(Total siswa di kelas: ${TOTAL_SISWA})</small>
                     </td>
                 </tr>
             `;
         } else {
-            filteredData.forEach((student, index) => {
+            paginatedData.forEach((student, index) => {
                 const badgeClass = getStatusClass(student.status_lamaran);
                 const berkasClass = getBerkasClass(student.berkas);
                 const photo = student.foto || 'https://placehold.co/100x100/003056/white?text=User';
@@ -609,10 +675,8 @@
                         <td style="font-weight:700; color:#003056;">${student.nama}</td>
                         <td style="color:#64748b; font-size:0.75rem; font-weight:700;">${student.nis}</td>
                         <td><span class="badge ${berkasClass}">${student.berkas}</span></td>
-                        <td>
-                            <div style="font-weight:700; color:#334155; font-size:0.875rem;">${student.perusahaan || '-'}</div>
-                            <div style="font-size:10px; color:#94a3b8;">${student.bidang_industri || '-'}</div>
-                        </td>
+                        <td style="font-weight:700; color:#334155; font-size:0.875rem;">${student.perusahaan || '-'}</td>
+                        <td style="font-size:0.875rem; color:#94a3b8;">${student.bidang_industri || '-'}</td>
                         <td style="text-align:center;"><span class="badge ${badgeClass}">${student.status_lamaran}</span></td>
                         <td style="text-align:center;"><button class="detail-button" data-id="${student.id}">Detail</button></td>
                     </tr>
@@ -623,6 +687,11 @@
         html += `
                         </tbody>
                     </table>
+                </div>
+                ${getPaginationMarkup(filteredData.length)}
+                <div style="background-color: #003056; color: rgba(255,255,255,0.7); padding: 16px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">
+                    <span>Kelas: ${KELAS_WALI} | Total data: ${filteredData.length} dari ${TOTAL_SISWA} siswa</span>
+                    <span>Update: ${formattedDate}, ${formattedTime}</span>
                 </div>
             </main>
         `;
@@ -710,8 +779,8 @@
         root.innerHTML = html;
 
         // Event listeners
-        document.getElementById('searchInput')?.addEventListener('input', (e) => { searchQuery = e.target.value; render(); });
-        document.getElementById('statusSelect')?.addEventListener('change', (e) => { statusFilter = e.target.value; render(); });
+        document.getElementById('searchInput')?.addEventListener('input', (e) => { searchQuery = e.target.value; resetPagination(); render(); });
+        document.getElementById('statusSelect')?.addEventListener('change', (e) => { statusFilter = e.target.value; resetPagination(); render(); });
         document.getElementById('printBtn')?.addEventListener('click', () => exportCSV());
 
         document.querySelectorAll('.detail-button').forEach(btn => {
@@ -720,6 +789,13 @@
                 selectedStudent = SISWAS.find(item => String(item.id) === String(id));
                 activeTab = 'berkas';
                 render();
+            });
+        });
+
+        document.querySelectorAll('.pagination-links a[data-page]').forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                event.preventDefault();
+                setPage(Number(btn.getAttribute('data-page')) || 1);
             });
         });
 

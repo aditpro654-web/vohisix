@@ -60,7 +60,7 @@
                 @error('kelas_id')
                     <div class="form-error">{{ $message }}</div>
                 @enderror
-                <p class="form-helper">Diperlukan untuk role Wali Kelas dan Kakonsli.</p>
+                <p class="form-helper">Diperlukan untuk role Wali Kelas saja.</p>
             </div>
 
             <div class="form-group" id="kelas_second_group">
@@ -73,7 +73,7 @@
                 @error('kelas_second')
                     <div class="form-error">{{ $message }}</div>
                 @enderror
-                <p class="form-helper">Hanya diperlukan untuk role Kakonsli.</p>
+                <p class="form-helper">Opsional jika dibutuhkan untuk pengaturan khusus.</p>
             </div>
 
             <div class="form-group" id="password_group">
@@ -184,11 +184,6 @@
                 kelasSecondGroup.style.display = 'none';
                 document.getElementById('kelas_id').required = true;
                 document.getElementById('kelas_second').required = false;
-            } else if (role === 'kakonsli') {
-                kelasIdGroup.style.display = '';
-                kelasSecondGroup.style.display = '';
-                document.getElementById('kelas_id').required = true;
-                document.getElementById('kelas_second').required = true;
             } else {
                 kelasIdGroup.style.display = 'none';
                 kelasSecondGroup.style.display = 'none';

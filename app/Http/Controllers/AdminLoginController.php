@@ -77,8 +77,9 @@ class AdminLoginController extends Controller
         $validated = $request->validated();
         $password = $validated['password'] ?? $validated['username'];
         // Normalize kelas values and protect against unexpected values
-        $kelasId = in_array($validated['kelas_id'] ?? null, ['XII SIJA 1', 'XII SIJA 2'], true) ? $validated['kelas_id'] : null;
-        $kelasSecond = in_array($validated['kelas_second'] ?? null, ['XII SIJA 1', 'XII SIJA 2'], true) ? $validated['kelas_second'] : null;
+        $kelasId = $validated['role'] === 'wali_kelas' && in_array($validated['kelas_id'] ?? null, ['XII SIJA 1', 'XII SIJA 2'], true)
+            ? $validated['kelas_id']
+            : null;
 
         try {
             User::create([
@@ -86,7 +87,7 @@ class AdminLoginController extends Controller
                 'name' => trim($validated['name']),
                 'role' => $validated['role'],
                 'kelas_id' => $kelasId,
-                'kelas_second' => $kelasSecond,
+                'kelas_second' => null,
                 'password' => Hash::make($password),
             ]);
 
@@ -121,14 +122,14 @@ class AdminLoginController extends Controller
             'name' => 'required|string|max:255',
             'role' => 'required|in:admin,siswa,wali_kelas,kakonsli',
             'password' => 'nullable|string|min:6',
-            'kelas_id' => 'nullable|required_if:role,wali_kelas,kakonsli|in:XII SIJA 1,XII SIJA 2',
-            'kelas_second' => 'nullable|required_if:role,kakonsli|in:XII SIJA 1,XII SIJA 2',
+            'kelas_id' => 'nullable|required_if:role,wali_kelas|in:XII SIJA 1,XII SIJA 2',
+            'kelas_second' => 'nullable|in:XII SIJA 1,XII SIJA 2',
         ]);
 
         $user->name = $validated['name'];
         $user->role = $validated['role'];
-        $user->kelas_id = $validated['kelas_id'] ?? null;
-        $user->kelas_second = $validated['kelas_second'] ?? null;
+        $user->kelas_id = $validated['role'] === 'wali_kelas' ? ($validated['kelas_id'] ?? null) : null;
+        $user->kelas_second = null;
 
         if ($validated['password']) {
             $user->password = Hash::make($validated['password']);

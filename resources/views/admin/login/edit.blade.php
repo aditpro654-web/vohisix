@@ -48,7 +48,7 @@
         </div>
 
         <div class="form-row">
-            <div class="form-group">
+            <div class="form-group" id="kelas_id_group">
                 <label for="kelas_id">Kelas Utama</label>
                 <select id="kelas_id" name="kelas_id">
                     <option value="">Tidak Ada</option>
@@ -58,10 +58,10 @@
                 @error('kelas_id')
                     <div class="form-error">{{ $message }}</div>
                 @enderror
-                <p class="form-helper">Diperlukan untuk role Wali Kelas dan Kakonsli.</p>
+                <p class="form-helper">Diperlukan untuk role Wali Kelas saja.</p>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" id="kelas_second_group">
                 <label for="kelas_second">Kelas Kedua</label>
                 <select id="kelas_second" name="kelas_second">
                     <option value="">Tidak Ada</option>
@@ -71,7 +71,7 @@
                 @error('kelas_second')
                     <div class="form-error">{{ $message }}</div>
                 @enderror
-                <p class="form-helper">Hanya diperlukan untuk role Kakonsli.</p>
+                <p class="form-helper">Opsional jika diperlukan untuk pengaturan khusus.</p>
             </div>
         </div>
 
@@ -89,4 +89,28 @@
         </div>
     </form>
 </div>
+
+@section('scripts')
+<script>
+    function updateRoleFields() {
+        const role = document.getElementById('role').value;
+        const kelasIdGroup = document.getElementById('kelas_id_group');
+        const kelasSecondGroup = document.getElementById('kelas_second_group');
+
+        if (role === 'wali_kelas') {
+            kelasIdGroup.style.display = '';
+            kelasSecondGroup.style.display = 'none';
+            document.getElementById('kelas_id').required = true;
+            document.getElementById('kelas_second').required = false;
+        } else {
+            kelasIdGroup.style.display = 'none';
+            kelasSecondGroup.style.display = 'none';
+            document.getElementById('kelas_id').required = false;
+            document.getElementById('kelas_second').required = false;
+        }
+    }
+
+    document.getElementById('role').addEventListener('change', updateRoleFields);
+    document.addEventListener('DOMContentLoaded', updateRoleFields);
+</script>
 @endsection

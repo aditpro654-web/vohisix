@@ -75,7 +75,7 @@
         </table>
     </div>
 
-    @if($users->hasPages())
+    @if($users->total() > 0)
         <div class="pagination-container">
             <div class="pagination-info">
                 Menampilkan {{ $users->firstItem() ?? 0 }} - {{ $users->lastItem() ?? 0 }} dari {{ $users->total() }} data

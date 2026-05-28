@@ -467,7 +467,7 @@
             </div>
         @endif
 
-        @if($dudis->hasPages())
+        @if($dudis->total() > 0)
             <div class="pagination-container">
                 <div class="pagination-info">
                     Menampilkan {{ $dudis->firstItem() ?? 0 }} - {{ $dudis->lastItem() ?? 0 }} dari {{ $dudis->total() }} data

@@ -31,11 +31,11 @@ class AdminLoginStoreRequest extends FormRequest
                 'min:6',
             ],
             'kelas_id' => [
-                Rule::requiredIf(fn () => in_array($this->input('role'), ['wali_kelas', 'kakonsli'], true)),
+                Rule::requiredIf(fn () => $this->input('role') === 'wali_kelas'),
                 Rule::in(['XII SIJA 1', 'XII SIJA 2']),
             ],
             'kelas_second' => [
-                Rule::requiredIf(fn () => $this->input('role') === 'kakonsli'),
+                Rule::nullable(),
                 Rule::in(['XII SIJA 1', 'XII SIJA 2']),
             ],
         ];
@@ -51,8 +51,7 @@ class AdminLoginStoreRequest extends FormRequest
             'role.required' => 'Role harus dipilih.',
             'password.required_if' => 'Password diperlukan untuk role selain siswa.',
             'password.min' => 'Password minimal 6 karakter.',
-            'kelas_id.required_if' => 'Kelas Utama diperlukan untuk Wali Kelas atau Kakonsli.',
-            'kelas_second.required_if' => 'Kelas Kedua diperlukan untuk Kakonsli.',
+            'kelas_id.required_if' => 'Kelas Utama diperlukan untuk role Wali Kelas.',
         ];
     }
 }

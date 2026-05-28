@@ -476,7 +476,7 @@
             @endforelse
         </div>
 
-        @if($bookings->hasPages())
+        @if($bookings->total() > 0)
             <div class="pagination-container">
                 <div class="pagination-info">
                     Menampilkan {{ $bookings->firstItem() ?? 0 }} - {{ $bookings->lastItem() ?? 0 }} dari {{ $bookings->total() }} data
