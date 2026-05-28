@@ -32,7 +32,7 @@ class PdfExportController extends Controller
         ];
 
         if (class_exists(Pdf::class)) {
-            $pdf = Pdf::loadView('reports.siswa_report', $data)
+            $pdf = Pdf::loadView('contoh.pdfcontoh_pdf', $data)
                 ->setPaper('a4', 'portrait')
                 ->setOption('dpi', 150)
                 ->setOption('isRemoteEnabled', true);
@@ -44,7 +44,7 @@ class PdfExportController extends Controller
             return $pdf->stream('laporan_siswa_' . now()->format('Ymd_His') . '.pdf');
         }
 
-        return view('reports.siswa_report', $data);
+        return view('contoh.pdfcontoh', $data);
     }
 
     public function siswaPreview(Request $request)
@@ -53,7 +53,7 @@ class PdfExportController extends Controller
 
         $pdfRouteName = str_replace('.preview', '', $request->route()->getName());
 
-        return view('reports.siswa_preview', [
+        return view('contoh.pdfcontoh', [
             'title' => 'Preview Laporan Siswa PKL',
             'generated_at' => now(),
             'filters' => [

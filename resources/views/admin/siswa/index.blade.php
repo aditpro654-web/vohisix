@@ -25,11 +25,43 @@
             </select>
             <!-- live search: removed submit button -->
             <a href="{{ route('admin.siswa.export', request()->query()) }}" class="btn btn-secondary">Export CSV</a>
-            <a href="{{ route('admin.siswa.export.pdf.preview', request()->query()) }}" class="btn btn-secondary" target="_blank" rel="noopener">Preview PDF</a>
-            <a href="{{ route('admin.siswa.export.pdf.preview', array_merge(request()->query(), ['auto_download' => 1])) }}" class="btn btn-secondary" target="_blank" rel="noopener">Preview + Unduh Otomatis</a>
-            <a href="{{ route('admin.siswa.export.pdf', array_merge(request()->query(), ['download' => 1])) }}" class="btn btn-secondary" target="_blank" rel="noopener">Unduh PDF</a>
+            <button type="button" class="btn btn-secondary" id="openPdfOptionsBtn">Cetak PDF</button>
             <a href="{{ route('admin.siswa.create') }}" class="btn btn-primary">+ Tambah Siswa Baru</a>
         </form>
+
+        <div id="pdfOptionsModal" class="modal-backdrop" style="display:none;">
+            <div class="modal-container modal-scale-in" style="max-width: 520px;">
+                <div class="modal-header">
+                    <div>
+                        <h2 style="margin:0; font-size:1.25rem;">Cetak PDF Siswa</h2>
+                        <p style="margin:8px 0 0; color:#64748b; font-size:0.95rem;">Pilih filter status atau kelas sebelum ke preview/cetak PDF.</p>
+                    </div>
+                    <button type="button" id="closePdfOptionsBtn" class="modal-close">✕</button>
+                </div>
+                <div class="modal-body" style="background:#ffffff; padding:24px;">
+                    <label for="pdfStatusSelect" style="font-weight:700; display:block; margin-bottom:8px;">Filter Status</label>
+                    <select id="pdfStatusSelect" style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid #d1d5db; margin-bottom:18px;">
+                        <option value="" {{ request('status') === null ? 'selected' : '' }}>Semua Status</option>
+                        <option value="Direview" {{ request('status') === 'Direview' ? 'selected' : '' }}>Direview</option>
+                        <option value="Diterima" {{ request('status') === 'Diterima' ? 'selected' : '' }}>Diterima</option>
+                        <option value="Ditolak" {{ request('status') === 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
+                    </select>
+
+                    <label for="pdfKelasSelect" style="font-weight:700; display:block; margin-bottom:8px;">Filter Kelas</label>
+                    <select id="pdfKelasSelect" style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid #d1d5db; margin-bottom:24px;">
+                        <option value="" {{ request('kelas') === null ? 'selected' : '' }}>Semua Kelas</option>
+                        @foreach($allKelas as $k)
+                            <option value="{{ $k }}" {{ request('kelas') === $k ? 'selected' : '' }}>{{ $k }}</option>
+                        @endforeach
+                    </select>
+
+                    <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:flex-end;">
+                        <button type="button" class="btn btn-secondary" id="previewPdfFromModalBtn">Tampilkan Preview</button>
+                        <button type="button" class="btn btn-primary" id="downloadPdfFromModalBtn">Cetak PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="table-card" id="tableAnchor">
@@ -285,6 +317,59 @@
         document.getElementById('docModal').style.display = 'none';
     }
     window.viewDocument = viewDocument;
+
+    const openPdfOptionsBtn = document.getElementById('openPdfOptionsBtn');
+    const pdfOptionsModal = document.getElementById('pdfOptionsModal');
+    const closePdfOptionsBtn = document.getElementById('closePdfOptionsBtn');
+    const previewPdfFromModalBtn = document.getElementById('previewPdfFromModalBtn');
+    const downloadPdfFromModalBtn = document.getElementById('downloadPdfFromModalBtn');
+
+    const previewPdfBaseUrl = '{{ route('admin.siswa.export.pdf.preview') }}';
+    const downloadPdfBaseUrl = '{{ route('admin.siswa.export.pdf') }}';
+
+    function buildPdfUrl(baseUrl, download = false) {
+        const status = document.getElementById('pdfStatusSelect').value;
+        const kelas = document.getElementById('pdfKelasSelect').value;
+        const url = new URL(baseUrl, window.location.origin);
+
+        if (status) {
+            url.searchParams.set('status', status);
+        }
+        if (kelas) {
+            url.searchParams.set('kelas', kelas);
+        }
+        if (download) {
+            url.searchParams.set('download', '1');
+        }
+
+        return url.toString();
+    }
+
+    if (openPdfOptionsBtn && pdfOptionsModal) {
+        openPdfOptionsBtn.addEventListener('click', function() {
+            pdfOptionsModal.style.display = 'flex';
+        });
+    }
+
+    if (closePdfOptionsBtn && pdfOptionsModal) {
+        closePdfOptionsBtn.addEventListener('click', function() {
+            pdfOptionsModal.style.display = 'none';
+        });
+    }
+
+    if (previewPdfFromModalBtn) {
+        previewPdfFromModalBtn.addEventListener('click', function() {
+            const previewUrl = buildPdfUrl(previewPdfBaseUrl);
+            window.open(previewUrl, '_blank', 'noopener');
+        });
+    }
+
+    if (downloadPdfFromModalBtn) {
+        downloadPdfFromModalBtn.addEventListener('click', function() {
+            const downloadUrl = buildPdfUrl(downloadPdfBaseUrl, true);
+            window.open(downloadUrl, '_blank', 'noopener');
+        });
+    }
 </script>
 @endsection
 
